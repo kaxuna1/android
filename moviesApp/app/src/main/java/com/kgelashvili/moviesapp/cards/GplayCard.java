@@ -28,6 +28,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kgelashvili.moviesapp.R;
+import com.kgelashvili.moviesapp.model.Movie;
+
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardHeader;
 import it.gmariotti.cardslib.library.internal.CardThumbnail;
@@ -39,6 +41,7 @@ import it.gmariotti.cardslib.library.internal.base.BaseCard;
  * @author Gabriele Mariotti (gabri.mariotti@gmail.com)
  */
 public class GplayCard extends Card {
+    Movie movie;
 
     public GplayCard(Context context) {
         super(context, R.layout.carddemo_gplay_inner_content);
@@ -49,11 +52,16 @@ public class GplayCard extends Card {
         super(context, innerLayout);
         init();
     }
+    public GplayCard(Context context,Movie movie) {
+        super(context, R.layout.carddemo_gplay_inner_content);
+        this.movie=movie;
+        init();
+    }
 
     private void init() {
         CardHeader header = new CardHeader(getContext());
         header.setButtonOverflowVisible(true);
-        header.setTitle("Google Maps");
+        header.setTitle(movie.getTitle_en());
         header.setPopupMenu(R.menu.popupmain, new CardHeader.OnClickCardHeaderPopupMenuListener() {
             @Override
             public void onMenuItemClick(BaseCard card, MenuItem item) {
@@ -66,6 +74,7 @@ public class GplayCard extends Card {
         GoogleNowBirthThumb thumbnail = new GoogleNowBirthThumb(getContext());
         thumbnail.setDrawableResource(R.drawable.carddemo_ic_gmaps_large);
         addCardThumbnail(thumbnail);
+
     }
 
     @Override

@@ -16,7 +16,7 @@
   limitations under the License.
   -->
 
-<it.gmariotti.cardslib.demo.ui.widget.CollectionView
+<com.kgelashvili.moviesapp.ui.widget.CollectionView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:iosched="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -28,4 +28,4 @@
     android:layout_marginEnd="@dimen/menu_hz_margin"
     android:clipToPadding="false"
     iosched:internalPadding="4dp"
-    tools:context="it.gmariotti.cardslib.demo.fragment.NativeDashFragment" />
+    tools:context="com.kgelashvili.moviesapp.fragment.NativeDashFragment" />

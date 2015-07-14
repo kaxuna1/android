@@ -33,7 +33,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <it.gmariotti.cardslib.demo.stock.StockListLayout
+    <com.kgelashvili.moviesapp.stock.StockListLayout
         android:id="@+id/carddemo_googlenow_main_inner_list"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="@dimen/card_header_simple_title_margin_left"

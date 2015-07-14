@@ -16,7 +16,7 @@
   limitations under the License.
   -->
 
-<it.gmariotti.cardslib.demo.ui.widget.HashtagView
+<com.kgelashvili.moviesapp.ui.widget.HashtagView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/hashtag_height"
@@ -43,4 +43,4 @@
         android:background="?selectableItemBackgroundBorderless"
         android:visibility="gone" />
 
-</it.gmariotti.cardslib.demo.ui.widget.HashtagView>
+</com.kgelashvili.moviesapp.ui.widget.HashtagView>

@@ -14,7 +14,7 @@
     <string name="title_activity_full_screen_movie">FullScreenMovie</string>
 
     <!--Authority -->
-    <string name="config_authority">it.gmariotti.cardslib.demo.provider</string>
+    <string name="config_authority">com.kgelashvili.moviesapp.provider</string>
 
     <!-- About -->
     <string name="title_about"><![CDATA[
@@ -26,7 +26,7 @@
         Author: <b><a href="https://plus.google.com/114432517923423045208">Gabriele Mariotti</a></b><br>
         <br>
         Get: <a href="https://github.com/gabrielemariotti/cardslib">Source and doc</a><br>
-        Get on Google Play: <a href="https://play.google.com/store/apps/details?id=it.gmariotti.cardslib.demo.extras">Cardslib Demo Extras</a><br>
+        Get on Google Play: <a href="https://play.google.com/store/apps/details?id=com.kgelashvili.moviesapp.extras">Cardslib Demo Extras</a><br>
         <br><br>
         <b>Many thanks for code and ideas to:</b><br>
         <b><a href="https://github.com/romannurik/Android-SwipeToDismiss">SwipeToDismiss</a></b><br>
@@ -306,6 +306,7 @@
     <string name="guidelines_text"><![CDATA[ Before using this library I recommend that you check out the new Google Material Guidelines.</br> <b>Don\'t over cardify your UI</b>.
     <br><br>
     You can find all the Material Design Guidelines on the usage of cards <a href="http://www.google.com/design/spec/components/cards.html">here</a>]]></string>
+    <string name="title_activity_settings">settingsActivity</string>
 
 
 </resources>

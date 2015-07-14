@@ -123,6 +123,7 @@ public class CardExpandFragment extends MaterialV1Fragment {
         CardExpand expand = new CardExpand(getActivity());
         //Set inner title in Expand Area
         expand.setTitle(getString(R.string.demo_expand_customtitle3));
+
         card.addCardExpand(expand);
 
         //Set card in the cardView
