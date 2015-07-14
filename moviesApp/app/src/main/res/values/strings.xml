@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">moviesApp</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_movie_page">MoviePageActivity</string>
+
+    <string name="title_activity_movie_full_scrin">MovieFullScrin</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <string name="title_activity_fullscreen">FullscreenActivity</string>
+
+    <string name="title_activity_full_screen_movie">FullScreenMovie</string>
+</resources>

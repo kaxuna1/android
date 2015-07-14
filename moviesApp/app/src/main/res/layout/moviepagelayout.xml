@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="fill_parent" >
+    <VideoView android:id="@+id/myvideoview"
+        android:layout_width="fill_parent"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_height="200dp">
+    </VideoView>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/myvideoview"
+        android:id="@+id/relativeLayout">
+
+        <ListView
+            android:layout_width="68dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/listView"
+            android:layout_weight="0.93"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@+id/tableLayout"
+            android:layout_below="@+id/downloadButton" />
+
+        <TableLayout
+            android:paddingTop="15dp"
+            android:layout_width="192dp"
+            android:layout_height="50dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:id="@+id/tableLayout">
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="20dp"
+                    android:id="@+id/imdbImg"
+                    android:layout_column="1"
+                    android:src="@drawable/imdb" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="imdbText"
+                    android:id="@+id/imdbRating"
+                    android:layout_column="3"
+                    android:layout_below="@+id/tableLayout2"/>
+            </TableRow>
+
+
+
+
+
+        </TableLayout>
+        <TableLayout
+            android:paddingTop="5dp"
+            android:layout_width="192dp"
+            android:layout_height="50dp"
+            android:id="@+id/tableLayout2"
+            android:layout_below="@+id/tableLayout"
+            android:layout_toEndOf="@+id/listView">
+
+
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="თარიღი:"
+                    android:id="@+id/textView"
+                    android:layout_column="1" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Medium Text"
+                    android:id="@+id/movieDate"
+                    android:layout_column="3" />
+            </TableRow>
+
+
+
+        </TableLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/tableLayout2"
+            android:layout_toEndOf="@+id/listView">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="შინაარსი"
+                android:id="@+id/textView2"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Small Text"
+                android:id="@+id/descriptionTxt"
+                android:layout_below="@+id/textView2"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true" />
+        </RelativeLayout>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="მთელ ეკრანზე"
+            android:id="@+id/fullScreenBtn"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@+id/tableLayout" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ენები"
+            android:id="@+id/langBtn"
+            android:layout_below="@+id/fullScreenBtn"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@+id/tableLayout" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="გადმოწერა"
+            android:id="@+id/downloadButton"
+            android:layout_below="@+id/langBtn"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@+id/tableLayout2" />
+
+    </RelativeLayout>
+
+</RelativeLayout>
