@@ -12,4 +12,18 @@
     <declare-styleable name="ThemeLPreview">
         <attr name="actionBarIconColor" format="color" />
     </declare-styleable>
+    <declare-styleable name="BaseTheme">
+        <attr name="actionBarInsetStart" format="dimension" />
+        <attr name="popupItemBackground" format="dimension" />
+        <attr name="actionBarOverlayTopOffset" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="CollectionView">
+        <attr name="internalPadding" format="dimension" />
+        <attr name="contentTopClearance" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="ScrimInsetsView">
+        <attr name="insetForeground" format="reference|color" />
+    </declare-styleable>
 </resources>
