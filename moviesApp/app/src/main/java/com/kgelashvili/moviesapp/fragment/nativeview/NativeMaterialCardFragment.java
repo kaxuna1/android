@@ -170,7 +170,6 @@ public class NativeMaterialCardFragment extends BaseMaterialFragment {
                 Toast.makeText(getActivity()," Click on ActionArea ",Toast.LENGTH_SHORT).show();
             }
         });
-
         //Set card in the CardViewNative
         CardViewNative cardView = (CardViewNative) getActivity().findViewById(R.id.carddemo_largeimage);
         cardView.setCard(card);

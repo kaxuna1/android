@@ -64,6 +64,7 @@
                                 android:layout_height="wrap_content"
                                 android:paddingLeft="@dimen/carddemo_list_padding"
                                 android:paddingRight="@dimen/carddemo_list_padding"
+                                android:layout_below="@+id/searchBox"
                                 style="@style/native_list_external"
                                 card:list_card_layout_resourceID="@layout/carddemo_native_list_cursor_layout"
                                 android:id="@+id/carddemo_list_cursor2"/>

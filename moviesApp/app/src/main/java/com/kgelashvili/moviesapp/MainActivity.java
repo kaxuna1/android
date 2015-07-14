@@ -30,6 +30,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kgelashvili.moviesapp.Classes.MovieServices;
+import com.kgelashvili.moviesapp.cards.CustomExpandCard;
+import com.kgelashvili.moviesapp.cards.CustomHeaderInnerCard;
 import com.kgelashvili.moviesapp.cards.CustomThumbCard;
 import com.kgelashvili.moviesapp.cards.GplayCard;
 import com.kgelashvili.moviesapp.cards.SuggestedCard;
@@ -47,7 +49,9 @@ import it.gmariotti.cardslib.library.cards.actions.IconSupplementalAction;
 import it.gmariotti.cardslib.library.cards.actions.TextSupplementalAction;
 import it.gmariotti.cardslib.library.cards.material.MaterialLargeImageCard;
 import it.gmariotti.cardslib.library.internal.Card;
+import it.gmariotti.cardslib.library.internal.CardArrayAdapter;
 import it.gmariotti.cardslib.library.internal.CardCursorAdapter;
+import it.gmariotti.cardslib.library.internal.CardExpand;
 import it.gmariotti.cardslib.library.internal.CardHeader;
 import it.gmariotti.cardslib.library.internal.CardThumbnail;
 import it.gmariotti.cardslib.library.internal.base.BaseCard;
@@ -76,10 +80,10 @@ public class MainActivity extends Activity {
     private static String TAG = "MainActivity";
 
 
-
+    ArrayList<Card> cards=new ArrayList<Card>();
 
     CardListView mListView;
-
+    CardArrayAdapter adapter2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,10 +112,10 @@ public class MainActivity extends Activity {
         tabSpec.setContent(R.id.tab2);
         tabSpec.setIndicator("ფავორიტები");
         tabHost.addTab(tabSpec);
-
+        adapter2=new CardArrayAdapter(MainActivity.this,cards);
 
         final getMovies getmovies = new getMovies();
-        adapter = new MovieListAdapter();
+        //adapter = new MovieListAdapter();
 
 
         new Thread(new Runnable() {
@@ -133,10 +137,10 @@ public class MainActivity extends Activity {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 keyWord = ((EditText) findViewById(R.id.searchBox)).getText().toString().replace(" ", "%20");
-                movies.clear();
-                adapter.clear();
+                cards.clear();
+                adapter2.clear();
                 currentLoaded = 0;
-                adapter.notifyDataSetChanged();
+                adapter2.notifyDataSetChanged();
 
 
             }
@@ -146,9 +150,10 @@ public class MainActivity extends Activity {
 
             }
         });
+
         mListView = (CardListView) findViewById(R.id.carddemo_list_cursor2);
         if (mListView != null) {
-            mListView.setAdapter(adapter);
+            mListView.setAdapter(adapter2);
         }
 
 
@@ -175,8 +180,8 @@ public class MainActivity extends Activity {
                 i.putExtra("time", 0);
                 startActivity(i);
             }
-        });
-        moviesListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+        });*/
+        mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
 
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -197,7 +202,7 @@ public class MainActivity extends Activity {
                     }).start();
                 }
             }
-        });*/
+        });
         mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
 
             @Override
@@ -224,9 +229,78 @@ public class MainActivity extends Activity {
 
     }
 
-    public void addMovieToLoadidData(Movie movie) {
+    public void addMovieToLoadidData(final Movie movie) {
 
-        adapter.add(movie);
+        //adapter.add(movie);
+
+
+        Card card = new Card(MainActivity.this);
+
+        //Create a CardHeader
+        CustomHeaderInnerCard header = new CustomHeaderInnerCard(MainActivity.this,
+                movie.getTitle_en(),movie.getRelease_date());
+
+        //Set the header title
+        header.setTitle(movie.getTitle_en());
+
+        card.addCardHeader(header);
+
+        header.setButtonExpandVisible(true);
+
+        card.addCardHeader(header);
+
+        CardExpand expand = new CardExpand(MainActivity.this);
+
+        expand.setTitle(movie.getDescription());
+
+        card.addCardExpand(expand);
+
+        //Create thumbnail
+        //CustomThumbCard thumb = new CustomThumbCard(MainActivity.this);
+
+        CardThumbnail thumbnail=new CardThumbnail(MainActivity.this);
+
+        thumbnail.setUrlResource(movie.getPoster());
+
+        //Set URL resource
+        //thumb.setUrlResource(movie.getPoster());
+
+
+        //Error Resource ID
+        thumbnail.setErrorResource(R.drawable.ic_error_loadingorangesmall);
+
+        //Add thumbnail to a card
+        card.addCardThumbnail(thumbnail);
+
+
+
+        //Set card in the cardView
+
+
+        //Set card in the cardVie
+
+        card.setOnClickListener(new Card.OnCardClickListener() {
+            @Override
+            public void onClick(Card card, View view) {
+                Movie selectedMovie = movie;
+
+                Intent i = new Intent(MainActivity.this, MoviePageActivity.class);
+                i.putExtra("movieId", selectedMovie.getId());
+                i.putExtra("description", selectedMovie.getDescription());
+                i.putExtra("title", selectedMovie.getTitle_en());
+                i.putExtra("date", selectedMovie.getRelease_date());
+                i.putExtra("duration", selectedMovie.getDuration());
+                i.putExtra("rating", selectedMovie.getImdb());
+                i.putExtra("imdb", selectedMovie.getImdb_id());
+                i.putExtra("lang", selectedMovie.getLang());
+                i.putExtra("time", 0);
+                startActivity(i);
+            }
+        });
+        adapter2.add(card);
+
+
+
     }
 
     private class MovieListAdapter extends ArrayAdapter<Movie> {

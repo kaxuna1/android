@@ -36,21 +36,26 @@ import it.gmariotti.cardslib.library.internal.CardHeader;
  */
 public class CustomHeaderInnerCard extends CardHeader {
 
+    String text1="text1",text2="text2";
     public CustomHeaderInnerCard(Context context) {
         super(context, R.layout.carddemo_example_inner_header);
     }
-
+    public CustomHeaderInnerCard(Context context,String text1,String text2) {
+        super(context, R.layout.carddemo_example_inner_header);
+        this.text1=text1;
+        this.text2=text2;
+    }
     @Override
     public void setupInnerViewElements(ViewGroup parent, View view) {
 
         if (view != null) {
             TextView t1 = (TextView) view.findViewById(R.id.text_example1);
             if (t1 != null)
-                t1.setText(getContext().getString(R.string.demo_header_exampletitle1));
+                t1.setText(text1);
 
             TextView t2 = (TextView) view.findViewById(R.id.text_example2);
             if (t2 != null)
-                t2.setText(getContext().getString(R.string.demo_header_exampletitle2));
+                t2.setText(text2);
         }
     }
 }
