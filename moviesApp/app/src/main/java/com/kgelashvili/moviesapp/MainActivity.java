@@ -19,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -29,7 +30,10 @@ import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.kgelashvili.moviesapp.Classes.CustomHeaderMainMovieItem;
+import com.kgelashvili.moviesapp.Classes.FloatingActionButton;
 import com.kgelashvili.moviesapp.Classes.MovieServices;
+import com.kgelashvili.moviesapp.Classes.dbHelper;
 import com.kgelashvili.moviesapp.cards.CustomExpandCard;
 import com.kgelashvili.moviesapp.cards.CustomHeaderInnerCard;
 import com.kgelashvili.moviesapp.cards.CustomThumbCard;
@@ -67,6 +71,7 @@ public class MainActivity extends Activity {
     ArrayList<Movie> movies = new ArrayList<Movie>();
     boolean loadingMore = false;
     String keyWord = "";
+    dbHelper dbHelper2=new dbHelper(MainActivity.this);
 
 
     private ListView mDrawerList;
@@ -81,9 +86,16 @@ public class MainActivity extends Activity {
 
 
     ArrayList<Card> cards=new ArrayList<Card>();
+    ArrayList<Card> cardsFav=new ArrayList<Card>();
 
     CardListView mListView;
+    CardListView mListView2;
     CardArrayAdapter adapter2;
+    CardArrayAdapter adapter3;
+
+
+    final getMovies getmovies = new getMovies();
+    final getMoviesFav getmoviesFav = new getMoviesFav();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,7 +113,7 @@ public class MainActivity extends Activity {
 
         mDrawerToggle = new CustomActionBarDrawerToggle(this, mDrawer);
         mDrawer.setDrawerListener(mDrawerToggle);
-        TabHost tabHost = (TabHost) findViewById(R.id.tabHost);
+        final TabHost tabHost = (TabHost) findViewById(R.id.tabHost);
         tabHost.setup();
         TabHost.TabSpec tabSpec = tabHost.newTabSpec("list");
         tabSpec.setContent(R.id.tab1);
@@ -112,9 +124,33 @@ public class MainActivity extends Activity {
         tabSpec.setContent(R.id.tab2);
         tabSpec.setIndicator("ფავორიტები");
         tabHost.addTab(tabSpec);
+
+        FloatingActionButton mFab = new FloatingActionButton.Builder(this)
+                .withColor(getResources().getColor(R.color.primary))
+                .withDrawable(getResources().getDrawable(R.drawable.action_search))
+                .withSize(72)
+                .withMargins(0, 0, 16, 16)
+                .create();
+        mFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((EditText)findViewById(R.id.searchBox)).requestFocus();
+               tabHost.setCurrentTab(0);
+                final EditText k=(EditText) findViewById(R.id.searchBox);
+                k.post(new Runnable() {
+                    public void run() {
+                        k.requestFocusFromTouch();
+                        InputMethodManager lManager = (InputMethodManager)MainActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
+                        lManager.showSoftInput(k, 0);
+                    }
+                });
+            }
+        });
+        adapter3=new CardArrayAdapter(MainActivity.this,cardsFav);
         adapter2=new CardArrayAdapter(MainActivity.this,cards);
 
-        final getMovies getmovies = new getMovies();
+
+
         //adapter = new MovieListAdapter();
 
 
@@ -123,6 +159,7 @@ public class MainActivity extends Activity {
             public void run() {
                 loadingMore = true;
                 getmovies.doInBackground("" + currentLoaded);
+                getmoviesFav.doInBackground("");
 
             }
         })
@@ -141,8 +178,6 @@ public class MainActivity extends Activity {
                 adapter2.clear();
                 currentLoaded = 0;
                 adapter2.notifyDataSetChanged();
-
-
             }
 
             @Override
@@ -152,9 +187,14 @@ public class MainActivity extends Activity {
         });
 
         mListView = (CardListView) findViewById(R.id.carddemo_list_cursor2);
+        mListView2 = (CardListView) findViewById(R.id.carddemo_list_cursor3);
         if (mListView != null) {
             mListView.setAdapter(adapter2);
         }
+        if (mListView2 != null) {
+            mListView2.setAdapter(adapter3);
+        }
+
 
 
 
@@ -237,23 +277,99 @@ public class MainActivity extends Activity {
         Card card = new Card(MainActivity.this);
 
         //Create a CardHeader
-        CustomHeaderInnerCard header = new CustomHeaderInnerCard(MainActivity.this,
-                movie.getTitle_en(),movie.getRelease_date());
+        CustomHeaderMainMovieItem header = new CustomHeaderMainMovieItem(MainActivity.this,
+                movie.getTitle_en(),movie.getRelease_date(),movie.getDescription().length()>50?movie.getDescription().substring(0,49):movie.getDescription());
 
         //Set the header title
         header.setTitle(movie.getTitle_en());
 
         card.addCardHeader(header);
 
-        header.setButtonExpandVisible(true);
+        header.setOtherButtonVisible(true);
 
-        card.addCardHeader(header);
+        //Add a callback
+        header.setOtherButtonClickListener(new CardHeader.OnClickCardHeaderOtherButtonListener() {
+            @Override
+            public void onButtonItemClick(Card card, View view) {
+                Toast.makeText(MainActivity.this, "დაემატა ფავორიტებში", Toast.LENGTH_LONG).show();
+                dbHelper2.createMovie(movie);
+                Card card2 = new Card(MainActivity.this);
 
-        CardExpand expand = new CardExpand(MainActivity.this);
+                //Create a CardHeader
+                CustomHeaderMainMovieItem header2 = new CustomHeaderMainMovieItem(MainActivity.this,
+                        movie.getTitle_en(), movie.getRelease_date(), movie.getDescription().length() > 50 ? movie.getDescription().substring(0, 49) : movie.getDescription());
 
-        expand.setTitle(movie.getDescription());
+                //Set the header title
+                header2.setTitle(movie.getTitle_en());
 
-        card.addCardExpand(expand);
+                card2.addCardHeader(header2);
+
+                header2.setOtherButtonVisible(true);
+                header2.setOtherButtonClickListener(new CardHeader.OnClickCardHeaderOtherButtonListener() {
+                    @Override
+                    public void onButtonItemClick(Card card, View view) {
+                        Toast.makeText(MainActivity.this, "დაემატა ფავორიტებში", Toast.LENGTH_LONG).show();
+                        dbHelper2.deleteMovie(movie);
+                        adapter3.remove(card);
+                        adapter3.notifyDataSetChanged();
+                    }
+                });
+
+                header2.setOtherButtonDrawable(R.drawable.card_menu_button_other_dismiss);
+
+
+                //Create thumbnail
+                //CustomThumbCard thumb = new CustomThumbCard(MainActivity.this);
+
+                CardThumbnail thumbnail2 = new CardThumbnail(MainActivity.this);
+
+                thumbnail2.setUrlResource(movie.getPoster());
+
+                //Set URL resource
+                //thumb.setUrlResource(movie.getPoster());
+
+
+                //Error Resource ID
+                thumbnail2.setErrorResource(R.drawable.ic_error_loadingorangesmall);
+
+                //Add thumbnail to a card
+                card2.addCardThumbnail(thumbnail2);
+
+
+                //Set card in the cardView
+
+
+                //Set card in the cardVie
+
+                card2.setOnClickListener(new Card.OnCardClickListener() {
+                    @Override
+                    public void onClick(Card card, View view) {
+                        Movie selectedMovie = movie;
+
+                        Intent i = new Intent(MainActivity.this, MoviePageActivity.class);
+                        i.putExtra("movieId", selectedMovie.getId());
+                        i.putExtra("description", selectedMovie.getDescription());
+                        i.putExtra("title", selectedMovie.getTitle_en());
+                        i.putExtra("date", selectedMovie.getRelease_date());
+                        i.putExtra("duration", selectedMovie.getDuration());
+                        i.putExtra("rating", selectedMovie.getImdb());
+                        i.putExtra("imdb", selectedMovie.getImdb_id());
+                        i.putExtra("lang", selectedMovie.getLang());
+                        i.putExtra("time", 0);
+                        startActivity(i);
+                    }
+                });
+                adapter3.add(card2);
+                card.getCardHeader().setOtherButtonVisible(false);
+
+            }
+        });
+
+        //Use this code to set your drawable
+        header.setOtherButtonDrawable(R.drawable.card_menu_button_other_add);
+
+
+
 
         //Create thumbnail
         //CustomThumbCard thumb = new CustomThumbCard(MainActivity.this);
@@ -445,6 +561,15 @@ public class MainActivity extends Activity {
 
     }
 
+    class getMoviesFav extends AsyncTask<String,ArrayList<Card>,ArrayList<Card>>{
+
+        @Override
+        protected ArrayList<Card> doInBackground(String... params) {
+            populateFavorites();
+            return null;
+        }
+    }
+
     private class CustomActionBarDrawerToggle extends ActionBarDrawerToggle {
 
         public CustomActionBarDrawerToggle(Activity mActivity, DrawerLayout mDrawerLayout) {
@@ -470,7 +595,9 @@ public class MainActivity extends Activity {
     }
 
     public static final String[] options = {
+            "სერიალები",
             "პარამეტრები"
+
     };
 
     private void _initMenu() {
@@ -505,19 +632,105 @@ public class MainActivity extends Activity {
             // update selected item and title, then close the drawer
             position = mSectionedAdapter.sectionedPositionToPosition(position);
             mDrawer.closeDrawer(mDrawerList);
-
+            Intent i;
             switch (position) {
-                case 0:
+                case 1:
 
-                    Intent i = new Intent(MainActivity.this, settingsActivity.class);
+                     i = new Intent(MainActivity.this, settingsActivity.class);
 
                     startActivity(i);
                     break;
-
+                case 0:
+                    i= new Intent(MainActivity.this,SeriesActiviry.class);
+                    startActivity(i);
+                    break;
             }
         }
     }
 
+    private void populateFavorites(){
 
+        List<Movie> moviesFavs=dbHelper2.getAllMovies();
+        for(int i=0;i<moviesFavs.size();i++){
+            final Movie movie=moviesFavs.get(i);
+            Card card = new Card(MainActivity.this);
+
+            //Create a CardHeader
+            CustomHeaderMainMovieItem header = new CustomHeaderMainMovieItem(MainActivity.this,
+                    movie.getTitle_en(),movie.getRelease_date(),movie.getDescription().length()>50?movie.getDescription().substring(0,49):movie.getDescription());
+
+            //Set the header title
+            header.setTitle(movie.getTitle_en());
+
+            card.addCardHeader(header);
+
+            header.setOtherButtonVisible(true);
+
+            //Add a callback
+            header.setOtherButtonClickListener(new CardHeader.OnClickCardHeaderOtherButtonListener() {
+                @Override
+                public void onButtonItemClick(Card card, View view) {
+                    Toast.makeText(MainActivity.this, "დაემატა ფავორიტებში", Toast.LENGTH_LONG).show();
+                    dbHelper2.deleteMovie(movie);
+                    adapter3.remove(card);
+                    adapter3.notifyDataSetChanged();
+                }
+            });
+
+            //Use this code to set your drawable
+            header.setOtherButtonDrawable(R.drawable.card_menu_button_other_dismiss);
+
+            CardExpand expand = new CardExpand(MainActivity.this);
+
+            card.addCardExpand(expand);
+
+
+
+            //Create thumbnail
+            //CustomThumbCard thumb = new CustomThumbCard(MainActivity.this);
+
+            CardThumbnail thumbnail=new CardThumbnail(MainActivity.this);
+
+            thumbnail.setUrlResource(movie.getPoster());
+
+            //Set URL resource
+            //thumb.setUrlResource(movie.getPoster());
+
+
+            //Error Resource ID
+            thumbnail.setErrorResource(R.drawable.ic_error_loadingorangesmall);
+
+            //Add thumbnail to a card
+            card.addCardThumbnail(thumbnail);
+
+
+
+            //Set card in the cardView
+
+
+            //Set card in the cardVie
+
+            card.setOnClickListener(new Card.OnCardClickListener() {
+                @Override
+                public void onClick(Card card, View view) {
+                    Movie selectedMovie = movie;
+
+                    Intent i = new Intent(MainActivity.this, MoviePageActivity.class);
+                    i.putExtra("movieId", selectedMovie.getId());
+                    i.putExtra("description", selectedMovie.getDescription());
+                    i.putExtra("title", selectedMovie.getTitle_en());
+                    i.putExtra("date", selectedMovie.getRelease_date());
+                    i.putExtra("duration", selectedMovie.getDuration());
+                    i.putExtra("rating", selectedMovie.getImdb());
+                    i.putExtra("imdb", selectedMovie.getImdb_id());
+                    i.putExtra("lang", selectedMovie.getLang());
+                    i.putExtra("time", 0);
+                    startActivity(i);
+                }
+            });
+            adapter3.add(card);
+            adapter3.notifyDataSetChanged();
+        }
+    }
 
 }

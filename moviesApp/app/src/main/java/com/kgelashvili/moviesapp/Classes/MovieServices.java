@@ -3,6 +3,7 @@ package com.kgelashvili.moviesapp.Classes;
 import android.util.Log;
 
 import com.kgelashvili.moviesapp.model.Movie;
+import com.kgelashvili.moviesapp.model.Serie;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -51,5 +52,41 @@ public class MovieServices {
 
 
         return Movies;
+    }
+
+    public ArrayList<Serie> getMainSeries(String offset,String language,String startYear,String endYear,String keyWord){
+        ArrayList<Serie> Series=new ArrayList<Serie>();
+        //offset=0,language=false,startYear=1900,endYear=2015
+        String url = "http://adjaranet.com/Search/SearchResults?ajax=1&display=15&startYear="+startYear+"&endYear="+endYear +
+                "&offset="+offset+"&isnew=0&keyword="+keyWord+"&needtags=0&orderBy=date&order%5Border%5D=data&order%5Bdata%5D=published&language="+language +
+                "&country=false&game=0&videos=0&xvideos=0&xphotos=0&trailers=0&episode=1&tvshow=0&flashgames=0";
+        NetworkDAO networkDAO=new NetworkDAO();
+        try {
+            String rawMoviesData=networkDAO.request(url);
+            Log.d("kaxa", rawMoviesData);
+            JSONObject jsonObject=new JSONObject(rawMoviesData);
+            JSONArray movies=jsonObject.getJSONArray("data");
+            for (int i=0;i<movies.length();i++){
+                JSONObject movieJ=movies.getJSONObject(i);
+                Serie serie=new Serie(movieJ.getString("id"),
+                        movieJ.getString("title_en"),
+                        movieJ.getString("link"),
+                        movieJ.getString("poster"),
+                        movieJ.getString("imdb"),
+                        movieJ.getString("imdb_id"),
+                        movieJ.getString("release_date"),
+                        movieJ.getString("description"),
+                        movieJ.getString("duration"),
+                        "");
+                Series.add(serie);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+        return Series;
     }
 }

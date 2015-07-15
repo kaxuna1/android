@@ -20,7 +20,7 @@ public class dbHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME="MoviesApp",
             TABLE_MOVIES="movies",KEY_ID="id",title_en="title_en",
-            link="link",poster="poster",imdb="imdb",imdb_id="imdb_id,",
+            link="link",poster="poster",imdb="imdb",imdb_id="imdb_id",
             release_date="release_date",description="description",duration="duration",lang="lang";
     public static final String TABLE_MOVIETIME="movieTime",movieId="movieId",time="time";
 
@@ -44,6 +44,22 @@ public class dbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_MOVIES);
 
         onCreate(db);
+    }
+    public Movie getMovie(String id){
+        Movie movie=null;
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_MOVIES+" where id='"+id+"'", null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                movie=new Movie (cursor.getString(0), cursor.getString(1), cursor.getString(2), cursor.getString(3),
+                        cursor.getString(4),cursor.getString(5),cursor.getString(6),cursor.getString(7),cursor.getString(8),cursor.getString(9));
+            }
+            while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return movie;
     }
 
     public void createMovie(Movie movie){

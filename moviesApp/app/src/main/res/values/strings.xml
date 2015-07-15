@@ -307,6 +307,8 @@
     <br><br>
     You can find all the Material Design Guidelines on the usage of cards <a href="http://www.google.com/design/spec/components/cards.html">here</a>]]></string>
     <string name="title_activity_settings">settingsActivity</string>
+    <string name="title_activity_series_activiry">SeriesActiviry</string>
+    <string name="title_activity_serie_page_activity">serie_page_activity</string>
 
 
 </resources>
