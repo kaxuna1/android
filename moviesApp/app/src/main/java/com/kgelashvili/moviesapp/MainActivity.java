@@ -3,7 +3,6 @@ package com.kgelashvili.moviesapp;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -27,41 +26,28 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TabHost;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kgelashvili.moviesapp.Classes.CustomHeaderMainMovieItem;
 import com.kgelashvili.moviesapp.Classes.FloatingActionButton;
 import com.kgelashvili.moviesapp.Classes.MovieServices;
 import com.kgelashvili.moviesapp.Classes.dbHelper;
-import com.kgelashvili.moviesapp.cards.CustomExpandCard;
-import com.kgelashvili.moviesapp.cards.CustomHeaderInnerCard;
 import com.kgelashvili.moviesapp.cards.CustomThumbCard;
-import com.kgelashvili.moviesapp.cards.GplayCard;
-import com.kgelashvili.moviesapp.cards.SuggestedCard;
-import com.kgelashvili.moviesapp.db.CardCursorContract;
-import com.kgelashvili.moviesapp.fragment.BaseFragment;
 import com.kgelashvili.moviesapp.model.Movie;
+import com.kgelashvili.moviesapp.model.Serie;
 import com.kgelashvili.moviesapp.utils.SimpleSectionedListAdapter;
 
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import it.gmariotti.cardslib.library.cards.actions.BaseSupplementalAction;
-import it.gmariotti.cardslib.library.cards.actions.IconSupplementalAction;
-import it.gmariotti.cardslib.library.cards.actions.TextSupplementalAction;
-import it.gmariotti.cardslib.library.cards.material.MaterialLargeImageCard;
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardArrayAdapter;
-import it.gmariotti.cardslib.library.internal.CardCursorAdapter;
 import it.gmariotti.cardslib.library.internal.CardExpand;
 import it.gmariotti.cardslib.library.internal.CardHeader;
 import it.gmariotti.cardslib.library.internal.CardThumbnail;
-import it.gmariotti.cardslib.library.internal.base.BaseCard;
 import it.gmariotti.cardslib.library.view.CardListView;
 import it.gmariotti.cardslib.library.view.CardView;
-import it.gmariotti.cardslib.library.view.CardViewNative;
 
 public class MainActivity extends Activity {
     String currentMovieUrl = "";
@@ -79,7 +65,6 @@ public class MainActivity extends Activity {
     private CustomActionBarDrawerToggle mDrawerToggle;
     private int mCurrentTitle = com.kgelashvili.moviesapp.R.string.app_name;
     private int mSelectedFragment;
-    private BaseFragment mBaseFragment;
     SimpleSectionedListAdapter mSectionedAdapter;
     protected ActionMode mActionMode;
     private static String TAG = "MainActivity";
@@ -96,6 +81,17 @@ public class MainActivity extends Activity {
 
     final getMovies getmovies = new getMovies();
     final getMoviesFav getmoviesFav = new getMoviesFav();
+
+
+    CardArrayAdapter adapter2Series;
+    ArrayList<Card> cardsSeries =new ArrayList<Card>();
+    private int currentLoadedSeries = 0;
+    boolean loadingMoreSeries = false;
+    String keyWordSeries = "";
+    CardListView mListViewSeries;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,7 +118,12 @@ public class MainActivity extends Activity {
 
         tabSpec = tabHost.newTabSpec("favorites");
         tabSpec.setContent(R.id.tab2);
-        tabSpec.setIndicator("ფავორიტები");
+        tabSpec.setIndicator("★");
+        tabHost.addTab(tabSpec);
+
+        tabSpec = tabHost.newTabSpec("series");
+        tabSpec.setContent(R.id.tab3);
+        tabSpec.setIndicator("სერიალები");
         tabHost.addTab(tabSpec);
 
         FloatingActionButton mFab = new FloatingActionButton.Builder(this)
@@ -265,6 +266,66 @@ public class MainActivity extends Activity {
                 }
             }
         });
+
+        final GetSeries getSeries=new GetSeries();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                loadingMoreSeries = true;
+                getSeries.doInBackground("" + currentLoadedSeries);
+
+            }
+        });
+        adapter2Series =new CardArrayAdapter(this, cardsSeries);
+        EditText searchBoxSeries = (EditText) findViewById(R.id.searchBoxSeries);
+        mListViewSeries = (CardListView) findViewById(R.id.seriesList);
+        if (mListViewSeries != null) {
+            mListViewSeries.setAdapter(adapter2Series);
+        }
+        searchBoxSeries.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                keyWordSeries = ((EditText) findViewById(R.id.searchBoxSeries)).getText().toString().replace(" ", "%20");
+                cardsSeries.clear();
+                adapter2Series.clear();
+                currentLoadedSeries = 0;
+                adapter2Series.notifyDataSetChanged();
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+        mListViewSeries.setOnScrollListener(new AbsListView.OnScrollListener() {
+
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem,
+                                 int visibleItemCount, int totalItemCount) {
+
+                int lastInScreen = firstVisibleItem + visibleItemCount;
+                if ((lastInScreen == totalItemCount) && !(loadingMoreSeries)) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            loadingMoreSeries = true;
+                            getSeries.doInBackground("" + currentLoadedSeries);
+                        }
+                    }).start();
+                }
+            }
+        });
+
 
 
     }
@@ -528,6 +589,10 @@ public class MainActivity extends Activity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent i;
+            i = new Intent(MainActivity.this, settingsActivity.class);
+
+            startActivity(i);
             return true;
         }
 
@@ -595,7 +660,7 @@ public class MainActivity extends Activity {
     }
 
     public static final String[] options = {
-            "სერიალები",
+
             "პარამეტრები"
 
     };
@@ -634,14 +699,10 @@ public class MainActivity extends Activity {
             mDrawer.closeDrawer(mDrawerList);
             Intent i;
             switch (position) {
-                case 1:
+                case 0:
 
                      i = new Intent(MainActivity.this, settingsActivity.class);
 
-                    startActivity(i);
-                    break;
-                case 0:
-                    i= new Intent(MainActivity.this,SeriesActiviry.class);
                     startActivity(i);
                     break;
             }
@@ -733,4 +794,99 @@ public class MainActivity extends Activity {
         }
     }
 
+    class GetSeries extends AsyncTask<String, ArrayList<Serie>, ArrayList<Serie>> {
+
+        @Override
+        protected ArrayList<Serie> doInBackground(String... strings) {
+
+            MovieServices movieServices = new MovieServices();
+            ArrayList<Serie> series = movieServices.getMainSeries(strings[0], "false", "1900", "2015", keyWord);
+            publishProgress(series);
+            return series;
+        }
+
+        @Override
+        protected void onProgressUpdate(ArrayList<Serie>... values) {
+            super.onProgressUpdate(values);
+            for (int i = 0; i < values[0].size(); i++) {
+                addSerieToLoadidData(values[0].get(i));
+            }
+            //adapter.notifyDataSetChanged();
+            Log.d("moviesLog", "" + currentLoaded);
+            currentLoadedSeries += 15;
+            //populateMoviesListViev();
+            loadingMoreSeries = false;
+        }
+
+    }
+
+    public void addSerieToLoadidData(final Serie serie) {
+
+        //adapter.add(movie);
+
+
+        Card card = new Card(MainActivity.this);
+
+        //Create a CardHeader
+        CustomHeaderMainMovieItem header = new CustomHeaderMainMovieItem(MainActivity.this,
+                serie.getTitle_en(),serie.getRelease_date(),serie.getDescription().length()>50?serie.getDescription().substring(0,49):serie.getDescription());
+
+        //Set the header title
+        header.setTitle(serie.getTitle_en());
+
+        card.addCardHeader(header);
+
+        //Add a callback
+
+
+        //Use this code to set your drawable
+
+
+
+
+        //Create thumbnail
+        //CustomThumbCard thumb = new CustomThumbCard(MainActivity.this);
+
+        CardThumbnail thumbnail=new CardThumbnail(MainActivity.this);
+
+        thumbnail.setUrlResource(serie.getPoster());
+
+        //Set URL resource
+        //thumb.setUrlResource(movie.getPoster());
+
+
+        //Error Resource ID
+        thumbnail.setErrorResource(R.drawable.ic_error_loadingorangesmall);
+
+        //Add thumbnail to a card
+        card.addCardThumbnail(thumbnail);
+
+
+
+        //Set card in the cardView
+
+
+        //Set card in the cardVie
+
+        card.setOnClickListener(new Card.OnCardClickListener() {
+            @Override
+            public void onClick(Card card, View view) {
+                Movie selectedMovie = serie;
+
+                Intent i = new Intent(MainActivity.this, serie_page_activity.class);
+                i.putExtra("movieId", selectedMovie.getId());
+                i.putExtra("description", selectedMovie.getDescription());
+                i.putExtra("title", selectedMovie.getTitle_en());
+                i.putExtra("date", selectedMovie.getRelease_date());
+                i.putExtra("duration", selectedMovie.getDuration());
+                i.putExtra("rating", selectedMovie.getImdb());
+                i.putExtra("imdb", selectedMovie.getImdb_id());
+                startActivity(i);
+            }
+        });
+        adapter2Series.add(card);
+
+
+
+    }
 }

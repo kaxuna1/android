@@ -9,7 +9,6 @@ import android.graphics.PixelFormat;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.Layout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -41,7 +40,7 @@ public class MoviePageActivity extends Activity {
         super.onCreate(savedInstanceState);
         final Intent intent = getIntent();
         setContentView(R.layout.moviepagelayout);
-        ((Button)findViewById(R.id.downloadButton)).setOnClickListener(new View.OnClickListener() {
+        ((Button)findViewById(R.id.downloadButtonSerie)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String url = videourl;
@@ -50,7 +49,7 @@ public class MoviePageActivity extends Activity {
                 startActivity(i);
             }
         });
-        ((Button)findViewById(R.id.langBtn)).setOnClickListener(new View.OnClickListener() {
+        ((Button)findViewById(R.id.langBtnSerie)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MoviePageActivity.this);
@@ -96,7 +95,7 @@ public class MoviePageActivity extends Activity {
         progressDialog = ProgressDialog.show(MoviePageActivity.this, "", "მიმდინარეობს ვიდეოს ჩატვირთა", true);
         progressDialog.setCancelable(true);
         PlayVideo();
-        ((Button)findViewById(R.id.fullScreenBtn)).setOnClickListener(new View.OnClickListener() {
+        ((Button)findViewById(R.id.fullScreenBtnSerie)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Log.d("kaxaLog", "" + videoView.getCurrentPosition());

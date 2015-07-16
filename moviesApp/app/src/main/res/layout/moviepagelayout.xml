@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin">
     <VideoView android:id="@+id/myvideoview"
         android:layout_width="fill_parent"
         android:layout_alignParentRight="true"
@@ -23,7 +25,7 @@
             android:layout_weight="0.93"
             android:layout_alignParentStart="true"
             android:layout_toStartOf="@+id/tableLayout"
-            android:layout_below="@+id/downloadButton" />
+            android:layout_below="@+id/downloadButtonSerie" />
 
         <TableLayout
             android:paddingTop="15dp"
@@ -124,7 +126,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="მთელ ეკრანზე"
-            android:id="@+id/fullScreenBtn"
+            android:id="@+id/fullScreenBtnSerie"
             android:layout_alignParentTop="true"
             android:layout_alignParentStart="true"
             android:layout_toStartOf="@+id/tableLayout" />
@@ -133,8 +135,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="ენები"
-            android:id="@+id/langBtn"
-            android:layout_below="@+id/fullScreenBtn"
+            android:id="@+id/langBtnSerie"
+            android:layout_below="@+id/fullScreenBtnSerie"
             android:layout_alignParentStart="true"
             android:layout_toStartOf="@+id/tableLayout" />
 
@@ -142,8 +144,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="გადმოწერა"
-            android:id="@+id/downloadButton"
-            android:layout_below="@+id/langBtn"
+            android:id="@+id/downloadButtonSerie"
+            android:layout_below="@+id/langBtnSerie"
             android:layout_alignParentStart="true"
             android:layout_toStartOf="@+id/tableLayout2" />
 

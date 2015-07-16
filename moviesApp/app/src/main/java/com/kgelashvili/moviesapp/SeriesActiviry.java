@@ -3,7 +3,6 @@ package com.kgelashvili.moviesapp;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -13,7 +12,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.kgelashvili.moviesapp.Classes.CustomHeaderMainMovieItem;
 import com.kgelashvili.moviesapp.Classes.MovieServices;
@@ -25,19 +23,18 @@ import java.util.ArrayList;
 
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardArrayAdapter;
-import it.gmariotti.cardslib.library.internal.CardHeader;
 import it.gmariotti.cardslib.library.internal.CardThumbnail;
 import it.gmariotti.cardslib.library.view.CardListView;
 
 public class SeriesActiviry extends Activity {
 
     dbHelper dbHelper2=new dbHelper(this);
-    CardArrayAdapter adapter2;
-    ArrayList<Card> cards=new ArrayList<Card>();
-    private int currentLoaded = 0;
-    boolean loadingMore = false;
-    String keyWord = "";
-    CardListView mListView;
+    CardArrayAdapter adapter2Series;
+    ArrayList<Card> cardsSeries =new ArrayList<Card>();
+    private int currentLoadedSeries = 0;
+    boolean loadingMoreSeries = false;
+    String keyWordSeries = "";
+    CardListView mListViewSeries;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,16 +46,16 @@ public class SeriesActiviry extends Activity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                loadingMore = true;
-                getSeries.doInBackground("" + currentLoaded);
+                loadingMoreSeries = true;
+                getSeries.doInBackground("" + currentLoadedSeries);
 
             }
         });
-        adapter2=new CardArrayAdapter(this,cards);
+        adapter2Series =new CardArrayAdapter(this, cardsSeries);
         EditText searchBox = (EditText) findViewById(R.id.searchBoxSeries);
-        mListView = (CardListView) findViewById(R.id.seriesList);
-        if (mListView != null) {
-            mListView.setAdapter(adapter2);
+        mListViewSeries = (CardListView) findViewById(R.id.seriesList);
+        if (mListViewSeries != null) {
+            mListViewSeries.setAdapter(adapter2Series);
         }
         searchBox.addTextChangedListener(new TextWatcher() {
             @Override
@@ -68,11 +65,11 @@ public class SeriesActiviry extends Activity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                keyWord = ((EditText) findViewById(R.id.searchBoxSeries)).getText().toString().replace(" ", "%20");
-                cards.clear();
-                adapter2.clear();
-                currentLoaded = 0;
-                adapter2.notifyDataSetChanged();
+                keyWordSeries = ((EditText) findViewById(R.id.searchBoxSeries)).getText().toString().replace(" ", "%20");
+                cardsSeries.clear();
+                adapter2Series.clear();
+                currentLoadedSeries = 0;
+                adapter2Series.notifyDataSetChanged();
             }
 
             @Override
@@ -80,7 +77,7 @@ public class SeriesActiviry extends Activity {
 
             }
         });
-        mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+        mListViewSeries.setOnScrollListener(new AbsListView.OnScrollListener() {
 
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -91,12 +88,12 @@ public class SeriesActiviry extends Activity {
                                  int visibleItemCount, int totalItemCount) {
 
                 int lastInScreen = firstVisibleItem + visibleItemCount;
-                if ((lastInScreen == totalItemCount) && !(loadingMore)) {
+                if ((lastInScreen == totalItemCount) && !(loadingMoreSeries)) {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            loadingMore = true;
-                            getSeries.doInBackground("" + currentLoaded);
+                            loadingMoreSeries = true;
+                            getSeries.doInBackground("" + currentLoadedSeries);
                         }
                     }).start();
                 }
@@ -136,7 +133,7 @@ public class SeriesActiviry extends Activity {
         protected ArrayList<Serie> doInBackground(String... strings) {
 
             MovieServices movieServices = new MovieServices();
-            ArrayList<Serie> series = movieServices.getMainSeries(strings[0], "false", "1900", "2015", keyWord);
+            ArrayList<Serie> series = movieServices.getMainSeries(strings[0], "false", "1900", "2015", keyWordSeries);
             publishProgress(series);
             return series;
         }
@@ -148,10 +145,10 @@ public class SeriesActiviry extends Activity {
                 addSerieToLoadidData(values[0].get(i));
             }
             //adapter.notifyDataSetChanged();
-            Log.d("moviesLog", "" + currentLoaded);
-            currentLoaded += 15;
+            Log.d("moviesLog", "" + currentLoadedSeries);
+            currentLoadedSeries += 15;
             //populateMoviesListViev();
-            loadingMore = false;
+            loadingMoreSeries = false;
         }
 
     }
@@ -220,7 +217,7 @@ public class SeriesActiviry extends Activity {
                 startActivity(i);
             }
         });
-        adapter2.add(card);
+        adapter2Series.add(card);
 
 
 
