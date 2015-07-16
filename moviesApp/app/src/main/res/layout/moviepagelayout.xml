@@ -125,18 +125,8 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="მთელ ეკრანზე"
-            android:id="@+id/fullScreenBtnSerie"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true"
-            android:layout_toStartOf="@+id/tableLayout" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:text="ენები"
             android:id="@+id/langBtnSerie"
-            android:layout_below="@+id/fullScreenBtnSerie"
             android:layout_alignParentStart="true"
             android:layout_toStartOf="@+id/tableLayout" />
 

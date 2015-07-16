@@ -19,6 +19,8 @@ import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
 
+import com.kgelashvili.moviesapp.Classes.FloatingActionButton;
+
 public class MoviePageActivity extends Activity {
 
     //Uri video = Uri.parse("http://212.72.157.137/fast2/storage/10246/10246_Georgian_300.mp4");
@@ -35,6 +37,31 @@ public class MoviePageActivity extends Activity {
         videourl = "http://adjaranet.com/download.php?mid="+value+"&file="+value+"_"+(extras.getString("lang").split(",")[0])+"_300";
         setTitle(extras.getString("title"));
         movieTime=extras.getInt("time");
+        final FloatingActionButton mFab = new FloatingActionButton.Builder(MoviePageActivity.this)
+                .withColor(getResources().getColor(R.color.primary))
+                .withDrawable(getResources().getDrawable(R.drawable.androidfullscreen))
+                .withSize(72)
+                .withMargins(0, 0, 16, 16)
+                .create();
+        mFab.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i=new Intent(MoviePageActivity.this,FullScreenMovie.class);
+                        i.putExtra("movieId",extras.getString("movieId"));
+                        i.putExtra("description",extras.getString("description"));
+                        i.putExtra("title",extras.getString("title"));
+                        i.putExtra("date",extras.getString("date"));
+                        i.putExtra("duration",extras.getString("duration"));
+                        i.putExtra("rating",extras.getString("rating"));
+                        i.putExtra("imdb",extras.getString("imdb"));
+                        i.putExtra("time", videoView.getCurrentPosition());
+                        i.putExtra("link",videourl);
+
+
+                        startActivityForResult(i, 0);
+                    }
+                });
 
 
         super.onCreate(savedInstanceState);
@@ -95,26 +122,7 @@ public class MoviePageActivity extends Activity {
         progressDialog = ProgressDialog.show(MoviePageActivity.this, "", "მიმდინარეობს ვიდეოს ჩატვირთა", true);
         progressDialog.setCancelable(true);
         PlayVideo();
-        ((Button)findViewById(R.id.fullScreenBtnSerie)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.d("kaxaLog", "" + videoView.getCurrentPosition());
-                Intent i=new Intent(MoviePageActivity.this,FullScreenMovie.class);
-                i.putExtra("movieId",extras.getString("movieId"));
-                i.putExtra("description",extras.getString("description"));
-                i.putExtra("title",extras.getString("title"));
-                i.putExtra("date",extras.getString("date"));
-                i.putExtra("duration",extras.getString("duration"));
-                i.putExtra("rating",extras.getString("rating"));
-                i.putExtra("imdb",extras.getString("imdb"));
-                i.putExtra("time", videoView.getCurrentPosition());
-                i.putExtra("link",videourl);
 
-
-                startActivityForResult(i, 0);
-
-            }
-        });
 
 
     }

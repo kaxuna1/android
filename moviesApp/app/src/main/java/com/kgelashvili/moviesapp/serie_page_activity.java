@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.MediaController;
 import android.widget.TextView;
@@ -69,8 +70,31 @@ public class serie_page_activity extends Activity {
                 .withSize(72)
                 .withMargins(0, 0, 16, 16)
                 .create();
-        mFab.setOnClickListener(new View.OnClickListener() {
+        ((Button)findViewById(R.id.downloadBtn)).setOnClickListener(new View.OnClickListener() {
             @Override
+            public void onClick(View view) {
+                String url = videourl;
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
+            }
+        });
+        TextView date=(TextView)findViewById(R.id.movieDate);
+        date.setText(extras.getString("date"));
+        ((TextView) findViewById(R.id.imdbRating)).setText(extras.getString("rating"));
+        ((ImageView)findViewById(R.id.imdbImg)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.imdb.com/title/" + extras.getString("imdb")));
+                startActivity(browserIntent);
+            }
+        });
+        ((TextView) findViewById(R.id.descriptionTxt)).setText(extras.getString("description"));
+
+
+        mFab.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
             public void onClick(View v) {
                 Intent i=new Intent(serie_page_activity.this,FullScreenMovie.class);
                 i.putExtra("movieId",extras.getString("movieId"));
