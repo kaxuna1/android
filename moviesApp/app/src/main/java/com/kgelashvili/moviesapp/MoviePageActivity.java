@@ -1,5 +1,6 @@
 package com.kgelashvili.moviesapp;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -9,10 +10,13 @@ import android.graphics.PixelFormat;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.MediaController;
@@ -37,7 +41,11 @@ public class MoviePageActivity extends Activity {
         videourl = "http://adjaranet.com/download.php?mid="+value+"&file="+value+"_"+(extras.getString("lang").split(",")[0])+"_300";
         setTitle(extras.getString("title"));
         movieTime=extras.getInt("time");
-        final FloatingActionButton mFab = new FloatingActionButton.Builder(MoviePageActivity.this)
+
+
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.moviepagelayout);
+        FloatingActionButton mFab = new FloatingActionButton.Builder(this)
                 .withColor(getResources().getColor(R.color.primary))
                 .withDrawable(getResources().getDrawable(R.drawable.androidfullscreen))
                 .withSize(72)
@@ -47,26 +55,21 @@ public class MoviePageActivity extends Activity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent i=new Intent(MoviePageActivity.this,FullScreenMovie.class);
-                        i.putExtra("movieId",extras.getString("movieId"));
-                        i.putExtra("description",extras.getString("description"));
-                        i.putExtra("title",extras.getString("title"));
-                        i.putExtra("date",extras.getString("date"));
-                        i.putExtra("duration",extras.getString("duration"));
-                        i.putExtra("rating",extras.getString("rating"));
-                        i.putExtra("imdb",extras.getString("imdb"));
+                        Intent i = new Intent(MoviePageActivity.this, FullScreenMovie.class);
+                        i.putExtra("movieId", extras.getString("movieId"));
+                        i.putExtra("description", extras.getString("description"));
+                        i.putExtra("title", extras.getString("title"));
+                        i.putExtra("date", extras.getString("date"));
+                        i.putExtra("duration", extras.getString("duration"));
+                        i.putExtra("rating", extras.getString("rating"));
+                        i.putExtra("imdb", extras.getString("imdb"));
                         i.putExtra("time", videoView.getCurrentPosition());
-                        i.putExtra("link",videourl);
+                        i.putExtra("link", videourl);
 
 
                         startActivityForResult(i, 0);
                     }
                 });
-
-
-        super.onCreate(savedInstanceState);
-        final Intent intent = getIntent();
-        setContentView(R.layout.moviepagelayout);
         ((Button)findViewById(R.id.downloadButtonSerie)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

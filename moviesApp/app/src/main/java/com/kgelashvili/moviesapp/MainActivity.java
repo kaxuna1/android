@@ -1,6 +1,8 @@
 package com.kgelashvili.moviesapp;
 
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -8,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.text.Editable;
@@ -327,6 +330,14 @@ public class MainActivity extends Activity {
         });
 
 
+        NotificationCompat.Builder notificationBuilder=new NotificationCompat.Builder(this);
+        notificationBuilder.setAutoCancel(true);
+        notificationBuilder.setContentTitle("testNotification");
+        notificationBuilder.setContentTitle("test notification text");
+        notificationBuilder.setSmallIcon(R.mipmap.ic_launcher);
+        Notification notification=notificationBuilder.build();
+        NotificationManager notificationManager=(NotificationManager)this.getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.notify(8,notification);
 
     }
 
@@ -800,7 +811,7 @@ public class MainActivity extends Activity {
         protected ArrayList<Serie> doInBackground(String... strings) {
 
             MovieServices movieServices = new MovieServices();
-            ArrayList<Serie> series = movieServices.getMainSeries(strings[0], "false", "1900", "2015", keyWord);
+            ArrayList<Serie> series = movieServices.getMainSeries(strings[0], "false", "1900", "2015", keyWordSeries);
             publishProgress(series);
             return series;
         }
@@ -819,7 +830,6 @@ public class MainActivity extends Activity {
         }
 
     }
-
     public void addSerieToLoadidData(final Serie serie) {
 
         //adapter.add(movie);
