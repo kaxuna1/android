@@ -14,9 +14,11 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.text.Editable;
+import android.text.Layout;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.ActionMode;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,13 +29,18 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.Toast;
 
 import com.kgelashvili.moviesapp.Classes.CustomHeaderMainMovieItem;
 import com.kgelashvili.moviesapp.Classes.FloatingActionButton;
 import com.kgelashvili.moviesapp.Classes.MovieServices;
+import com.kgelashvili.moviesapp.Classes.ScrollViewExt;
+import com.kgelashvili.moviesapp.Classes.ScrollViewListener;
 import com.kgelashvili.moviesapp.Classes.dbHelper;
 import com.kgelashvili.moviesapp.cards.CustomThumbCard;
 import com.kgelashvili.moviesapp.model.Movie;
@@ -44,6 +51,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import it.gmariotti.cardslib.library.cards.actions.BaseSupplementalAction;
+import it.gmariotti.cardslib.library.cards.actions.IconSupplementalAction;
+import it.gmariotti.cardslib.library.cards.material.MaterialLargeImageCard;
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardArrayAdapter;
 import it.gmariotti.cardslib.library.internal.CardExpand;
@@ -51,8 +61,9 @@ import it.gmariotti.cardslib.library.internal.CardHeader;
 import it.gmariotti.cardslib.library.internal.CardThumbnail;
 import it.gmariotti.cardslib.library.view.CardListView;
 import it.gmariotti.cardslib.library.view.CardView;
+import it.gmariotti.cardslib.library.view.CardViewNative;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements ScrollViewListener {
     String currentMovieUrl = "";
     int currentMovieTime = 0;
     private int currentLoaded = 0;
@@ -138,13 +149,13 @@ public class MainActivity extends Activity {
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((EditText)findViewById(R.id.searchBox)).requestFocus();
-               tabHost.setCurrentTab(0);
-                final EditText k=(EditText) findViewById(R.id.searchBox);
+                ((EditText) findViewById(R.id.searchBox)).requestFocus();
+                tabHost.setCurrentTab(0);
+                final EditText k = (EditText) findViewById(R.id.searchBox);
                 k.post(new Runnable() {
                     public void run() {
                         k.requestFocusFromTouch();
-                        InputMethodManager lManager = (InputMethodManager)MainActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
+                        InputMethodManager lManager = (InputMethodManager) MainActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
                         lManager.showSoftInput(k, 0);
                     }
                 });
@@ -157,17 +168,31 @@ public class MainActivity extends Activity {
 
         //adapter = new MovieListAdapter();
 
-
+        final getGeoMovies geoMovies=new getGeoMovies();
+        final getPremierMovies premierMovies=new getPremierMovies();
         new Thread(new Runnable() {
             @Override
             public void run() {
                 loadingMore = true;
                 getmovies.doInBackground("" + currentLoaded);
                 getmoviesFav.doInBackground("");
+                geoMovies.doInBackground("");
+                premierMovies.doInBackground("");
 
             }
         })
                 .start();
+        final Thread loadMoviesThread=new Thread(){
+            public void run(){
+
+                    getmovies.doInBackground(""+currentLoaded);
+
+            }
+        };
+
+
+
+
         EditText searchBox = (EditText) findViewById(R.id.searchBox);
         searchBox.addTextChangedListener(new TextWatcher() {
             @Override
@@ -181,7 +206,7 @@ public class MainActivity extends Activity {
                 cards.clear();
                 adapter2.clear();
                 currentLoaded = 0;
-                adapter2.notifyDataSetChanged();
+                //loadMore();
             }
 
             @Override
@@ -198,8 +223,8 @@ public class MainActivity extends Activity {
         if (mListView2 != null) {
             mListView2.setAdapter(adapter3);
         }
-
-
+        ScrollViewExt scroll = (ScrollViewExt) findViewById(R.id.scrollView);
+        scroll.setScrollViewListener(this);
 
 
 
@@ -225,50 +250,6 @@ public class MainActivity extends Activity {
                 startActivity(i);
             }
         });*/
-        mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
-
-            @Override
-            public void onScrollStateChanged(AbsListView view, int scrollState) {
-            }
-
-            @Override
-            public void onScroll(AbsListView view, int firstVisibleItem,
-                                 int visibleItemCount, int totalItemCount) {
-
-                int lastInScreen = firstVisibleItem + visibleItemCount;
-                if ((lastInScreen == totalItemCount) && !(loadingMore)) {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            loadingMore = true;
-                            getmovies.doInBackground("" + currentLoaded);
-                        }
-                    }).start();
-                }
-            }
-        });
-        mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
-
-            @Override
-            public void onScrollStateChanged(AbsListView view, int scrollState) {
-            }
-
-            @Override
-            public void onScroll(AbsListView view, int firstVisibleItem,
-                                 int visibleItemCount, int totalItemCount) {
-
-                int lastInScreen = firstVisibleItem + visibleItemCount;
-                if ((lastInScreen == totalItemCount) && !(loadingMore)) {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            loadingMore = true;
-                            getmovies.doInBackground("" + currentLoaded);
-                        }
-                    }).start();
-                }
-            }
-        });
 
         final GetSeries getSeries=new GetSeries();
 
@@ -299,6 +280,7 @@ public class MainActivity extends Activity {
                 adapter2Series.clear();
                 currentLoadedSeries = 0;
                 adapter2Series.notifyDataSetChanged();
+                setListViewHeightBasedOnChildren(mListView);
             }
 
             @Override
@@ -328,6 +310,30 @@ public class MainActivity extends Activity {
                 }
             }
         });
+        mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem,
+                                 int visibleItemCount, int totalItemCount) {
+
+                int lastInScreen = firstVisibleItem + visibleItemCount;
+                if ((lastInScreen == totalItemCount) && !(loadingMoreSeries)) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            loadingMore = true;
+                            getmovies.doInBackground("" + currentLoaded);
+                        }
+                    }).start();
+                    setListViewHeightBasedOnChildren(mListView);
+                }
+            }
+        });
+
 
 
         NotificationCompat.Builder notificationBuilder=new NotificationCompat.Builder(this);
@@ -489,6 +495,7 @@ public class MainActivity extends Activity {
 
 
 
+
     }
 
     private class MovieListAdapter extends ArrayAdapter<Movie> {
@@ -583,6 +590,17 @@ public class MainActivity extends Activity {
         }
     }
 
+    public void loadMore(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                loadingMore = true;
+                getmovies.doInBackground("" + currentLoaded);
+                getmoviesFav.doInBackground("");
+
+            }
+        }).run();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -628,13 +646,297 @@ public class MainActivity extends Activity {
             for (int i = 0; i < values[0].size(); i++) {
                 addMovieToLoadidData(values[0].get(i));
             }
+            setListViewHeightBasedOnChildren(mListView);
             //adapter.notifyDataSetChanged();
+            Log.d("moviesLogKaxa","gamodzaxda");
             Log.d("moviesLog", "" + currentLoaded);
             currentLoaded += 15;
             //populateMoviesListViev();
             loadingMore = false;
         }
 
+    }
+
+    class getGeoMovies extends AsyncTask<String, ArrayList<Movie>, ArrayList<Movie>> {
+
+        @Override
+        protected ArrayList<Movie> doInBackground(String... strings) {
+
+            MovieServices movieServices = new MovieServices();
+            ArrayList<Movie> movies = movieServices.getLatestGeoMovies();
+            publishProgress(movies);
+
+            return movies;
+        }
+        @Override
+        protected void onProgressUpdate(ArrayList<Movie>... values) {
+            super.onProgressUpdate(values);
+            Log.d("kaxaGeo1", "kaxaGeo1");
+            for (int i = 0; i < values[0].size(); i++) {
+                addGeoMovieToColection(values[0].get(i));
+            }
+
+        }
+
+    }
+
+    class getPremierMovies extends AsyncTask<String, ArrayList<Movie>, ArrayList<Movie>> {
+
+        @Override
+        protected ArrayList<Movie> doInBackground(String... strings) {
+
+            MovieServices movieServices = new MovieServices();
+            ArrayList<Movie> movies = movieServices.getPremierMovies();
+            publishProgress(movies);
+
+            return movies;
+        }
+        @Override
+        protected void onProgressUpdate(ArrayList<Movie>... values) {
+            super.onProgressUpdate(values);
+            Log.d("kaxaGeo1", "kaxaGeo1");
+            for (int i = 0; i < values[0].size(); i++) {
+                addPremiereMovieToColection(values[0].get(i));
+            }
+
+        }
+
+    }
+
+    private void addPremiereMovieToColection(final Movie movie) {
+        LinearLayout linearLayout = (LinearLayout )findViewById(R.id.premierMoviesLayout);
+        LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
+        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.movieontop, null, false);
+
+
+        ArrayList<BaseSupplementalAction> actions = new ArrayList<BaseSupplementalAction>();
+        IconSupplementalAction t1 = new IconSupplementalAction(MainActivity.this, R.id.ic3);
+        t1.setOnActionClickListener(new BaseSupplementalAction.OnActionClickListener() {
+            @Override
+            public void onClick(Card card, View view) {
+                Toast.makeText(MainActivity.this, "დაემატა ფავორიტებში", Toast.LENGTH_LONG).show();
+                dbHelper2.createMovie(movie);
+                Card card2 = new Card(MainActivity.this);
+
+                //Create a CardHeader
+                CustomHeaderMainMovieItem header2 = new CustomHeaderMainMovieItem(MainActivity.this,
+                        movie.getTitle_en(), movie.getRelease_date(), movie.getDescription().length() > 50 ? movie.getDescription().substring(0, 49) : movie.getDescription());
+
+                //Set the header title
+                header2.setTitle(movie.getTitle_en());
+
+                card2.addCardHeader(header2);
+
+                header2.setOtherButtonVisible(true);
+                header2.setOtherButtonClickListener(new CardHeader.OnClickCardHeaderOtherButtonListener() {
+                    @Override
+                    public void onButtonItemClick(Card card, View view) {
+                        Toast.makeText(MainActivity.this, "დაემატა ფავორიტებში", Toast.LENGTH_LONG).show();
+                        dbHelper2.deleteMovie(movie);
+                        adapter3.remove(card);
+                        adapter3.notifyDataSetChanged();
+                    }
+                });
+
+                header2.setOtherButtonDrawable(R.drawable.card_menu_button_other_dismiss);
+
+
+                //Create thumbnail
+                //CustomThumbCard thumb = new CustomThumbCard(MainActivity.this);
+
+                CardThumbnail thumbnail2 = new CardThumbnail(MainActivity.this);
+
+                thumbnail2.setUrlResource(movie.getPoster());
+
+                //Set URL resource
+                //thumb.setUrlResource(movie.getPoster());
+
+
+                //Error Resource ID
+                thumbnail2.setErrorResource(R.drawable.ic_error_loadingorangesmall);
+
+                //Add thumbnail to a card
+                card2.addCardThumbnail(thumbnail2);
+
+
+                //Set card in the cardView
+
+
+                //Set card in the cardVie
+
+                card2.setOnClickListener(new Card.OnCardClickListener() {
+                    @Override
+                    public void onClick(Card card, View view) {
+                        Movie selectedMovie = movie;
+
+                        Intent i = new Intent(MainActivity.this, MoviePageActivity.class);
+                        i.putExtra("movieId", selectedMovie.getId());
+                        i.putExtra("description", selectedMovie.getDescription());
+                        i.putExtra("title", selectedMovie.getTitle_en());
+                        i.putExtra("date", selectedMovie.getRelease_date());
+                        i.putExtra("duration", selectedMovie.getDuration());
+                        i.putExtra("rating", selectedMovie.getImdb());
+                        i.putExtra("imdb", selectedMovie.getImdb_id());
+                        i.putExtra("lang", selectedMovie.getLang());
+                        i.putExtra("time", 0);
+                        startActivity(i);
+                    }
+                });
+                adapter3.add(card2);
+            }
+        });
+        actions.add(t1);
+
+
+        MaterialLargeImageCard card =
+                MaterialLargeImageCard.with(MainActivity.this)
+                        //.setTextOverImage(movie.getTitle_en())
+                        .useDrawableUrl(movie.getPoster())
+                        .setupSupplementalActions(R.layout.carddemo_native_material_supplemental_actions_large_icon, actions)
+                        .build();
+
+
+        card.setOnClickListener(new Card.OnCardClickListener() {
+            @Override
+            public void onClick(Card card, View view) {
+                Movie selectedMovie = movie;
+
+                Intent i = new Intent(MainActivity.this, MoviePageActivity.class);
+                i.putExtra("movieId", selectedMovie.getId());
+                i.putExtra("description", selectedMovie.getDescription());
+                i.putExtra("title", selectedMovie.getTitle_en());
+                i.putExtra("date", selectedMovie.getRelease_date());
+                i.putExtra("duration", selectedMovie.getDuration());
+                i.putExtra("rating", selectedMovie.getImdb());
+                i.putExtra("imdb", selectedMovie.getImdb_id());
+                i.putExtra("lang", selectedMovie.getLang());
+                i.putExtra("time", 0);
+                startActivity(i);
+            }
+        });
+        CardViewNative cardView = (CardViewNative) layout.findViewById(R.id.movieCard);
+        cardView.setCard(card);
+
+        linearLayout.addView(layout);
+
+    }
+
+    private void addGeoMovieToColection(final Movie movie) {
+        Log.d("gamodzaxda","qartuli");
+        LinearLayout linearLayout = (LinearLayout )findViewById(R.id.geoMoviesLayout);
+        LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
+        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.movieontop, null, false);
+
+
+        ArrayList<BaseSupplementalAction> actions = new ArrayList<BaseSupplementalAction>();
+        IconSupplementalAction t1 = new IconSupplementalAction(MainActivity.this, R.id.ic3);
+        t1.setOnActionClickListener(new BaseSupplementalAction.OnActionClickListener() {
+            @Override
+            public void onClick(Card card, View view) {
+                Toast.makeText(MainActivity.this, "დაემატა ფავორიტებში", Toast.LENGTH_LONG).show();
+                dbHelper2.createMovie(movie);
+                Card card2 = new Card(MainActivity.this);
+
+                //Create a CardHeader
+                CustomHeaderMainMovieItem header2 = new CustomHeaderMainMovieItem(MainActivity.this,
+                        movie.getTitle_en(), movie.getRelease_date(), movie.getDescription().length() > 50 ? movie.getDescription().substring(0, 49) : movie.getDescription());
+
+                //Set the header title
+                header2.setTitle(movie.getTitle_en());
+
+                card2.addCardHeader(header2);
+
+                header2.setOtherButtonVisible(true);
+                header2.setOtherButtonClickListener(new CardHeader.OnClickCardHeaderOtherButtonListener() {
+                    @Override
+                    public void onButtonItemClick(Card card, View view) {
+                        Toast.makeText(MainActivity.this, "დაემატა ფავორიტებში", Toast.LENGTH_LONG).show();
+                        dbHelper2.deleteMovie(movie);
+                        adapter3.remove(card);
+                        adapter3.notifyDataSetChanged();
+                    }
+                });
+
+                header2.setOtherButtonDrawable(R.drawable.card_menu_button_other_dismiss);
+
+
+                //Create thumbnail
+                //CustomThumbCard thumb = new CustomThumbCard(MainActivity.this);
+
+                CardThumbnail thumbnail2 = new CardThumbnail(MainActivity.this);
+
+                thumbnail2.setUrlResource(movie.getPoster());
+
+                //Set URL resource
+                //thumb.setUrlResource(movie.getPoster());
+
+
+                //Error Resource ID
+                thumbnail2.setErrorResource(R.drawable.ic_error_loadingorangesmall);
+
+                //Add thumbnail to a card
+                card2.addCardThumbnail(thumbnail2);
+
+
+                //Set card in the cardView
+
+
+                //Set card in the cardVie
+
+                card2.setOnClickListener(new Card.OnCardClickListener() {
+                    @Override
+                    public void onClick(Card card, View view) {
+                        Movie selectedMovie = movie;
+
+                        Intent i = new Intent(MainActivity.this, MoviePageActivity.class);
+                        i.putExtra("movieId", selectedMovie.getId());
+                        i.putExtra("description", selectedMovie.getDescription());
+                        i.putExtra("title", selectedMovie.getTitle_en());
+                        i.putExtra("date", selectedMovie.getRelease_date());
+                        i.putExtra("duration", selectedMovie.getDuration());
+                        i.putExtra("rating", selectedMovie.getImdb());
+                        i.putExtra("imdb", selectedMovie.getImdb_id());
+                        i.putExtra("lang", selectedMovie.getLang());
+                        i.putExtra("time", 0);
+                        startActivity(i);
+                    }
+                });
+                adapter3.add(card2);
+            }
+        });
+        actions.add(t1);
+
+
+        MaterialLargeImageCard card =
+                MaterialLargeImageCard.with(MainActivity.this)
+                        //.setTextOverImage(movie.getTitle_en())
+                        .useDrawableUrl(movie.getPoster())
+                        .setupSupplementalActions(R.layout.carddemo_native_material_supplemental_actions_large_icon, actions)
+                        .build();
+
+
+        card.setOnClickListener(new Card.OnCardClickListener() {
+            @Override
+            public void onClick(Card card, View view) {
+                Movie selectedMovie = movie;
+
+                Intent i = new Intent(MainActivity.this, MoviePageActivity.class);
+                i.putExtra("movieId", selectedMovie.getId());
+                i.putExtra("description", selectedMovie.getDescription());
+                i.putExtra("title", selectedMovie.getTitle_en());
+                i.putExtra("date", selectedMovie.getRelease_date());
+                i.putExtra("duration", selectedMovie.getDuration());
+                i.putExtra("rating", selectedMovie.getImdb());
+                i.putExtra("imdb", selectedMovie.getImdb_id());
+                i.putExtra("lang", selectedMovie.getLang());
+                i.putExtra("time", 0);
+                startActivity(i);
+            }
+        });
+        CardViewNative cardView = (CardViewNative) layout.findViewById(R.id.movieCard);
+        cardView.setCard(card);
+
+        linearLayout.addView(layout);
     }
 
     class getMoviesFav extends AsyncTask<String,ArrayList<Card>,ArrayList<Card>>{
@@ -898,5 +1200,48 @@ public class MainActivity extends Activity {
 
 
 
+    }
+
+    public static void setListViewHeightBasedOnChildren(ListView listView) {
+
+        ListAdapter listAdapter = listView.getAdapter();
+        if (listAdapter == null)
+            return;
+
+        int desiredWidth = View.MeasureSpec.makeMeasureSpec(listView.getWidth(), View.MeasureSpec.UNSPECIFIED);
+        int totalHeight = 0;
+        View view = null;
+        for (int i = 0; i < listAdapter.getCount(); i++) {
+            view = listAdapter.getView(i, view, listView);
+            if (i == 0)
+                view.setLayoutParams(new ViewGroup.LayoutParams(desiredWidth, AbsListView.LayoutParams.WRAP_CONTENT));
+
+            view.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
+            totalHeight += view.getMeasuredHeight();
+        }
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        listView.setLayoutParams(params);
+        listView.requestLayout();
+    }
+
+    @Override
+    public void onScrollChanged(ScrollViewExt scrollView, int x, int y, int oldx, int oldy) {
+        // We take the last son in the scrollview
+        View view = (View) scrollView.getChildAt(scrollView.getChildCount() - 1);
+        int diff = (view.getBottom() - (scrollView.getHeight() + scrollView.getScrollY()));
+
+        // if diff is zero, then the bottom has been reached
+        if (diff == 0) {
+            if(!loadingMore){
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        loadingMore = true;
+                        getmovies.doInBackground("" + currentLoaded);
+                    }
+                }).start();
+            }
+        }
     }
 }

@@ -3,8 +3,6 @@
     android:id="@+id/drawer_layout2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
     layout_marginTop="?attr/actionBarSize">
     <RelativeLayout
         android:layout_width="match_parent"
@@ -35,43 +33,109 @@
                         android:id="@+id/tab1"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:descendantFocusability="beforeDescendants"
+                        android:focusableInTouchMode="true"
+                        android:weightSum="1">
 
-                        <RelativeLayout
+                        <EditText
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:focusableInTouchMode="true">
+                            android:layout_height="wrap_content"
+                            android:id="@+id/searchBox"
+                            android:layout_alignParentTop="true"
+                            android:layout_alignParentStart="true"
+                            android:layout_alignParentEnd="true"
+                            android:gravity="center"
+                            android:hint="ძებნა"
+                            android:singleLine="true"
+                            />
 
-                            <EditText
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:id="@+id/searchBox"
-                                android:layout_alignParentTop="true"
-                                android:layout_alignParentStart="true"
-                                android:layout_alignParentEnd="true"
-                                android:gravity="center"
-                                android:hint="ძებნა"
-                                android:singleLine="true"
-                                />
 
-                            <!--<ListView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:id="@+id/moviesListView"
-                                android:layout_below="@+id/searchBox"
-                                android:layout_alignParentBottom="true"
-                                android:layout_alignParentEnd="true"
-                                android:layout_alignParentStart="true" />-->
-                            <it.gmariotti.cardslib.library.view.CardListView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+
+                        <com.kgelashvili.moviesapp.Classes.ScrollViewExt
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/horizontalScrollView"
+                            android:id="@+id/scrollView" >
+
+
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:focusableInTouchMode="true"
                                 android:paddingLeft="@dimen/carddemo_list_padding"
-                                android:paddingRight="@dimen/carddemo_list_padding"
-                                android:layout_below="@+id/searchBox"
-                                style="@style/native_list_external"
-                                card:list_card_layout_resourceID="@layout/carddemo_native_list_cursor_layout"
-                                android:id="@+id/carddemo_list_cursor2"/>
-                        </RelativeLayout>
+                                android:paddingRight="@dimen/carddemo_list_padding">
+
+                                <!--<ListView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:id="@+id/moviesListView"
+                                    android:layout_below="@+id/searchBox"
+                                    android:layout_alignParentBottom="true"
+                                    android:layout_alignParentEnd="true"
+                                    android:layout_alignParentStart="true" />-->
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textAppearance="?android:attr/textAppearanceMedium"
+                                    android:text="ქართულად გახმოვანებული ფილმები"
+                                    android:id="@+id/textView5" />
+
+                                <HorizontalScrollView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@+id/textView5"
+                                    android:id="@+id/horizontalScrollView"
+                                    android:layout_weight="0.04">
+
+                                    <LinearLayout
+                                        android:paddingLeft="@dimen/carddemo_list_padding"
+                                        android:paddingRight="@dimen/carddemo_list_padding"
+                                        android:orientation="horizontal"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:id="@+id/geoMoviesLayout">
+
+                                    </LinearLayout>
+                                </HorizontalScrollView>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textAppearance="?android:attr/textAppearanceMedium"
+                                    android:text="პრემიერა"
+                                    android:layout_below="@id/horizontalScrollView"
+                                    android:id="@+id/textView6" />
+
+                                <HorizontalScrollView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@+id/textView6"
+                                    android:id="@+id/horizontalScrollView2"
+                                    android:layout_weight="0.04">
+
+                                    <LinearLayout
+                                        android:paddingLeft="@dimen/carddemo_list_padding"
+                                        android:paddingRight="@dimen/carddemo_list_padding"
+                                        android:orientation="horizontal"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:id="@+id/premierMoviesLayout">
+
+                                    </LinearLayout>
+                                </HorizontalScrollView>
+                                <it.gmariotti.cardslib.library.view.CardListView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:paddingLeft="@dimen/carddemo_list_padding"
+                                    android:paddingRight="@dimen/carddemo_list_padding"
+                                    android:layout_below="@+id/horizontalScrollView2"
+
+                                    style="@style/native_list_external"
+                                    card:list_card_layout_resourceID="@layout/carddemo_native_list_cursor_layout"
+                                    android:id="@+id/carddemo_list_cursor2"/>
+                            </RelativeLayout>
+                        </com.kgelashvili.moviesapp.Classes.ScrollViewExt>
+
                     </LinearLayout>
 
                     <LinearLayout

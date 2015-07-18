@@ -89,4 +89,76 @@ public class MovieServices {
 
         return Series;
     }
+
+    public ArrayList<Movie> getLatestGeoMovies(){
+        ArrayList<Movie> Movies=new ArrayList<Movie>();
+        String url = "http://adjaranet.com/cache/cached_home_geomovies.php?type=geomovies&order=new&period=day&limit=25";
+        NetworkDAO networkDAO=new NetworkDAO();
+        try {
+            String rawMoviesData=networkDAO.request(url);
+            Log.d("kaxaGeo", rawMoviesData);
+            JSONArray movies=new JSONArray(rawMoviesData);
+            //JSONArray movies=jsonObject.getJSONArray("data");
+            for (int i=0;i<movies.length();i++){
+                JSONObject movieJ=movies.getJSONObject(i);
+                Log.d("kaxa", movieJ.getString("poster"));
+                Log.d("lang",movieJ.getString("lang"));
+                Movie movie=new Movie(movieJ.getString("id"),
+                        movieJ.getString("title_en"),
+                        movieJ.getString("link"),
+                        movieJ.getString("poster"),
+                        movieJ.getString("imdb"),
+                        movieJ.getString("imdb_id"),
+                        movieJ.getString("release_date"),
+                        movieJ.getString("description"),
+                        movieJ.getString("duration"),
+                        movieJ.getString("lang"));
+                Movies.add(movie);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+
+        return Movies;
+    }
+
+    public ArrayList<Movie> getPremierMovies(){
+        ArrayList<Movie> Movies=new ArrayList<Movie>();
+        String url = "http://adjaranet.com/cache/cached_home_premiere.php?type=premiere&order=new&period=week&limit=25";
+        NetworkDAO networkDAO=new NetworkDAO();
+        try {
+            String rawMoviesData=networkDAO.request(url);
+            Log.d("kaxaGeo", rawMoviesData);
+            JSONArray movies=new JSONArray(rawMoviesData);
+            //JSONArray movies=jsonObject.getJSONArray("data");
+            for (int i=0;i<movies.length();i++){
+                JSONObject movieJ=movies.getJSONObject(i);
+                Log.d("kaxa", movieJ.getString("poster"));
+                Log.d("lang",movieJ.getString("lang"));
+                Movie movie=new Movie(movieJ.getString("id"),
+                        movieJ.getString("title_en"),
+                        movieJ.getString("link"),
+                        movieJ.getString("poster"),
+                        movieJ.getString("imdb"),
+                        movieJ.getString("imdb_id"),
+                        movieJ.getString("release_date"),
+                        movieJ.getString("description"),
+                        movieJ.getString("duration"),
+                        movieJ.getString("lang"));
+                Movies.add(movie);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+
+        return Movies;
+    }
 }

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="120dp" android:layout_height="match_parent"
+    xmlns:card="http://schemas.android.com/apk/res-auto"
+    >
+
+    <it.gmariotti.cardslib.library.view.CardViewNative
+        android:id="@+id/movieCard"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        card:card_layout_resourceID="@layout/native_material_largeimage_card"
+        style="@style/card_external"
+        />
+    </RelativeLayout>
+
