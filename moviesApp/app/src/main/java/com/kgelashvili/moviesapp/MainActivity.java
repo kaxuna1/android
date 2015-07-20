@@ -69,7 +69,7 @@ public class MainActivity extends Activity implements ScrollViewListener {
     private int currentLoaded = 0;
     ArrayAdapter<Movie> adapter;
     ArrayList<Movie> movies = new ArrayList<Movie>();
-    boolean loadingMore = false;
+    boolean loadingMore = true;
     String keyWord = "";
     dbHelper dbHelper2=new dbHelper(MainActivity.this);
 
@@ -100,7 +100,7 @@ public class MainActivity extends Activity implements ScrollViewListener {
     CardArrayAdapter adapter2Series;
     ArrayList<Card> cardsSeries =new ArrayList<Card>();
     private int currentLoadedSeries = 0;
-    boolean loadingMoreSeries = false;
+    boolean loadingMoreSeries = true;
     String keyWordSeries = "";
     CardListView mListViewSeries;
 
@@ -125,9 +125,14 @@ public class MainActivity extends Activity implements ScrollViewListener {
         mDrawer.setDrawerListener(mDrawerToggle);
         final TabHost tabHost = (TabHost) findViewById(R.id.tabHost);
         tabHost.setup();
-        TabHost.TabSpec tabSpec = tabHost.newTabSpec("list");
+        TabHost.TabSpec tabSpec = tabHost.newTabSpec("main");
+        tabSpec.setContent(R.id.tab0);
+        tabSpec.setIndicator("მთავარი");
+        tabHost.addTab(tabSpec);
+
+        tabSpec = tabHost.newTabSpec("list");
         tabSpec.setContent(R.id.tab1);
-        tabSpec.setIndicator("კინოები");
+        tabSpec.setIndicator("ფილმები");
         tabHost.addTab(tabSpec);
 
         tabSpec = tabHost.newTabSpec("favorites");
@@ -170,14 +175,19 @@ public class MainActivity extends Activity implements ScrollViewListener {
 
         final getGeoMovies geoMovies=new getGeoMovies();
         final getPremierMovies premierMovies=new getPremierMovies();
+        final GetSeries getSeries=new GetSeries();
+        final getLatestEpisodes latestEpisodes=new getLatestEpisodes();
         new Thread(new Runnable() {
             @Override
             public void run() {
                 loadingMore = true;
                 getmovies.doInBackground("" + currentLoaded);
+                loadingMoreSeries = true;
+                getSeries.doInBackground("" + currentLoadedSeries);
                 getmoviesFav.doInBackground("");
                 geoMovies.doInBackground("");
                 premierMovies.doInBackground("");
+                latestEpisodes.doInBackground("");
 
             }
         })
@@ -223,8 +233,7 @@ public class MainActivity extends Activity implements ScrollViewListener {
         if (mListView2 != null) {
             mListView2.setAdapter(adapter3);
         }
-        ScrollViewExt scroll = (ScrollViewExt) findViewById(R.id.scrollView);
-        scroll.setScrollViewListener(this);
+
 
 
 
@@ -251,16 +260,9 @@ public class MainActivity extends Activity implements ScrollViewListener {
             }
         });*/
 
-        final GetSeries getSeries=new GetSeries();
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                loadingMoreSeries = true;
-                getSeries.doInBackground("" + currentLoadedSeries);
 
-            }
-        });
+
         adapter2Series =new CardArrayAdapter(this, cardsSeries);
         EditText searchBoxSeries = (EditText) findViewById(R.id.searchBoxSeries);
         mListViewSeries = (CardListView) findViewById(R.id.seriesList);
@@ -280,7 +282,6 @@ public class MainActivity extends Activity implements ScrollViewListener {
                 adapter2Series.clear();
                 currentLoadedSeries = 0;
                 adapter2Series.notifyDataSetChanged();
-                setListViewHeightBasedOnChildren(mListView);
             }
 
             @Override
@@ -321,7 +322,7 @@ public class MainActivity extends Activity implements ScrollViewListener {
                                  int visibleItemCount, int totalItemCount) {
 
                 int lastInScreen = firstVisibleItem + visibleItemCount;
-                if ((lastInScreen == totalItemCount) && !(loadingMoreSeries)) {
+                if ((lastInScreen == totalItemCount) && !(loadingMore)) {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -329,11 +330,31 @@ public class MainActivity extends Activity implements ScrollViewListener {
                             getmovies.doInBackground("" + currentLoaded);
                         }
                     }).start();
-                    setListViewHeightBasedOnChildren(mListView);
                 }
             }
         });
+        mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
 
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem,
+                                 int visibleItemCount, int totalItemCount) {
+
+                int lastInScreen = firstVisibleItem + visibleItemCount;
+                if ((lastInScreen == totalItemCount) && !(loadingMore)) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            loadingMore = true;
+                            getmovies.doInBackground("" + currentLoaded);
+                        }
+                    }).start();
+                }
+            }
+        });
 
 
         NotificationCompat.Builder notificationBuilder=new NotificationCompat.Builder(this);
@@ -632,7 +653,7 @@ public class MainActivity extends Activity implements ScrollViewListener {
 
         @Override
         protected ArrayList<Movie> doInBackground(String... strings) {
-
+            Log.d("kinoLoad","gamodzaxda");
             MovieServices movieServices = new MovieServices();
             ArrayList<Movie> movies = movieServices.getMainMovies(strings[0], "false", "1900", "2015", keyWord);
             publishProgress(movies);
@@ -646,7 +667,6 @@ public class MainActivity extends Activity implements ScrollViewListener {
             for (int i = 0; i < values[0].size(); i++) {
                 addMovieToLoadidData(values[0].get(i));
             }
-            setListViewHeightBasedOnChildren(mListView);
             //adapter.notifyDataSetChanged();
             Log.d("moviesLogKaxa","gamodzaxda");
             Log.d("moviesLog", "" + currentLoaded);
@@ -700,6 +720,73 @@ public class MainActivity extends Activity implements ScrollViewListener {
             }
 
         }
+
+    }
+
+    class getLatestEpisodes extends AsyncTask<String, ArrayList<Movie>, ArrayList<Movie>> {
+
+        @Override
+        protected ArrayList<Movie> doInBackground(String... strings) {
+
+            MovieServices movieServices = new MovieServices();
+            ArrayList<Movie> series = movieServices.getNewEpisodes();
+            //Log.d("kaxatest21",series.get(0).getTitle_en());
+            publishProgress(series);
+
+            return series;
+        }
+        @Override
+        protected void onProgressUpdate(ArrayList<Movie>... values) {
+            super.onProgressUpdate(values);
+            Log.d("kaxaGeo12", "kaxaGeo12");
+            for (int i = 0; i < values[0].size(); i++) {
+                addLatestEpisodeToColection(values[0].get(i));
+            }
+
+        }
+
+    }
+
+    private void addLatestEpisodeToColection(final Movie serie) {
+
+        Log.d("episodes","episodes12");
+        LinearLayout linearLayout = (LinearLayout )findViewById(R.id.newEpisodesLayout);
+        LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
+        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.movieontop, null, false);
+
+
+
+
+
+        MaterialLargeImageCard card =
+                MaterialLargeImageCard.with(MainActivity.this)
+                        //.setTextOverImage("Se "+serie.getLastSes()+" Ep "+serie.getLastEp())
+                        .useDrawableUrl(serie.getPoster())
+                        .build();
+
+
+        card.setOnClickListener(new Card.OnCardClickListener() {
+            @Override
+            public void onClick(Card card, View view) {
+                Movie selectedMovie = serie;
+
+                Intent i = new Intent(MainActivity.this, serie_page_activity.class);
+                i.putExtra("movieId", selectedMovie.getId());
+                i.putExtra("description", selectedMovie.getDescription());
+                i.putExtra("title", selectedMovie.getTitle_en());
+                i.putExtra("date", selectedMovie.getRelease_date());
+                i.putExtra("duration", selectedMovie.getDuration());
+                i.putExtra("rating", selectedMovie.getImdb());
+                i.putExtra("imdb", selectedMovie.getImdb_id());
+                i.putExtra("lang", selectedMovie.getLang());
+                i.putExtra("time", 0);
+                startActivity(i);
+            }
+        });
+        CardViewNative cardView = (CardViewNative) layout.findViewById(R.id.movieCard);
+        cardView.setCard(card);
+
+        linearLayout.addView(layout);
 
     }
 
@@ -1132,11 +1219,11 @@ public class MainActivity extends Activity implements ScrollViewListener {
         }
 
     }
+
     public void addSerieToLoadidData(final Serie serie) {
 
         //adapter.add(movie);
-
-
+        Log.d("logSeries","log");
         Card card = new Card(MainActivity.this);
 
         //Create a CardHeader
@@ -1232,8 +1319,10 @@ public class MainActivity extends Activity implements ScrollViewListener {
         int diff = (view.getBottom() - (scrollView.getHeight() + scrollView.getScrollY()));
 
         // if diff is zero, then the bottom has been reached
+
         if (diff == 0) {
             if(!loadingMore){
+                Log.d("gamodzaxda1","aqedan");
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
