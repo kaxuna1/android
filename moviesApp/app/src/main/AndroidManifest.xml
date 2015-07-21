@@ -3,6 +3,7 @@
     package="com.kgelashvili.moviesapp" >
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -11,7 +12,7 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".MainActivity"
-            android:label="კინოები"
+            android:label="Adjaranet"
             android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -51,7 +52,7 @@
             android:name=".SeriesActiviry"
             android:label="@string/title_activity_series_activiry"
             android:parentActivityName=".MainActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.kgelashvili.moviesapp.MainActivity" />
@@ -60,11 +61,28 @@
             android:name=".serie_page_activity"
             android:label="@string/title_activity_serie_page_activity"
             android:parentActivityName=".SeriesActiviry"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.kgelashvili.moviesapp.SeriesActiviry" />
         </activity>
+
+        <receiver android:name=".MyBroadcastReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".StartUpService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
+        <service
+            android:name=".CheckNewEpisodes"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
     </application>
 
 </manifest>

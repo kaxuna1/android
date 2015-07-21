@@ -3,6 +3,10 @@
     android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     tools:context="com.kgelashvili.moviesapp.serie_page_activity">
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/relativeLayout6">
     <VideoView android:id="@+id/myserieview"
         android:layout_width="fill_parent"
         android:layout_alignParentRight="true"
@@ -10,11 +14,11 @@
         android:layout_alignParentTop="true"
         android:layout_height="200dp">
     </VideoView>
-
+    </RelativeLayout>
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/myserieview"
+        android:layout_below="@+id/relativeLayout6"
         android:id="@+id/relativeLayout">
 
         <Button

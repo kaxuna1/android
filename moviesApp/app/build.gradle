@@ -18,6 +18,11 @@ android {
         }
     }
 }
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+}
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
@@ -39,4 +44,5 @@ dependencies {
     //Optional for twoway  (coming soon)
     //compile 'com.github.gabrielemariotti.cards:cardslib-extra-twoway:2.1.0'
     compile files('libs/jsoup-1.8.2.jar')
+    compile 'uk.co.chrisjenx:calligraphy:2.1.0'
 }

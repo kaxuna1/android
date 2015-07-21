@@ -174,7 +174,43 @@ public class MovieServices {
             for (int i=0;i<movies.length();i++){
                 JSONObject movieJ=movies.getJSONObject(i);
                 Log.d("kaxa", movieJ.getString("poster"));
-                Log.d("lang", movieJ.getString("lang"));
+                //Log.d("lang", movieJ.getString("lang"));
+                Movie movie=new Movie(movieJ.getString("id"),
+                        movieJ.getString("title_en"),
+                        movieJ.getString("link"),
+                        movieJ.getString("poster"),
+                        movieJ.getString("imdb"),
+                        "",
+                        movieJ.getString("release_date"),
+                        movieJ.getString("description"),
+                        "",
+                        "");
+                Movies.add(movie);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+
+        return Movies;
+    }
+
+    public ArrayList<Movie> getNewAddedMovies(){
+        ArrayList<Movie> Movies=new ArrayList<Movie>();
+        String url = "http://adjaranet.com/cache/cached_home_movies.php?type=movies&order=new&period=week&limit=25";
+        NetworkDAO networkDAO=new NetworkDAO();
+        try {
+            String rawMoviesData=networkDAO.request(url);
+            Log.d("kaxaGeo", rawMoviesData);
+            JSONArray movies=new JSONArray(rawMoviesData);
+            //JSONArray movies=jsonObject.getJSONArray("data");
+            for (int i=0;i<movies.length();i++){
+                JSONObject movieJ=movies.getJSONObject(i);
+                Log.d("kaxa", movieJ.getString("poster"));
+                Log.d("lang",movieJ.getString("lang"));
                 Movie movie=new Movie(movieJ.getString("id"),
                         movieJ.getString("title_en"),
                         movieJ.getString("link"),
@@ -184,7 +220,7 @@ public class MovieServices {
                         movieJ.getString("release_date"),
                         movieJ.getString("description"),
                         movieJ.getString("duration"),
-                        "");
+                        movieJ.getString("lang"));
                 Movies.add(movie);
             }
         } catch (IOException e) {

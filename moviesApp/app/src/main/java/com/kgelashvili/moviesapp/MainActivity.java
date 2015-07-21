@@ -1,12 +1,15 @@
 package com.kgelashvili.moviesapp;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -62,6 +65,8 @@ import it.gmariotti.cardslib.library.internal.CardThumbnail;
 import it.gmariotti.cardslib.library.view.CardListView;
 import it.gmariotti.cardslib.library.view.CardView;
 import it.gmariotti.cardslib.library.view.CardViewNative;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class MainActivity extends Activity implements ScrollViewListener {
     String currentMovieUrl = "";
@@ -105,15 +110,45 @@ public class MainActivity extends Activity implements ScrollViewListener {
     CardListView mListViewSeries;
 
 
-
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
 
         super.onCreate(savedInstanceState);
+
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                        .setDefaultFontPath("fonts/bpg_square_mtavruli_2009.ttf")
+                        .setFontAttrId(R.attr.fontPath)
+                        .build()
+        );
+        //getActionBar().hide();
+
         setContentView(R.layout.activity_main);
+
+        LayoutInflater inflater = (LayoutInflater) getActionBar().getThemedContext()
+                .getSystemService(LAYOUT_INFLATER_SERVICE);
+
+        final View customActionBarView = inflater.inflate(
+                R.layout.customheader, null);
+        final ActionBar actionBar = getActionBar();
+        actionBar.setHomeButtonEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(false);
+        actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setIcon(R.mipmap.ic_launcher);
+        actionBar.setCustomView(customActionBarView);
+        actionBar.setDisplayShowCustomEnabled(true);
+
+
+        //Typeface face = Typeface.createFromAsset(getAssets(),"fonts/bpg_square_mtavruli_2009.ttf");
+
+
         MainActivity.this.getWindow().getDecorView().setBackgroundColor(getResources().getColor(R.color.gray_background));
+
 
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout2);
 
@@ -137,13 +172,15 @@ public class MainActivity extends Activity implements ScrollViewListener {
 
         tabSpec = tabHost.newTabSpec("favorites");
         tabSpec.setContent(R.id.tab2);
-        tabSpec.setIndicator("★");
+        tabSpec.setIndicator("ფავორიტები");
         tabHost.addTab(tabSpec);
 
         tabSpec = tabHost.newTabSpec("series");
         tabSpec.setContent(R.id.tab3);
         tabSpec.setIndicator("სერიალები");
         tabHost.addTab(tabSpec);
+
+
 
         FloatingActionButton mFab = new FloatingActionButton.Builder(this)
                 .withColor(getResources().getColor(R.color.primary))
@@ -155,7 +192,7 @@ public class MainActivity extends Activity implements ScrollViewListener {
             @Override
             public void onClick(View v) {
                 ((EditText) findViewById(R.id.searchBox)).requestFocus();
-                tabHost.setCurrentTab(0);
+                tabHost.setCurrentTab(1);
                 final EditText k = (EditText) findViewById(R.id.searchBox);
                 k.post(new Runnable() {
                     public void run() {
@@ -177,6 +214,7 @@ public class MainActivity extends Activity implements ScrollViewListener {
         final getPremierMovies premierMovies=new getPremierMovies();
         final GetSeries getSeries=new GetSeries();
         final getLatestEpisodes latestEpisodes=new getLatestEpisodes();
+        final getNewAddedMovies newAddedMovies=new getNewAddedMovies();
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -188,6 +226,7 @@ public class MainActivity extends Activity implements ScrollViewListener {
                 geoMovies.doInBackground("");
                 premierMovies.doInBackground("");
                 latestEpisodes.doInBackground("");
+                newAddedMovies.doInBackground("");
 
             }
         })
@@ -204,6 +243,7 @@ public class MainActivity extends Activity implements ScrollViewListener {
 
 
         EditText searchBox = (EditText) findViewById(R.id.searchBox);
+        //searchBox.setTypeface(face);
         searchBox.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -357,14 +397,18 @@ public class MainActivity extends Activity implements ScrollViewListener {
         });
 
 
-        NotificationCompat.Builder notificationBuilder=new NotificationCompat.Builder(this);
-        notificationBuilder.setAutoCancel(true);
-        notificationBuilder.setContentTitle("testNotification");
-        notificationBuilder.setContentTitle("test notification text");
-        notificationBuilder.setSmallIcon(R.mipmap.ic_launcher);
-        Notification notification=notificationBuilder.build();
-        NotificationManager notificationManager=(NotificationManager)this.getSystemService(NOTIFICATION_SERVICE);
-        notificationManager.notify(8,notification);
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle("My Notification Title")
+                        .setContentText("Something interesting happened");
+        int NOTIFICATION_ID = 12345;
+
+        Intent targetIntent = new Intent(this, MainActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(contentIntent);
+        NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        nManager.notify(NOTIFICATION_ID, builder.build());
 
     }
 
@@ -723,6 +767,148 @@ public class MainActivity extends Activity implements ScrollViewListener {
 
     }
 
+    class getNewAddedMovies extends AsyncTask<String, ArrayList<Movie>, ArrayList<Movie>> {
+
+        @Override
+        protected ArrayList<Movie> doInBackground(String... strings) {
+
+            MovieServices movieServices = new MovieServices();
+            ArrayList<Movie> movies = movieServices.getNewAddedMovies();
+            publishProgress(movies);
+
+            return movies;
+        }
+        @Override
+        protected void onProgressUpdate(ArrayList<Movie>... values) {
+            super.onProgressUpdate(values);
+            Log.d("kaxaGeo1", "kaxaGeo1");
+            for (int i = 0; i < values[0].size(); i++) {
+                addNewAddedMoviesToColection(values[0].get(i));
+            }
+
+        }
+
+    }
+
+    private void addNewAddedMoviesToColection(final Movie movie) {
+        LinearLayout linearLayout = (LinearLayout )findViewById(R.id.newAddedMoviesLayout);
+        LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
+        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.movieontop, null, false);
+
+
+        ArrayList<BaseSupplementalAction> actions = new ArrayList<BaseSupplementalAction>();
+        IconSupplementalAction t1 = new IconSupplementalAction(MainActivity.this, R.id.ic3);
+        t1.setOnActionClickListener(new BaseSupplementalAction.OnActionClickListener() {
+            @Override
+            public void onClick(Card card, View view) {
+                Toast.makeText(MainActivity.this, "დაემატა ფავორიტებში", Toast.LENGTH_LONG).show();
+                dbHelper2.createMovie(movie);
+                Card card2 = new Card(MainActivity.this);
+
+                //Create a CardHeader
+                CustomHeaderMainMovieItem header2 = new CustomHeaderMainMovieItem(MainActivity.this,
+                        movie.getTitle_en(), movie.getRelease_date(), movie.getDescription().length() > 50 ? movie.getDescription().substring(0, 49) : movie.getDescription());
+
+                //Set the header title
+                header2.setTitle(movie.getTitle_en());
+
+                card2.addCardHeader(header2);
+
+                header2.setOtherButtonVisible(true);
+                header2.setOtherButtonClickListener(new CardHeader.OnClickCardHeaderOtherButtonListener() {
+                    @Override
+                    public void onButtonItemClick(Card card, View view) {
+                        Toast.makeText(MainActivity.this, "დაემატა ფავორიტებში", Toast.LENGTH_LONG).show();
+                        dbHelper2.deleteMovie(movie);
+                        adapter3.remove(card);
+                        adapter3.notifyDataSetChanged();
+                    }
+                });
+
+                header2.setOtherButtonDrawable(R.drawable.card_menu_button_other_dismiss);
+
+
+                //Create thumbnail
+                //CustomThumbCard thumb = new CustomThumbCard(MainActivity.this);
+
+                CardThumbnail thumbnail2 = new CardThumbnail(MainActivity.this);
+
+                thumbnail2.setUrlResource(movie.getPoster());
+
+                //Set URL resource
+                //thumb.setUrlResource(movie.getPoster());
+
+
+                //Error Resource ID
+                thumbnail2.setErrorResource(R.drawable.ic_error_loadingorangesmall);
+
+                //Add thumbnail to a card
+                card2.addCardThumbnail(thumbnail2);
+
+
+                //Set card in the cardView
+
+
+                //Set card in the cardVie
+
+                card2.setOnClickListener(new Card.OnCardClickListener() {
+                    @Override
+                    public void onClick(Card card, View view) {
+                        Movie selectedMovie = movie;
+
+                        Intent i = new Intent(MainActivity.this, MoviePageActivity.class);
+                        i.putExtra("movieId", selectedMovie.getId());
+                        i.putExtra("description", selectedMovie.getDescription());
+                        i.putExtra("title", selectedMovie.getTitle_en());
+                        i.putExtra("date", selectedMovie.getRelease_date());
+                        i.putExtra("duration", selectedMovie.getDuration());
+                        i.putExtra("rating", selectedMovie.getImdb());
+                        i.putExtra("imdb", selectedMovie.getImdb_id());
+                        i.putExtra("lang", selectedMovie.getLang());
+                        i.putExtra("time", 0);
+                        startActivity(i);
+
+                    }
+                });
+                adapter3.add(card2);
+            }
+        });
+        actions.add(t1);
+
+
+        MaterialLargeImageCard card =
+                MaterialLargeImageCard.with(MainActivity.this)
+                        //.setTextOverImage(movie.getTitle_en())
+                        .useDrawableUrl(movie.getPoster())
+                                //.setupSupplementalActions(R.layout.carddemo_native_material_supplemental_actions_large_icon, actions)
+                        .build();
+
+
+        card.setOnClickListener(new Card.OnCardClickListener() {
+            @Override
+            public void onClick(Card card, View view) {
+                Movie selectedMovie = movie;
+
+                Intent i = new Intent(MainActivity.this, MoviePageActivity.class);
+                i.putExtra("movieId", selectedMovie.getId());
+                i.putExtra("description", selectedMovie.getDescription());
+                i.putExtra("title", selectedMovie.getTitle_en());
+                i.putExtra("date", selectedMovie.getRelease_date());
+                i.putExtra("duration", selectedMovie.getDuration());
+                i.putExtra("rating", selectedMovie.getImdb());
+                i.putExtra("imdb", selectedMovie.getImdb_id());
+                i.putExtra("lang", selectedMovie.getLang());
+                i.putExtra("time", 0);
+                startActivity(i);
+            }
+        });
+        CardViewNative cardView = (CardViewNative) layout.findViewById(R.id.movieCard);
+        cardView.setCard(card);
+
+        linearLayout.addView(layout);
+
+    }
+
     class getLatestEpisodes extends AsyncTask<String, ArrayList<Movie>, ArrayList<Movie>> {
 
         @Override
@@ -879,7 +1065,7 @@ public class MainActivity extends Activity implements ScrollViewListener {
                 MaterialLargeImageCard.with(MainActivity.this)
                         //.setTextOverImage(movie.getTitle_en())
                         .useDrawableUrl(movie.getPoster())
-                        .setupSupplementalActions(R.layout.carddemo_native_material_supplemental_actions_large_icon, actions)
+                        //.setupSupplementalActions(R.layout.carddemo_native_material_supplemental_actions_large_icon, actions)
                         .build();
 
 
@@ -998,7 +1184,7 @@ public class MainActivity extends Activity implements ScrollViewListener {
                 MaterialLargeImageCard.with(MainActivity.this)
                         //.setTextOverImage(movie.getTitle_en())
                         .useDrawableUrl(movie.getPoster())
-                        .setupSupplementalActions(R.layout.carddemo_native_material_supplemental_actions_large_icon, actions)
+                        //.setupSupplementalActions(R.layout.carddemo_native_material_supplemental_actions_large_icon, actions)
                         .build();
 
 
@@ -1048,7 +1234,7 @@ public class MainActivity extends Activity implements ScrollViewListener {
 
         @Override
         public void onDrawerClosed(View view) {
-            getActionBar().setTitle("კინოები");
+            getActionBar().setTitle("Adjaranet");
             invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
         }
 

@@ -1,13 +1,17 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 <android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawer_layout2"
-    layout_marginTop="?attr/actionBarSize"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        >
 
         <TabHost
             android:id="@+id/tabHost"
@@ -28,7 +32,8 @@
                     <TabWidget
                         android:id="@android:id/tabs"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"></TabWidget>
+                        android:layout_height="wrap_content"
+                     >></TabWidget>
                 </HorizontalScrollView>
 
                 <FrameLayout
@@ -121,12 +126,13 @@
 
                                     </LinearLayout>
                                 </HorizontalScrollView>
+
                                 <TextView
                                     android:id="@+id/textView7"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_below="@id/horizontalScrollView2"
-                                    android:text="ახალი ეპიზოდები"
+                                    android:text="ახალი დამატებული ფილმები"
                                     android:textAppearance="?android:attr/textAppearanceMedium" />
 
                                 <HorizontalScrollView
@@ -134,6 +140,33 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_below="@+id/textView7"
+                                    android:layout_weight="0.04"
+                                    android:scrollbars="none">
+
+                                    <LinearLayout
+                                        android:id="@+id/newAddedMoviesLayout"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:orientation="horizontal"
+                                        android:paddingLeft="@dimen/carddemo_list_padding"
+                                        android:paddingRight="@dimen/carddemo_list_padding">
+
+                                    </LinearLayout>
+                                </HorizontalScrollView>
+
+                                <TextView
+                                    android:id="@+id/textView8"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@id/horizontalScrollView3"
+                                    android:text="ახალი ეპიზოდები"
+                                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                                <HorizontalScrollView
+                                    android:id="@+id/horizontalScrollView4"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@+id/textView8"
                                     android:layout_weight="0.04"
                                     android:scrollbars="none">
 
@@ -280,3 +313,4 @@
         android:divider="@android:color/darker_gray"
         android:dividerHeight="1dp"></ListView>
 </android.support.v4.widget.DrawerLayout>
+</RelativeLayout>

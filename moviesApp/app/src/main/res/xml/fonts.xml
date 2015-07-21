@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<familyset>
+
+    <!-- Some Font. Can be referenced with 'someFont' or 'aspergit' -->
+    <family>
+        <nameset>
+            <name>geoMtavruli</name>
+            <name>geoMtavruli</name>
+        </nameset>
+        <fileset>
+            <file>bpg_square_mtavruli_2009.ttf</file>
+        </fileset>
+    </family>
+
+</familyset>

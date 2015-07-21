@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PixelFormat;
@@ -25,6 +26,9 @@ import android.widget.VideoView;
 
 import com.kgelashvili.moviesapp.Classes.FloatingActionButton;
 
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
 public class MoviePageActivity extends Activity {
 
     //Uri video = Uri.parse("http://212.72.157.137/fast2/storage/10246/10246_Georgian_300.mp4");
@@ -33,6 +37,12 @@ public class MoviePageActivity extends Activity {
     VideoView videoView;
     String videourl="";
     int movieTime=0;
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -44,6 +54,11 @@ public class MoviePageActivity extends Activity {
 
 
         super.onCreate(savedInstanceState);
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                        .setDefaultFontPath("fonts/bpg_square_mtavruli_2009.ttf")
+                        .setFontAttrId(R.attr.fontPath)
+                        .build()
+        );
         setContentView(R.layout.moviepagelayout);
         FloatingActionButton mFab = new FloatingActionButton.Builder(this)
                 .withColor(getResources().getColor(R.color.primary))
@@ -134,12 +149,11 @@ public class MoviePageActivity extends Activity {
         try
         {
             getWindow().setFormat(PixelFormat.TRANSLUCENT);
-            MediaController mediaController = new MediaController(MoviePageActivity.this);
-            mediaController.setAnchorView(videoView);
+
 
 
             final Uri video = Uri.parse(videourl);
-            videoView.setMediaController(mediaController);
+            //videoView.setMediaController(mediaController);
             videoView.setVideoURI(video);
             videoView.requestFocus();
             videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener()
@@ -147,18 +161,24 @@ public class MoviePageActivity extends Activity {
 
                 public void onPrepared(MediaPlayer mp)
                 {
+
                     progressDialog.dismiss();
                     videoView.start();
                     videoView.seekTo(movieTime);
                     videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
                         @Override
                         public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
-                            movieTime=mediaPlayer.getCurrentPosition();
-                            Log.d("kaxaError","error");
+                            movieTime = mediaPlayer.getCurrentPosition();
+                            Log.d("kaxaError", "error");
                             PlayVideo();
                             return true;
                         }
                     });
+                    MediaController mediaController = new MediaController(MoviePageActivity.this);
+                    mediaController.setAnchorView(videoView);
+                    videoView.setMediaController(mediaController);
+
+
                 }
             });
 

@@ -3,6 +3,7 @@ package com.kgelashvili.moviesapp;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PixelFormat;
@@ -43,6 +44,8 @@ import java.util.ArrayList;
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardHeader;
 import it.gmariotti.cardslib.library.view.CardView;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class serie_page_activity extends Activity {
     private static ProgressDialog progressDialog;
@@ -56,9 +59,20 @@ public class serie_page_activity extends Activity {
     VideoView videoView;
     int movieTime=0;
     EpisodesListAdapter adapter;
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                        .setDefaultFontPath("fonts/bpg_square_mtavruli_2009.ttf")
+                        .setFontAttrId(R.attr.fontPath)
+                        .build()
+        );
         setContentView(R.layout.activity_serie_page_activity);
         seasons=new ArrayList<Season>();
         final Bundle extras = getIntent().getExtras();
@@ -183,12 +197,10 @@ public class serie_page_activity extends Activity {
         try
         {
             getWindow().setFormat(PixelFormat.TRANSLUCENT);
-            MediaController mediaController = new MediaController(serie_page_activity.this);
-            mediaController.setAnchorView(videoView);
+
 
 
             final Uri video = Uri.parse(videourl);
-            videoView.setMediaController(mediaController);
             videoView.setVideoURI(video);
             videoView.requestFocus();
             videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener()
@@ -202,12 +214,15 @@ public class serie_page_activity extends Activity {
                     videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
                         @Override
                         public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
-                            movieTime=mediaPlayer.getCurrentPosition();
-                            Log.d("kaxaError","error");
+                            movieTime = mediaPlayer.getCurrentPosition();
+                            Log.d("kaxaError", "error");
                             PlayVideo();
                             return true;
                         }
                     });
+                    MediaController mediaController = new MediaController(serie_page_activity.this);
+                    mediaController.setAnchorView(videoView);
+                    videoView.setMediaController(mediaController);
                 }
             });
 
