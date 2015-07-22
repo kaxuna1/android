@@ -26,13 +26,11 @@ public class StartUpService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         // The service is starting, due to a call to startService()
 
-        AlarmManager alarm=(AlarmManager)getSystemService(Context.ALARM_SERVICE);
-
-        Intent myIntent = new Intent(this, CheckNewEpisodes.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(StartUpService.this, 0, myIntent,PendingIntent.FLAG_UPDATE_CURRENT);
-
-        alarm.setRepeating(AlarmManager.RTC_WAKEUP,System.currentTimeMillis(),15000,pendingIntent );
-
+        AlarmManager am=(AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+        Intent intent2 = new Intent(this, CheckEpisodesBroadcastReceiver.class);
+        //intent.putExtra(ONE_TIME, Boolean.TRUE);
+        PendingIntent pi = PendingIntent.getBroadcast(this, 0, intent2, 0);
+        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (1000 * 30), pi);
         return 1;
     }
 }

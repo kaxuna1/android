@@ -2,6 +2,7 @@ package com.kgelashvili.moviesapp;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -36,6 +37,7 @@ import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.RemoteViews;
 import android.widget.TabHost;
 import android.widget.Toast;
 
@@ -50,7 +52,11 @@ import com.kgelashvili.moviesapp.model.Movie;
 import com.kgelashvili.moviesapp.model.Serie;
 import com.kgelashvili.moviesapp.utils.SimpleSectionedListAdapter;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -396,21 +402,14 @@ public class MainActivity extends Activity implements ScrollViewListener {
             }
         });
 
-
-        NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.mipmap.ic_launcher)
-                        .setContentTitle("My Notification Title")
-                        .setContentText("Something interesting happened");
-        int NOTIFICATION_ID = 12345;
-
-        Intent targetIntent = new Intent(this, MainActivity.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        builder.setContentIntent(contentIntent);
-        NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        nManager.notify(NOTIFICATION_ID, builder.build());
-
+        AlarmManager am=(AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+        Intent intent2 = new Intent(this, CheckEpisodesBroadcastReceiver.class);
+        //intent.putExtra(ONE_TIME, Boolean.TRUE);
+        PendingIntent pi = PendingIntent.getBroadcast(this, 0, intent2, 0);
+        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (1000 * 5), pi);
     }
+
+
 
     public void addMovieToLoadidData(final Movie movie) {
 
