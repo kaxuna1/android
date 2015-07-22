@@ -1,16 +1,13 @@
-package com.kgelashvili.moviesapp;
+package com.kgelashvili.moviesapp.services;
 
 import android.app.AlarmManager;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
 
-import java.util.Calendar;
+import com.kgelashvili.moviesapp.broadcastreceivers.CheckEpisodesBroadcastReceiver;
 
 public class StartUpService extends Service {
     public StartUpService() {

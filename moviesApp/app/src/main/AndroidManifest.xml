@@ -67,26 +67,21 @@
                 android:value="com.kgelashvili.moviesapp.SeriesActiviry" />
         </activity>
 
-        <receiver android:name=".MyBroadcastReceiver" >
+        <receiver android:name=".broadcastreceivers.MyBroadcastReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".CheckEpisodesBroadcastReceiver" >
+        <receiver android:name=".broadcastreceivers.CheckEpisodesBroadcastReceiver" >
         </receiver>
 
         <service
-            android:name=".StartUpService"
+            android:name=".services.StartUpService"
             android:enabled="true"
             android:exported="true" >
         </service>
         <service
-            android:name=".CheckNewEpisodes"
-            android:enabled="true"
-            android:exported="true" >
-        </service>
-        <service
-            android:name=".openMovieFromNotificationService"
+            android:name=".services.CheckNewEpisodes"
             android:enabled="true"
             android:exported="true" >
         </service>

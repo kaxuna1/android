@@ -154,7 +154,8 @@ public class MoviePageActivity extends Activity {
 
             final Uri video = Uri.parse(videourl);
             //videoView.setMediaController(mediaController);
-            videoView.setVideoURI(video);
+            Log.d("moviePageLink",videourl);
+            videoView.setVideoURI(Uri.parse(videourl));
             videoView.requestFocus();
             videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener()
             {
