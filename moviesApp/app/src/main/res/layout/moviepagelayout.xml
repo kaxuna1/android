@@ -1,78 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/moviePageRelative"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:alpha="0"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     tools:context="com.kgelashvili.moviesapp.serie_page_activity">
+
     <RelativeLayout
+        android:id="@+id/relativeLayout4"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/relativeLayout4"><VideoView android:id="@+id/myvideoview"
-        android:layout_width="fill_parent"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_height="200dp">
-    </VideoView></RelativeLayout>
+        android:layout_height="wrap_content">
+
+        <VideoView
+            android:id="@+id/myvideoview"
+            android:layout_width="fill_parent"
+            android:layout_height="200dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"></VideoView>
+    </RelativeLayout>
 
 
     <RelativeLayout
+        android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/relativeLayout4"
-        android:id="@+id/relativeLayout">
+        android:layout_below="@+id/relativeLayout4">
 
         <ListView
+            android:id="@+id/listView"
             android:layout_width="68dp"
             android:layout_height="wrap_content"
-            android:id="@+id/listView"
-            android:layout_weight="0.93"
             android:layout_alignParentStart="true"
+            android:layout_below="@+id/downloadButtonSerie"
             android:layout_toStartOf="@+id/tableLayout"
-            android:layout_below="@+id/downloadButtonSerie" />
+            android:layout_weight="0.93" />
 
         <TableLayout
-            android:paddingTop="15dp"
+            android:id="@+id/tableLayout"
             android:layout_width="192dp"
             android:layout_height="50dp"
-            android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
-            android:id="@+id/tableLayout">
+            android:layout_alignParentTop="true"
+            android:paddingTop="15dp">
 
             <TableRow
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
                 <ImageView
+                    android:id="@+id/imdbImg"
                     android:layout_width="50dp"
                     android:layout_height="20dp"
-                    android:id="@+id/imdbImg"
                     android:layout_column="1"
                     android:src="@drawable/imdb" />
 
                 <TextView
+                    android:id="@+id/imdbRating"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="imdbText"
-                    android:id="@+id/imdbRating"
+                    android:layout_below="@+id/tableLayout2"
                     android:layout_column="3"
-                    android:layout_below="@+id/tableLayout2"/>
+                    android:text="imdbText"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
             </TableRow>
 
 
-
-
-
         </TableLayout>
+
         <TableLayout
-            android:paddingTop="5dp"
+            android:id="@+id/tableLayout2"
             android:layout_width="192dp"
             android:layout_height="50dp"
-            android:id="@+id/tableLayout2"
             android:layout_below="@+id/tableLayout"
-            android:layout_toEndOf="@+id/listView">
-
+            android:layout_toEndOf="@+id/listView"
+            android:paddingTop="5dp">
 
 
             <TableRow
@@ -80,22 +85,21 @@
                 android:layout_height="match_parent">
 
                 <TextView
+                    android:id="@+id/textView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:layout_column="1"
                     android:text="თარიღი:"
-                    android:id="@+id/textView"
-                    android:layout_column="1" />
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
 
                 <TextView
+                    android:id="@+id/movieDate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:layout_column="3"
                     android:text="Medium Text"
-                    android:id="@+id/movieDate"
-                    android:layout_column="3" />
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
             </TableRow>
-
 
 
         </TableLayout>
@@ -107,41 +111,41 @@
             android:layout_toEndOf="@+id/listView">
 
             <TextView
+                android:id="@+id/textView2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="შინაარსი"
-                android:id="@+id/textView2"
+                android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
-                android:layout_alignParentStart="true" />
+                android:text="შინაარსი"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <TextView
+                android:id="@+id/descriptionTxt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="Small Text"
-                android:id="@+id/descriptionTxt"
-                android:layout_below="@+id/textView2"
+                android:layout_alignParentEnd="true"
                 android:layout_alignParentStart="true"
-                android:layout_alignParentEnd="true" />
+                android:layout_below="@+id/textView2"
+                android:text="Small Text"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
         </RelativeLayout>
 
         <Button
+            android:id="@+id/langBtnSerie"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="ენები"
-            android:id="@+id/langBtnSerie"
             android:layout_alignParentStart="true"
-            android:layout_toStartOf="@+id/tableLayout" />
+            android:layout_toStartOf="@+id/tableLayout"
+            android:text="ენები" />
 
         <Button
+            android:id="@+id/downloadButtonSerie"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="გადმოწერა"
-            android:id="@+id/downloadButtonSerie"
-            android:layout_below="@+id/langBtnSerie"
             android:layout_alignParentStart="true"
-            android:layout_toStartOf="@+id/tableLayout2" />
+            android:layout_below="@+id/langBtnSerie"
+            android:layout_toStartOf="@+id/tableLayout2"
+            android:text="გადმოწერა" />
 
     </RelativeLayout>
 

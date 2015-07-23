@@ -1,6 +1,5 @@
 package com.kgelashvili.moviesapp;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -11,20 +10,20 @@ import android.graphics.PixelFormat;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
 
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 import com.kgelashvili.moviesapp.Classes.FloatingActionButton;
+import com.nineoldandroids.animation.Animator;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
@@ -35,8 +34,8 @@ public class MoviePageActivity extends Activity {
     private static ProgressDialog progressDialog;
 
     VideoView videoView;
-    String videourl="";
-    int movieTime=0;
+    String videourl = "";
+    int movieTime = 0;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -46,12 +45,6 @@ public class MoviePageActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        final Bundle extras = getIntent().getExtras();
-        final String value = extras.getString("movieId");
-        videourl = "http://adjaranet.com/download.php?mid="+value+"&file="+value+"_"+(extras.getString("lang").split(",")[0])+"_300";
-        setTitle(extras.getString("title"));
-        movieTime=extras.getInt("time");
-
 
         super.onCreate(savedInstanceState);
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
@@ -60,7 +53,9 @@ public class MoviePageActivity extends Activity {
                         .build()
         );
         setContentView(R.layout.moviepagelayout);
-        FloatingActionButton mFab = new FloatingActionButton.Builder(this)
+        final Bundle extras = getIntent().getExtras();
+        final String value = extras.getString("movieId");
+        FloatingActionButton mFab = new FloatingActionButton.Builder(MoviePageActivity.this)
                 .withColor(getResources().getColor(R.color.primary))
                 .withDrawable(getResources().getDrawable(R.drawable.androidfullscreen))
                 .withSize(72)
@@ -85,7 +80,7 @@ public class MoviePageActivity extends Activity {
                         startActivityForResult(i, 0);
                     }
                 });
-        ((Button)findViewById(R.id.downloadButtonSerie)).setOnClickListener(new View.OnClickListener() {
+        ((Button) findViewById(R.id.downloadButtonSerie)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String url = videourl;
@@ -94,7 +89,7 @@ public class MoviePageActivity extends Activity {
                 startActivity(i);
             }
         });
-        ((Button)findViewById(R.id.langBtnSerie)).setOnClickListener(new View.OnClickListener() {
+        ((Button) findViewById(R.id.langBtnSerie)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MoviePageActivity.this);
@@ -124,10 +119,10 @@ public class MoviePageActivity extends Activity {
         });
 
 
-        TextView date=(TextView)findViewById(R.id.movieDate);
+        TextView date = (TextView) findViewById(R.id.movieDate);
         date.setText(extras.getString("date"));
         ((TextView) findViewById(R.id.imdbRating)).setText(extras.getString("rating"));
-        ((ImageView)findViewById(R.id.imdbImg)).setOnClickListener(new View.OnClickListener() {
+        ((ImageView) findViewById(R.id.imdbImg)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.imdb.com/title/" + extras.getString("imdb")));
@@ -135,33 +130,55 @@ public class MoviePageActivity extends Activity {
             }
         });
         ((TextView) findViewById(R.id.descriptionTxt)).setText(extras.getString("description"));
+        videourl = "http://adjaranet.com/download.php?mid=" + value + "&file=" + value + "_" + (extras.getString("lang").split(",")[0]) + "_300";
+        setTitle(extras.getString("title"));
+        movieTime = extras.getInt("time");
+
 
         videoView = (VideoView) findViewById(R.id.myvideoview);
         progressDialog = ProgressDialog.show(MoviePageActivity.this, "", "მიმდინარეობს ვიდეოს ჩატვირთა", true);
         progressDialog.setCancelable(true);
         PlayVideo();
 
+        YoYo.with(Techniques.SlideInRight).duration(500).withListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+
+
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        }).playOn(findViewById(R.id.moviePageRelative));
 
 
     }
-    private void PlayVideo()
-    {
-        try
-        {
-            getWindow().setFormat(PixelFormat.TRANSLUCENT);
 
+    private void PlayVideo() {
+        try {
+            getWindow().setFormat(PixelFormat.TRANSLUCENT);
 
 
             final Uri video = Uri.parse(videourl);
             //videoView.setMediaController(mediaController);
-            Log.d("moviePageLink",videourl);
+            Log.d("moviePageLink", videourl);
             videoView.setVideoURI(Uri.parse(videourl));
             videoView.requestFocus();
-            videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener()
-            {
+            videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
 
-                public void onPrepared(MediaPlayer mp)
-                {
+                public void onPrepared(MediaPlayer mp) {
 
                     progressDialog.dismiss();
                     videoView.start();
@@ -183,11 +200,9 @@ public class MoviePageActivity extends Activity {
                 }
             });
 
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             progressDialog.dismiss();
-            System.out.println("Video Play Error :"+e.toString());
+            System.out.println("Video Play Error :" + e.toString());
             finish();
         }
 
@@ -219,11 +234,35 @@ public class MoviePageActivity extends Activity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        movieTime=resultCode;
+        movieTime = resultCode;
         super.onActivityResult(requestCode, resultCode, data);
         Log.d("requestCodekaxa", "" + requestCode);
-        Log.d("resultCodekaxa",""+resultCode);
+        Log.d("resultCodekaxa", "" + resultCode);
 
+    }
+
+    public void onBackPressed() {
+        YoYo.with(Techniques.SlideOutRight).withListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                finish();
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        }).duration(500).playOn(findViewById(R.id.moviePageRelative));
     }
 
 

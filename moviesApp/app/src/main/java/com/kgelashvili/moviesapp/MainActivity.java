@@ -35,6 +35,8 @@ import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.Toast;
 
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 import com.kgelashvili.moviesapp.Classes.CustomHeaderMainMovieItem;
 import com.kgelashvili.moviesapp.Classes.FloatingActionButton;
 import com.kgelashvili.moviesapp.Classes.MovieServices;
@@ -46,6 +48,7 @@ import com.kgelashvili.moviesapp.cards.CustomThumbCard;
 import com.kgelashvili.moviesapp.model.Movie;
 import com.kgelashvili.moviesapp.model.Serie;
 import com.kgelashvili.moviesapp.utils.SimpleSectionedListAdapter;
+import com.nineoldandroids.animation.Animator;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -969,7 +972,7 @@ public class MainActivity extends Activity implements ScrollViewListener {
     private void addPremiereMovieToColection(final Movie movie) {
         LinearLayout linearLayout = (LinearLayout )findViewById(R.id.premierMoviesLayout);
         LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
-        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.movieontop, null, false);
+        final RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.movieontop, null, false);
 
 
         ArrayList<BaseSupplementalAction> actions = new ArrayList<BaseSupplementalAction>();
@@ -1059,25 +1062,50 @@ public class MainActivity extends Activity implements ScrollViewListener {
                         .build();
 
 
+
+
         card.setOnClickListener(new Card.OnCardClickListener() {
             @Override
             public void onClick(Card card, View view) {
-                Movie selectedMovie = movie;
 
-                Intent i = new Intent(MainActivity.this, MoviePageActivity.class);
-                i.putExtra("movieId", selectedMovie.getId());
-                i.putExtra("description", selectedMovie.getDescription());
-                i.putExtra("title", selectedMovie.getTitle_en());
-                i.putExtra("date", selectedMovie.getRelease_date());
-                i.putExtra("duration", selectedMovie.getDuration());
-                i.putExtra("rating", selectedMovie.getImdb());
-                i.putExtra("imdb", selectedMovie.getImdb_id());
-                i.putExtra("lang", selectedMovie.getLang());
-                i.putExtra("time", 0);
-                startActivity(i);
+                YoYo.with(Techniques.ZoomOutLeft).duration(500).withListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        Movie selectedMovie = movie;
+
+                        Intent i = new Intent(MainActivity.this, MoviePageActivity.class);
+                        i.putExtra("movieId", selectedMovie.getId());
+                        i.putExtra("description", selectedMovie.getDescription());
+                        i.putExtra("title", selectedMovie.getTitle_en());
+                        i.putExtra("date", selectedMovie.getRelease_date());
+                        i.putExtra("duration", selectedMovie.getDuration());
+                        i.putExtra("rating", selectedMovie.getImdb());
+                        i.putExtra("imdb", selectedMovie.getImdb_id());
+                        i.putExtra("lang", selectedMovie.getLang());
+                        i.putExtra("time", 0);
+                        startActivityForResult(i, 1);
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                }).playOn(findViewById(R.id.mainActivityRelative));
+
             }
         });
         CardViewNative cardView = (CardViewNative) layout.findViewById(R.id.movieCard);
+
         cardView.setCard(card);
 
         linearLayout.addView(layout);
@@ -1508,5 +1536,11 @@ public class MainActivity extends Activity implements ScrollViewListener {
                 }).start();
             }
         }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        YoYo.with(Techniques.ZoomInLeft).playOn(findViewById(R.id.mainActivityRelative));
     }
 }
