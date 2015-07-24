@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/mainfragmentframe">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cardview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="8dp"
+        card_view:cardBackgroundColor="@android:color/white"
+        card_view:cardCornerRadius="8dp">
+
+        <com.kgelashvili.moviesapp.Classes.ScrollViewExt
+            android:id="@+id/scrollView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/horizontalScrollView"
+            android:scrollbars="none">
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:focusableInTouchMode="true"
+                android:paddingLeft="@dimen/carddemo_list_padding"
+                android:paddingRight="@dimen/carddemo_list_padding">
+
+                <!--<ListView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/moviesListView"
+                    android:layout_below="@+id/searchBox"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentStart="true" />-->
+                <TextView
+                    android:id="@+id/textView5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="10dp"
+                    android:text="ქართულად გახმოვანებული ფილმები"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <HorizontalScrollView
+                    android:id="@+id/horizontalScrollView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/textView5"
+                    android:layout_weight="0.04"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:id="@+id/geoMoviesLayout2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:paddingLeft="@dimen/carddemo_list_padding"
+                        android:paddingRight="@dimen/carddemo_list_padding">
+
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <TextView
+                    android:id="@+id/textView6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/horizontalScrollView"
+                    android:text="პრემიერა"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <HorizontalScrollView
+                    android:id="@+id/horizontalScrollView2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/textView6"
+                    android:layout_weight="0.04"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:id="@+id/premierMoviesLayout2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:paddingLeft="@dimen/carddemo_list_padding"
+                        android:paddingRight="@dimen/carddemo_list_padding">
+
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <TextView
+                    android:id="@+id/textView7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/horizontalScrollView2"
+                    android:text="ახალი დამატებული ფილმები"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <HorizontalScrollView
+                    android:id="@+id/horizontalScrollView3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/textView7"
+                    android:layout_weight="0.04"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:id="@+id/newAddedMoviesLayout2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:paddingLeft="@dimen/carddemo_list_padding"
+                        android:paddingRight="@dimen/carddemo_list_padding">
+
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <TextView
+                    android:id="@+id/textView8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/horizontalScrollView3"
+                    android:text="ახალი ეპიზოდები"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <HorizontalScrollView
+                    android:id="@+id/horizontalScrollView4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/textView8"
+                    android:layout_weight="0.04"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:id="@+id/newEpisodesLayout2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:paddingLeft="@dimen/carddemo_list_padding"
+                        android:paddingRight="@dimen/carddemo_list_padding">
+
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+
+            </RelativeLayout>
+        </com.kgelashvili.moviesapp.Classes.ScrollViewExt>
+    </android.support.v7.widget.CardView>
+</FrameLayout>

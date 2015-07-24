@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -68,7 +69,7 @@ import it.gmariotti.cardslib.library.view.CardViewNative;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class MainActivity extends Activity implements ScrollViewListener {
+public class MainActivity extends AppCompatActivity implements ScrollViewListener {
     String currentMovieUrl = "";
     int currentMovieTime = 0;
     private int currentLoaded = 0;
@@ -130,18 +131,18 @@ public class MainActivity extends Activity implements ScrollViewListener {
 
         setContentView(R.layout.activity_main);
 
-        LayoutInflater inflater = (LayoutInflater) getActionBar().getThemedContext()
+        /*LayoutInflater inflater = (LayoutInflater) getSupportActionBar().getThemedContext()
                 .getSystemService(LAYOUT_INFLATER_SERVICE);
 
         final View customActionBarView = inflater.inflate(
                 R.layout.customheader, null);
-        final ActionBar actionBar = getActionBar();
+        final android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(false);
         actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setIcon(R.mipmap.ic_launcher);
         actionBar.setCustomView(customActionBarView);
-        actionBar.setDisplayShowCustomEnabled(true);
+        actionBar.setDisplayShowCustomEnabled(true);*/
 
 
         //Typeface face = Typeface.createFromAsset(getAssets(),"fonts/bpg_square_mtavruli_2009.ttf");
@@ -403,159 +404,6 @@ public class MainActivity extends Activity implements ScrollViewListener {
         am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (1000 * 5), pi);
     }
 
-
-
-    public void addMovieToLoadidData(final Movie movie) {
-
-        //adapter.add(movie);
-
-
-        Card card = new Card(MainActivity.this);
-
-        //Create a CardHeader
-        CustomHeaderMainMovieItem header = new CustomHeaderMainMovieItem(MainActivity.this,
-                movie.getTitle_en(),movie.getRelease_date(),movie.getDescription().length()>50?movie.getDescription().substring(0,49):movie.getDescription());
-
-        //Set the header title
-        header.setTitle(movie.getTitle_en());
-
-        card.addCardHeader(header);
-
-        header.setOtherButtonVisible(true);
-
-        //Add a callback
-        header.setOtherButtonClickListener(new CardHeader.OnClickCardHeaderOtherButtonListener() {
-            @Override
-            public void onButtonItemClick(Card card, View view) {
-                Toast.makeText(MainActivity.this, "დაემატა ფავორიტებში", Toast.LENGTH_LONG).show();
-                dbHelper2.createMovie(movie);
-                Card card2 = new Card(MainActivity.this);
-
-                //Create a CardHeader
-                CustomHeaderMainMovieItem header2 = new CustomHeaderMainMovieItem(MainActivity.this,
-                        movie.getTitle_en(), movie.getRelease_date(), movie.getDescription().length() > 50 ? movie.getDescription().substring(0, 49) : movie.getDescription());
-
-                //Set the header title
-                header2.setTitle(movie.getTitle_en());
-
-                card2.addCardHeader(header2);
-
-                header2.setOtherButtonVisible(true);
-                header2.setOtherButtonClickListener(new CardHeader.OnClickCardHeaderOtherButtonListener() {
-                    @Override
-                    public void onButtonItemClick(Card card, View view) {
-                        Toast.makeText(MainActivity.this, "დაემატა ფავორიტებში", Toast.LENGTH_LONG).show();
-                        dbHelper2.deleteMovie(movie);
-                        adapter3.remove(card);
-                        adapter3.notifyDataSetChanged();
-                    }
-                });
-
-                header2.setOtherButtonDrawable(R.drawable.card_menu_button_other_dismiss);
-
-
-                //Create thumbnail
-                //CustomThumbCard thumb = new CustomThumbCard(MainActivity.this);
-
-                CardThumbnail thumbnail2 = new CardThumbnail(MainActivity.this);
-
-                thumbnail2.setUrlResource(movie.getPoster());
-
-                //Set URL resource
-                //thumb.setUrlResource(movie.getPoster());
-
-
-                //Error Resource ID
-                thumbnail2.setErrorResource(R.drawable.ic_error_loadingorangesmall);
-
-                //Add thumbnail to a card
-                card2.addCardThumbnail(thumbnail2);
-
-
-                //Set card in the cardView
-
-
-                //Set card in the cardVie
-
-                card2.setOnClickListener(new Card.OnCardClickListener() {
-                    @Override
-                    public void onClick(Card card, View view) {
-                        Movie selectedMovie = movie;
-
-                        Intent i = new Intent(MainActivity.this, MoviePageActivity.class);
-                        i.putExtra("movieId", selectedMovie.getId());
-                        i.putExtra("description", selectedMovie.getDescription());
-                        i.putExtra("title", selectedMovie.getTitle_en());
-                        i.putExtra("date", selectedMovie.getRelease_date());
-                        i.putExtra("duration", selectedMovie.getDuration());
-                        i.putExtra("rating", selectedMovie.getImdb());
-                        i.putExtra("imdb", selectedMovie.getImdb_id());
-                        i.putExtra("lang", selectedMovie.getLang());
-                        i.putExtra("time", 0);
-                        startActivity(i);
-                    }
-                });
-                adapter3.add(card2);
-                card.getCardHeader().setOtherButtonVisible(false);
-
-            }
-        });
-
-        //Use this code to set your drawable
-        header.setOtherButtonDrawable(R.drawable.card_menu_button_other_add);
-
-
-
-
-        //Create thumbnail
-        //CustomThumbCard thumb = new CustomThumbCard(MainActivity.this);
-
-        CardThumbnail thumbnail=new CardThumbnail(MainActivity.this);
-
-        thumbnail.setUrlResource(movie.getPoster());
-
-        //Set URL resource
-        //thumb.setUrlResource(movie.getPoster());
-
-
-        //Error Resource ID
-        thumbnail.setErrorResource(R.drawable.ic_error_loadingorangesmall);
-
-        //Add thumbnail to a card
-        card.addCardThumbnail(thumbnail);
-
-
-
-        //Set card in the cardView
-
-
-        //Set card in the cardVie
-
-        card.setOnClickListener(new Card.OnCardClickListener() {
-            @Override
-            public void onClick(Card card, View view) {
-                Movie selectedMovie = movie;
-
-                Intent i = new Intent(MainActivity.this, MoviePageActivity.class);
-                i.putExtra("movieId", selectedMovie.getId());
-                i.putExtra("description", selectedMovie.getDescription());
-                i.putExtra("title", selectedMovie.getTitle_en());
-                i.putExtra("date", selectedMovie.getRelease_date());
-                i.putExtra("duration", selectedMovie.getDuration());
-                i.putExtra("rating", selectedMovie.getImdb());
-                i.putExtra("imdb", selectedMovie.getImdb_id());
-                i.putExtra("lang", selectedMovie.getLang());
-                i.putExtra("time", 0);
-                startActivity(i);
-            }
-        });
-        adapter2.add(card);
-
-
-
-
-    }
-
     private class MovieListAdapter extends ArrayAdapter<Movie> {
         public MovieListAdapter() {
             super(MainActivity.this, R.layout.itemview, movies);
@@ -711,6 +559,157 @@ public class MainActivity extends Activity implements ScrollViewListener {
             //populateMoviesListViev();
             loadingMore = false;
         }
+
+    }
+
+    public void addMovieToLoadidData(final Movie movie) {
+
+        //adapter.add(movie);
+
+
+        Card card = new Card(MainActivity.this);
+
+        //Create a CardHeader
+        CustomHeaderMainMovieItem header = new CustomHeaderMainMovieItem(MainActivity.this,
+                movie.getTitle_en(),movie.getRelease_date(),movie.getDescription().length()>50?movie.getDescription().substring(0,49):movie.getDescription());
+
+        //Set the header title
+        header.setTitle(movie.getTitle_en());
+
+        card.addCardHeader(header);
+
+        header.setOtherButtonVisible(true);
+
+        //Add a callback
+        header.setOtherButtonClickListener(new CardHeader.OnClickCardHeaderOtherButtonListener() {
+            @Override
+            public void onButtonItemClick(Card card, View view) {
+                Toast.makeText(MainActivity.this, "დაემატა ფავორიტებში", Toast.LENGTH_LONG).show();
+                dbHelper2.createMovie(movie);
+                Card card2 = new Card(MainActivity.this);
+
+                //Create a CardHeader
+                CustomHeaderMainMovieItem header2 = new CustomHeaderMainMovieItem(MainActivity.this,
+                        movie.getTitle_en(), movie.getRelease_date(), movie.getDescription().length() > 50 ? movie.getDescription().substring(0, 49) : movie.getDescription());
+
+                //Set the header title
+                header2.setTitle(movie.getTitle_en());
+
+                card2.addCardHeader(header2);
+
+                header2.setOtherButtonVisible(true);
+                header2.setOtherButtonClickListener(new CardHeader.OnClickCardHeaderOtherButtonListener() {
+                    @Override
+                    public void onButtonItemClick(Card card, View view) {
+                        Toast.makeText(MainActivity.this, "დაემატა ფავორიტებში", Toast.LENGTH_LONG).show();
+                        dbHelper2.deleteMovie(movie);
+                        adapter3.remove(card);
+                        adapter3.notifyDataSetChanged();
+                    }
+                });
+
+                header2.setOtherButtonDrawable(R.drawable.card_menu_button_other_dismiss);
+
+
+                //Create thumbnail
+                //CustomThumbCard thumb = new CustomThumbCard(MainActivity.this);
+
+                CardThumbnail thumbnail2 = new CardThumbnail(MainActivity.this);
+
+                thumbnail2.setUrlResource(movie.getPoster());
+
+                //Set URL resource
+                //thumb.setUrlResource(movie.getPoster());
+
+
+                //Error Resource ID
+                thumbnail2.setErrorResource(R.drawable.ic_error_loadingorangesmall);
+
+                //Add thumbnail to a card
+                card2.addCardThumbnail(thumbnail2);
+
+
+                //Set card in the cardView
+
+
+                //Set card in the cardVie
+
+                card2.setOnClickListener(new Card.OnCardClickListener() {
+                    @Override
+                    public void onClick(Card card, View view) {
+                        Movie selectedMovie = movie;
+
+                        Intent i = new Intent(MainActivity.this, MoviePageActivity.class);
+                        i.putExtra("movieId", selectedMovie.getId());
+                        i.putExtra("description", selectedMovie.getDescription());
+                        i.putExtra("title", selectedMovie.getTitle_en());
+                        i.putExtra("date", selectedMovie.getRelease_date());
+                        i.putExtra("duration", selectedMovie.getDuration());
+                        i.putExtra("rating", selectedMovie.getImdb());
+                        i.putExtra("imdb", selectedMovie.getImdb_id());
+                        i.putExtra("lang", selectedMovie.getLang());
+                        i.putExtra("time", 0);
+                        startActivity(i);
+                    }
+                });
+                adapter3.add(card2);
+                card.getCardHeader().setOtherButtonVisible(false);
+
+            }
+        });
+
+        //Use this code to set your drawable
+        header.setOtherButtonDrawable(R.drawable.card_menu_button_other_add);
+
+
+
+
+        //Create thumbnail
+        //CustomThumbCard thumb = new CustomThumbCard(MainActivity.this);
+
+        CardThumbnail thumbnail=new CardThumbnail(MainActivity.this);
+
+        thumbnail.setUrlResource(movie.getPoster());
+
+        //Set URL resource
+        //thumb.setUrlResource(movie.getPoster());
+
+
+        //Error Resource ID
+        thumbnail.setErrorResource(R.drawable.ic_error_loadingorangesmall);
+
+        //Add thumbnail to a card
+        card.addCardThumbnail(thumbnail);
+
+
+
+        //Set card in the cardView
+
+
+        //Set card in the cardVie
+
+        card.setOnClickListener(new Card.OnCardClickListener() {
+            @Override
+            public void onClick(Card card, View view) {
+                Movie selectedMovie = movie;
+
+                Intent i = new Intent(MainActivity.this, MoviePageActivity.class);
+                i.putExtra("movieId", selectedMovie.getId());
+                i.putExtra("description", selectedMovie.getDescription());
+                i.putExtra("title", selectedMovie.getTitle_en());
+                i.putExtra("date", selectedMovie.getRelease_date());
+                i.putExtra("duration", selectedMovie.getDuration());
+                i.putExtra("rating", selectedMovie.getImdb());
+                i.putExtra("imdb", selectedMovie.getImdb_id());
+                i.putExtra("lang", selectedMovie.getLang());
+                i.putExtra("time", 0);
+                startActivity(i);
+            }
+        });
+        adapter2.add(card);
+
+
+
 
     }
 
@@ -1209,9 +1208,126 @@ public class MainActivity extends Activity implements ScrollViewListener {
         card.setOnClickListener(new Card.OnCardClickListener() {
             @Override
             public void onClick(Card card, View view) {
-                Movie selectedMovie = movie;
+                YoYo.with(Techniques.ZoomOutLeft).duration(500).withListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
 
-                Intent i = new Intent(MainActivity.this, MoviePageActivity.class);
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        Movie selectedMovie = movie;
+
+                        Intent i = new Intent(MainActivity.this, MoviePageActivity.class);
+                        i.putExtra("movieId", selectedMovie.getId());
+                        i.putExtra("description", selectedMovie.getDescription());
+                        i.putExtra("title", selectedMovie.getTitle_en());
+                        i.putExtra("date", selectedMovie.getRelease_date());
+                        i.putExtra("duration", selectedMovie.getDuration());
+                        i.putExtra("rating", selectedMovie.getImdb());
+                        i.putExtra("imdb", selectedMovie.getImdb_id());
+                        i.putExtra("lang", selectedMovie.getLang());
+                        i.putExtra("time", 0);
+                        startActivityForResult(i, 1);
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                }).playOn(findViewById(R.id.mainActivityRelative));
+            }
+        });
+        CardViewNative cardView = (CardViewNative) layout.findViewById(R.id.movieCard);
+        cardView.setCard(card);
+
+        linearLayout.addView(layout);
+    }
+
+    class GetSeries extends AsyncTask<String, ArrayList<Serie>, ArrayList<Serie>> {
+
+        @Override
+        protected ArrayList<Serie> doInBackground(String... strings) {
+
+            MovieServices movieServices = new MovieServices();
+            ArrayList<Serie> series = movieServices.getMainSeries(strings[0], "false", "1900", "2015", keyWordSeries);
+            publishProgress(series);
+            return series;
+        }
+
+        @Override
+        protected void onProgressUpdate(ArrayList<Serie>... values) {
+            super.onProgressUpdate(values);
+            for (int i = 0; i < values[0].size(); i++) {
+                addSerieToLoadidData(values[0].get(i));
+            }
+            //adapter.notifyDataSetChanged();
+            Log.d("moviesLog", "" + currentLoaded);
+            currentLoadedSeries += 15;
+            //populateMoviesListViev();
+            loadingMoreSeries = false;
+        }
+
+    }
+
+    public void addSerieToLoadidData(final Serie serie) {
+
+        //adapter.add(movie);
+        Log.d("logSeries","log");
+        Card card = new Card(MainActivity.this);
+
+        //Create a CardHeader
+        CustomHeaderMainMovieItem header = new CustomHeaderMainMovieItem(MainActivity.this,
+                serie.getTitle_en(),serie.getRelease_date(),serie.getDescription().length()>50?serie.getDescription().substring(0,49):serie.getDescription());
+
+        //Set the header title
+        header.setTitle(serie.getTitle_en());
+
+        card.addCardHeader(header);
+
+        //Add a callback
+
+
+        //Use this code to set your drawable
+
+
+
+
+        //Create thumbnail
+        //CustomThumbCard thumb = new CustomThumbCard(MainActivity.this);
+
+        CardThumbnail thumbnail=new CardThumbnail(MainActivity.this);
+
+        thumbnail.setUrlResource(serie.getPoster());
+
+        //Set URL resource
+        //thumb.setUrlResource(movie.getPoster());
+
+
+        //Error Resource ID
+        thumbnail.setErrorResource(R.drawable.ic_error_loadingorangesmall);
+
+        //Add thumbnail to a card
+        card.addCardThumbnail(thumbnail);
+
+
+
+        //Set card in the cardView
+
+
+        //Set card in the cardVie
+
+        card.setOnClickListener(new Card.OnCardClickListener() {
+            @Override
+            public void onClick(Card card, View view) {
+                Movie selectedMovie = serie;
+
+                Intent i = new Intent(MainActivity.this, serie_page_activity.class);
                 i.putExtra("movieId", selectedMovie.getId());
                 i.putExtra("description", selectedMovie.getDescription());
                 i.putExtra("title", selectedMovie.getTitle_en());
@@ -1219,15 +1335,13 @@ public class MainActivity extends Activity implements ScrollViewListener {
                 i.putExtra("duration", selectedMovie.getDuration());
                 i.putExtra("rating", selectedMovie.getImdb());
                 i.putExtra("imdb", selectedMovie.getImdb_id());
-                i.putExtra("lang", selectedMovie.getLang());
-                i.putExtra("time", 0);
                 startActivity(i);
             }
         });
-        CardViewNative cardView = (CardViewNative) layout.findViewById(R.id.movieCard);
-        cardView.setCard(card);
+        adapter2Series.add(card);
 
-        linearLayout.addView(layout);
+
+
     }
 
     class getMoviesFav extends AsyncTask<String,ArrayList<Card>,ArrayList<Card>>{
@@ -1252,13 +1366,13 @@ public class MainActivity extends Activity implements ScrollViewListener {
 
         @Override
         public void onDrawerClosed(View view) {
-            getActionBar().setTitle("Adjaranet");
+            //getSupportActionBar().setTitle("Adjaranet");
             invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
         }
 
         @Override
         public void onDrawerOpened(View drawerView) {
-            getActionBar().setTitle("მენიუ");
+            //getSupportActionBar().setTitle("მენიუ");
             invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
         }
     }
@@ -1398,100 +1512,7 @@ public class MainActivity extends Activity implements ScrollViewListener {
         }
     }
 
-    class GetSeries extends AsyncTask<String, ArrayList<Serie>, ArrayList<Serie>> {
 
-        @Override
-        protected ArrayList<Serie> doInBackground(String... strings) {
-
-            MovieServices movieServices = new MovieServices();
-            ArrayList<Serie> series = movieServices.getMainSeries(strings[0], "false", "1900", "2015", keyWordSeries);
-            publishProgress(series);
-            return series;
-        }
-
-        @Override
-        protected void onProgressUpdate(ArrayList<Serie>... values) {
-            super.onProgressUpdate(values);
-            for (int i = 0; i < values[0].size(); i++) {
-                addSerieToLoadidData(values[0].get(i));
-            }
-            //adapter.notifyDataSetChanged();
-            Log.d("moviesLog", "" + currentLoaded);
-            currentLoadedSeries += 15;
-            //populateMoviesListViev();
-            loadingMoreSeries = false;
-        }
-
-    }
-
-    public void addSerieToLoadidData(final Serie serie) {
-
-        //adapter.add(movie);
-        Log.d("logSeries","log");
-        Card card = new Card(MainActivity.this);
-
-        //Create a CardHeader
-        CustomHeaderMainMovieItem header = new CustomHeaderMainMovieItem(MainActivity.this,
-                serie.getTitle_en(),serie.getRelease_date(),serie.getDescription().length()>50?serie.getDescription().substring(0,49):serie.getDescription());
-
-        //Set the header title
-        header.setTitle(serie.getTitle_en());
-
-        card.addCardHeader(header);
-
-        //Add a callback
-
-
-        //Use this code to set your drawable
-
-
-
-
-        //Create thumbnail
-        //CustomThumbCard thumb = new CustomThumbCard(MainActivity.this);
-
-        CardThumbnail thumbnail=new CardThumbnail(MainActivity.this);
-
-        thumbnail.setUrlResource(serie.getPoster());
-
-        //Set URL resource
-        //thumb.setUrlResource(movie.getPoster());
-
-
-        //Error Resource ID
-        thumbnail.setErrorResource(R.drawable.ic_error_loadingorangesmall);
-
-        //Add thumbnail to a card
-        card.addCardThumbnail(thumbnail);
-
-
-
-        //Set card in the cardView
-
-
-        //Set card in the cardVie
-
-        card.setOnClickListener(new Card.OnCardClickListener() {
-            @Override
-            public void onClick(Card card, View view) {
-                Movie selectedMovie = serie;
-
-                Intent i = new Intent(MainActivity.this, serie_page_activity.class);
-                i.putExtra("movieId", selectedMovie.getId());
-                i.putExtra("description", selectedMovie.getDescription());
-                i.putExtra("title", selectedMovie.getTitle_en());
-                i.putExtra("date", selectedMovie.getRelease_date());
-                i.putExtra("duration", selectedMovie.getDuration());
-                i.putExtra("rating", selectedMovie.getImdb());
-                i.putExtra("imdb", selectedMovie.getImdb_id());
-                startActivity(i);
-            }
-        });
-        adapter2Series.add(card);
-
-
-
-    }
 
     public static void setListViewHeightBasedOnChildren(ListView listView) {
 

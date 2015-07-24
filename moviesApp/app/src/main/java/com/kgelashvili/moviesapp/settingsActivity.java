@@ -1,7 +1,21 @@
 package com.kgelashvili.moviesapp;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
+import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.util.TypedValue;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -9,8 +23,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.astuetz.*;
+import com.astuetz.PagerSlidingTabStrip;
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
+import com.kgelashvili.moviesapp.fragments.MainPageFragment;
+import com.readystatesoftware.systembartint.SystemBarTintManager;
+
 import java.util.ArrayList;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
 import it.gmariotti.cardslib.library.cards.actions.BaseSupplementalAction;
 import it.gmariotti.cardslib.library.cards.actions.TextSupplementalAction;
 import it.gmariotti.cardslib.library.cards.material.MaterialLargeImageCard;
@@ -19,22 +42,82 @@ import it.gmariotti.cardslib.library.internal.CardExpand;
 import it.gmariotti.cardslib.library.internal.CardHeader;
 import it.gmariotti.cardslib.library.view.CardView;
 import it.gmariotti.cardslib.library.view.CardViewNative;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class settingsActivity extends Activity {
+public class settingsActivity extends AppCompatActivity {
 
-    protected ActionMode mActionMode;
-    protected Card card;
+   /* @InjectView(R.id.toolbar)
+    Toolbar toolbar;*/
+    @InjectView(R.id.tabs)
+    com.astuetz.PagerSlidingTabStrip tabs;
+    @InjectView(R.id.pager)
+    ViewPager pager;
 
-    protected CardView cardViewCab;
+    private MyPagerAdapter adapter;
+    private Drawable oldBackground = null;
+    private int currentColor;
+    private SystemBarTintManager mTintManager;
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                        .setDefaultFontPath("fonts/bpg_square_mtavruli_2009.ttf")
+                        .setFontAttrId(R.attr.fontPath)
+                        .build()
+        );
         setContentView(R.layout.activity_settings);
-        getActionBar().setTitle("პარამეტრები");
+        ButterKnife.inject(this);
+        //setSupportActionBar(toolbar);
+        // create our manager instance after the content view is set
+        mTintManager = new SystemBarTintManager(this);
+        // enable status bar tint
+        mTintManager.setStatusBarTintEnabled(true);
+        adapter = new MyPagerAdapter(getSupportFragmentManager());
+        pager.setAdapter(adapter);
+        //tabs.setTextColor(R.color.md_blue_grey_50);
+        tabs.setViewPager(pager);
+        final int pageMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources()
+                .getDisplayMetrics());
+        pager.setPageMargin(pageMargin);
+        pager.setCurrentItem(0);
+        changeColor(getResources().getColor(R.color.primary));
 
+        tabs.setOnTabReselectedListener(new PagerSlidingTabStrip.OnTabReselectedListener() {
+            @Override
+            public void onTabReselected(int position) {
+                Toast.makeText(settingsActivity.this, "Tab reselected: " + position, Toast.LENGTH_SHORT).show();
+            }
+        });
+        //tabs.setTextColor(R.color.md_white_1000);
     }
+    private void changeColor(int newColor) {
+        tabs.setBackgroundColor(newColor);
+        tabs.setTextColor(getResources().getColor(R.color.md_white_1000));
+        tabs.setUnderlineColor(getResources().getColor(R.color.md_white_1000));
+        tabs.setIndicatorColor(getResources().getColor(R.color.md_white_1000));
+        mTintManager.setTintColor(newColor);
+        // change ActionBar color just if an ActionBar is available
+        Drawable colorDrawable = new ColorDrawable(newColor);
+        Drawable bottomDrawable = new ColorDrawable(getResources().getColor(android.R.color.transparent));
+        LayerDrawable ld = new LayerDrawable(new Drawable[]{colorDrawable, bottomDrawable});
+        /*if (oldBackground == null) {
+            getSupportActionBar().setBackgroundDrawable(ld);
+        } else {
+            TransitionDrawable td = new TransitionDrawable(new Drawable[]{oldBackground, ld});
+            getSupportActionBar().setBackgroundDrawable(td);
+            td.startTransition(200);
+        }*/
 
+        oldBackground = ld;
+        currentColor = newColor;
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -56,44 +139,42 @@ public class settingsActivity extends Activity {
 
         return super.onOptionsItemSelected(item);
     }
-    private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
 
-        // Called when the action mode is created; startActionMode() was called
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            // Inflate a menu resource providing context menu items
-            MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.mainmovielongpressed, menu);
-            return true;
+
+    public class MyPagerAdapter extends FragmentPagerAdapter {
+
+        private final String[] TITLES = {"მთავარი", "ფილმები", "ფავორიტები", "სერიალები"};
+
+        public MyPagerAdapter(FragmentManager fm) {
+            super(fm);
         }
 
-        // Called each time the action mode is shown. Always called after onCreateActionMode, but
-        // may be called multiple times if the mode is invalidated.
         @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false; // Return false if nothing is done
+        public CharSequence getPageTitle(int position) {
+            return TITLES[position];
         }
 
-        // Called when the user selects a contextual menu item
         @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.addtofav:
-                    //TODO add to favorites
-                    mode.finish(); // Action picked, so close the CAB
-                    return true;
-                default:
-                    return false;
+        public int getCount() {
+            return TITLES.length;
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            switch (position){
+                case 0:return MainPageFragment.newInstance(position,findViewById(R.id.fragmentMainLinar));
+                case 1:return SuperAwesomeCardFragment.newInstance(position);
+                case 2:return SuperAwesomeCardFragment.newInstance(position);
+                case 3:return SuperAwesomeCardFragment.newInstance(position);
+                default:return SuperAwesomeCardFragment.newInstance(position);
             }
         }
+    }
 
-        // Called when the user exits the action mode
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-            mActionMode = null;
-            if (card!=null)
-                cardViewCab.setActivated(false);
-        }
-    };
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        YoYo.with(Techniques.ZoomInLeft).playOn(findViewById(R.id.fragmentMainLinar));
+    }
 
 }

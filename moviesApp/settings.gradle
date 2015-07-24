@@ -1,1 +1,1 @@
-include ':app', ':library-cards', ':library-core', ':demo:stock', ':library-recyclerview'
+include ':app', ':library-cards', ':library-core', ':demo:stock', ':library-recyclerview', ':materialviewpager1'
