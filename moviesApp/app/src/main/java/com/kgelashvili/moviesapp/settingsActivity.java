@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -27,7 +28,10 @@ import com.astuetz.*;
 import com.astuetz.PagerSlidingTabStrip;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
+import com.kgelashvili.moviesapp.fragments.FavoritesPageFragment;
 import com.kgelashvili.moviesapp.fragments.MainPageFragment;
+import com.kgelashvili.moviesapp.fragments.MoviesPageFragment;
+import com.kgelashvili.moviesapp.fragments.SeriesPageFragment;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 
 import java.util.ArrayList;
@@ -53,8 +57,6 @@ public class settingsActivity extends AppCompatActivity {
     com.astuetz.PagerSlidingTabStrip tabs;
     @InjectView(R.id.pager)
     ViewPager pager;
-
-    private MyPagerAdapter adapter;
     private Drawable oldBackground = null;
     private int currentColor;
     private SystemBarTintManager mTintManager;
@@ -67,35 +69,7 @@ public class settingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                        .setDefaultFontPath("fonts/bpg_square_mtavruli_2009.ttf")
-                        .setFontAttrId(R.attr.fontPath)
-                        .build()
-        );
         setContentView(R.layout.activity_settings);
-        ButterKnife.inject(this);
-        //setSupportActionBar(toolbar);
-        // create our manager instance after the content view is set
-        mTintManager = new SystemBarTintManager(this);
-        // enable status bar tint
-        mTintManager.setStatusBarTintEnabled(true);
-        adapter = new MyPagerAdapter(getSupportFragmentManager());
-        pager.setAdapter(adapter);
-        //tabs.setTextColor(R.color.md_blue_grey_50);
-        tabs.setViewPager(pager);
-        final int pageMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources()
-                .getDisplayMetrics());
-        pager.setPageMargin(pageMargin);
-        pager.setCurrentItem(0);
-        changeColor(getResources().getColor(R.color.primary));
-
-        tabs.setOnTabReselectedListener(new PagerSlidingTabStrip.OnTabReselectedListener() {
-            @Override
-            public void onTabReselected(int position) {
-                Toast.makeText(settingsActivity.this, "Tab reselected: " + position, Toast.LENGTH_SHORT).show();
-            }
-        });
-        //tabs.setTextColor(R.color.md_white_1000);
     }
     private void changeColor(int newColor) {
         tabs.setBackgroundColor(newColor);
@@ -141,35 +115,6 @@ public class settingsActivity extends AppCompatActivity {
     }
 
 
-    public class MyPagerAdapter extends FragmentPagerAdapter {
-
-        private final String[] TITLES = {"მთავარი", "ფილმები", "ფავორიტები", "სერიალები"};
-
-        public MyPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return TITLES[position];
-        }
-
-        @Override
-        public int getCount() {
-            return TITLES.length;
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            switch (position){
-                case 0:return MainPageFragment.newInstance(position,findViewById(R.id.fragmentMainLinar));
-                case 1:return SuperAwesomeCardFragment.newInstance(position);
-                case 2:return SuperAwesomeCardFragment.newInstance(position);
-                case 3:return SuperAwesomeCardFragment.newInstance(position);
-                default:return SuperAwesomeCardFragment.newInstance(position);
-            }
-        }
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

@@ -7,7 +7,6 @@
       <module fileurl="file://$PROJECT_DIR$/library-cards/library-cards.iml" filepath="$PROJECT_DIR$/library-cards/library-cards.iml" />
       <module fileurl="file://$PROJECT_DIR$/library-core/library-core.iml" filepath="$PROJECT_DIR$/library-core/library-core.iml" />
       <module fileurl="file://$PROJECT_DIR$/library-recyclerview/library-recyclerview.iml" filepath="$PROJECT_DIR$/library-recyclerview/library-recyclerview.iml" />
-      <module fileurl="file://$PROJECT_DIR$/materialviewpager1/materialviewpager1.iml" filepath="$PROJECT_DIR$/materialviewpager1/materialviewpager1.iml" />
       <module fileurl="file://$PROJECT_DIR$/moviesApp.iml" filepath="$PROJECT_DIR$/moviesApp.iml" />
       <module fileurl="file://$PROJECT_DIR$/demo/stock/stock.iml" filepath="$PROJECT_DIR$/demo/stock/stock.iml" />
     </modules>

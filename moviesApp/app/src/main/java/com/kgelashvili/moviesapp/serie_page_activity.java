@@ -77,7 +77,7 @@ public class serie_page_activity extends Activity {
         seasons=new ArrayList<Season>();
         final Bundle extras = getIntent().getExtras();
         id=extras.getString("movieId");
-        getActionBar().setTitle(extras.getString("title"));
+       // getActionBar().setTitle(extras.getString("title"));
         final FloatingActionButton mFab = new FloatingActionButton.Builder(serie_page_activity.this)
                 .withColor(getResources().getColor(R.color.primary))
                 .withDrawable(getResources().getDrawable(R.drawable.androidfullscreen))
@@ -147,7 +147,7 @@ public class serie_page_activity extends Activity {
                 Log.d("currentSerieUrl",videourl);
                 progressDialog = ProgressDialog.show(serie_page_activity.this, "", "მიმდინარეობს ვიდეოს ჩატვირთა", true);
                 progressDialog.setCancelable(true);
-                getActionBar().setTitle(extras.getString("title") + " " + currentEpisodes.get(position).getName());
+                //getActionBar().setTitle(extras.getString("title") + " " + currentEpisodes.get(position).getName());
                 ((Button)findViewById(R.id.langBtnSerie)).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

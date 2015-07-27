@@ -16,7 +16,6 @@
             <option value="$PROJECT_DIR$/library-cards" />
             <option value="$PROJECT_DIR$/library-core" />
             <option value="$PROJECT_DIR$/library-recyclerview" />
-            <option value="$PROJECT_DIR$/materialviewpager1" />
           </set>
         </option>
       </GradleProjectSettings>
