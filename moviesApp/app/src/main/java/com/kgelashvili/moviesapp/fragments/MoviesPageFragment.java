@@ -16,12 +16,15 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 import com.kgelashvili.moviesapp.Classes.CustomHeaderMainMovieItem;
 import com.kgelashvili.moviesapp.Classes.MovieServices;
 import com.kgelashvili.moviesapp.Classes.dbHelper;
 import com.kgelashvili.moviesapp.MoviePageActivity;
 import com.kgelashvili.moviesapp.R;
 import com.kgelashvili.moviesapp.model.Movie;
+import com.nineoldandroids.animation.Animator;
 
 import java.util.ArrayList;
 
@@ -214,76 +217,7 @@ public class MoviesPageFragment extends Fragment {
             public void onButtonItemClick(Card card, View view) {
                 Toast.makeText(getActivity(), "დაემატა ფავორიტებში", Toast.LENGTH_LONG).show();
                 dbHelper2.createMovie(movie);
-                Card card2 = new Card(getActivity());
 
-                //Create a CardHeader
-                CustomHeaderMainMovieItem header2 = new CustomHeaderMainMovieItem(getActivity(),
-                        movie.getTitle_en(), movie.getRelease_date(), movie.getDescription().length() > 50 ? movie.getDescription().substring(0, 49) : movie.getDescription());
-
-                //Set the header title
-                header2.setTitle(movie.getTitle_en());
-
-                card2.addCardHeader(header2);
-
-                header2.setOtherButtonVisible(true);
-                header2.setOtherButtonClickListener(new CardHeader.OnClickCardHeaderOtherButtonListener() {
-                    @Override
-                    public void onButtonItemClick(Card card, View view) {
-                        Toast.makeText(getActivity(), "დაემატა ფავორიტებში", Toast.LENGTH_LONG).show();
-                        dbHelper2.deleteMovie(movie);
-                        //TODO seamless adding/deleting to favorites tab
-                        //adapter3.remove(card);
-                        //adapter3.notifyDataSetChanged();
-                    }
-                });
-
-                header2.setOtherButtonDrawable(R.drawable.card_menu_button_other_dismiss);
-
-
-                //Create thumbnail
-                //CustomThumbCard thumb = new CustomThumbCard(MainActivity.this);
-
-                CardThumbnail thumbnail2 = new CardThumbnail(getActivity());
-
-                thumbnail2.setUrlResource(movie.getPoster());
-
-                //Set URL resource
-                //thumb.setUrlResource(movie.getPoster());
-
-
-                //Error Resource ID
-                thumbnail2.setErrorResource(R.drawable.ic_error_loadingorangesmall);
-
-                //Add thumbnail to a card
-                card2.addCardThumbnail(thumbnail2);
-
-
-                //Set card in the cardView
-
-
-                //Set card in the cardVie
-
-                card2.setOnClickListener(new Card.OnCardClickListener() {
-                    @Override
-                    public void onClick(Card card, View view) {
-                        Movie selectedMovie = movie;
-
-                        Intent i = new Intent(getActivity(), MoviePageActivity.class);
-                        i.putExtra("movieId", selectedMovie.getId());
-                        i.putExtra("description", selectedMovie.getDescription());
-                        i.putExtra("title", selectedMovie.getTitle_en());
-                        i.putExtra("date", selectedMovie.getRelease_date());
-                        i.putExtra("duration", selectedMovie.getDuration());
-                        i.putExtra("rating", selectedMovie.getImdb());
-                        i.putExtra("imdb", selectedMovie.getImdb_id());
-                        i.putExtra("lang", selectedMovie.getLang());
-                        i.putExtra("time", 0);
-                        startActivity(i);
-                    }
-                });
-                //// TODO: 7/27/2015
-                //adapter3.add(card2);
-                card.getCardHeader().setOtherButtonVisible(false);
 
             }
         });
@@ -321,19 +255,40 @@ public class MoviesPageFragment extends Fragment {
         card.setOnClickListener(new Card.OnCardClickListener() {
             @Override
             public void onClick(Card card, View view) {
-                Movie selectedMovie = movie;
 
-                Intent i = new Intent(getActivity(), MoviePageActivity.class);
-                i.putExtra("movieId", selectedMovie.getId());
-                i.putExtra("description", selectedMovie.getDescription());
-                i.putExtra("title", selectedMovie.getTitle_en());
-                i.putExtra("date", selectedMovie.getRelease_date());
-                i.putExtra("duration", selectedMovie.getDuration());
-                i.putExtra("rating", selectedMovie.getImdb());
-                i.putExtra("imdb", selectedMovie.getImdb_id());
-                i.putExtra("lang", selectedMovie.getLang());
-                i.putExtra("time", 0);
-                startActivity(i);
+                YoYo.with(Techniques.ZoomOutLeft).duration(500).withListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        Movie selectedMovie = movie;
+
+                        Intent i = new Intent(getActivity(), MoviePageActivity.class);
+                        i.putExtra("movieId", selectedMovie.getId());
+                        i.putExtra("description", selectedMovie.getDescription());
+                        i.putExtra("title", selectedMovie.getTitle_en());
+                        i.putExtra("date", selectedMovie.getRelease_date());
+                        i.putExtra("duration", selectedMovie.getDuration());
+                        i.putExtra("rating", selectedMovie.getImdb());
+                        i.putExtra("imdb", selectedMovie.getImdb_id());
+                        i.putExtra("lang", selectedMovie.getLang());
+                        i.putExtra("time", 0);
+                        startActivityForResult(i, 1);
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                }).playOn(MoviesPageFragment.view);
             }
         });
         adapter2.add(card);

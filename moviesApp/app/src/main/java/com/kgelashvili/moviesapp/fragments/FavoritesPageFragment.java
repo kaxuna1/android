@@ -13,11 +13,14 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.Toast;
 
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 import com.kgelashvili.moviesapp.Classes.CustomHeaderMainMovieItem;
 import com.kgelashvili.moviesapp.Classes.dbHelper;
 import com.kgelashvili.moviesapp.MoviePageActivity;
 import com.kgelashvili.moviesapp.R;
 import com.kgelashvili.moviesapp.model.Movie;
+import com.nineoldandroids.animation.Animator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +44,7 @@ public class FavoritesPageFragment extends Fragment {
     private static dbHelper dbHelper2;
     CardArrayAdapter adapter3;
     ArrayList<Card> cardsFav=new ArrayList<Card>();
+    getMoviesFav getMoviesFav=new getMoviesFav();
     @InjectView(R.id.favoritesList)
     CardListView mListView;
     public static FavoritesPageFragment newInstance(int position,View view,dbHelper dbHelper2) {
@@ -64,8 +68,15 @@ public class FavoritesPageFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.favoritesfragment, container, false);
         ButterKnife.inject(this, rootView);
         ViewCompat.setElevation(rootView, 50);
-        adapter3=new CardArrayAdapter(getActivity(),cardsFav);
+        adapter3=new CardArrayAdapter(getActivity(), cardsFav);
         mListView.setAdapter(adapter3);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                adapter3.clear();
+                getMoviesFav.doInBackground("");
+            }
+        }).run();
         return rootView;
     }
 
@@ -143,19 +154,40 @@ public class FavoritesPageFragment extends Fragment {
             card.setOnClickListener(new Card.OnCardClickListener() {
                 @Override
                 public void onClick(Card card, View view) {
-                    Movie selectedMovie = movie;
+                    YoYo.with(Techniques.ZoomOutLeft).duration(500).withListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animation) {
 
-                    Intent i = new Intent(getActivity(), MoviePageActivity.class);
-                    i.putExtra("movieId", selectedMovie.getId());
-                    i.putExtra("description", selectedMovie.getDescription());
-                    i.putExtra("title", selectedMovie.getTitle_en());
-                    i.putExtra("date", selectedMovie.getRelease_date());
-                    i.putExtra("duration", selectedMovie.getDuration());
-                    i.putExtra("rating", selectedMovie.getImdb());
-                    i.putExtra("imdb", selectedMovie.getImdb_id());
-                    i.putExtra("lang", selectedMovie.getLang());
-                    i.putExtra("time", 0);
-                    startActivity(i);
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            Movie selectedMovie = movie;
+
+                            Intent i = new Intent(getActivity(), MoviePageActivity.class);
+                            i.putExtra("movieId", selectedMovie.getId());
+                            i.putExtra("description", selectedMovie.getDescription());
+                            i.putExtra("title", selectedMovie.getTitle_en());
+                            i.putExtra("date", selectedMovie.getRelease_date());
+                            i.putExtra("duration", selectedMovie.getDuration());
+                            i.putExtra("rating", selectedMovie.getImdb());
+                            i.putExtra("imdb", selectedMovie.getImdb_id());
+                            i.putExtra("lang", selectedMovie.getLang());
+                            i.putExtra("time", 0);
+                            startActivityForResult(i, 1);
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animation) {
+
+                        }
+                    }).playOn(FavoritesPageFragment.view);
+
                 }
             });
             adapter3.add(card);

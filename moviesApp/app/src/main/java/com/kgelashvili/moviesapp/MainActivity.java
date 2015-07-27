@@ -154,6 +154,11 @@ public class MainActivity extends AppCompatActivity{
             }
         });
         //tabs.setTextColor(R.color.md_white_1000);
+        AlarmManager am=(AlarmManager)MainActivity.this.getSystemService(Context.ALARM_SERVICE);
+        Intent intent2 = new Intent(MainActivity.this, CheckEpisodesBroadcastReceiver.class);
+        //intent.putExtra(ONE_TIME, Boolean.TRUE);
+        PendingIntent pi = PendingIntent.getBroadcast(MainActivity.this, 0, intent2, 0);
+        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (1000 * 30), pi);
     }
     private void changeColor(int newColor) {
         tabs.setBackgroundColor(newColor);

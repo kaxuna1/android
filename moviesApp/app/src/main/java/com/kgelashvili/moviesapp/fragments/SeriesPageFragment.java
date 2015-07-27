@@ -14,13 +14,17 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.EditText;
 
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 import com.kgelashvili.moviesapp.Classes.CustomHeaderMainMovieItem;
 import com.kgelashvili.moviesapp.Classes.MovieServices;
 import com.kgelashvili.moviesapp.Classes.dbHelper;
+import com.kgelashvili.moviesapp.MoviePageActivity;
 import com.kgelashvili.moviesapp.R;
 import com.kgelashvili.moviesapp.model.Movie;
 import com.kgelashvili.moviesapp.model.Serie;
 import com.kgelashvili.moviesapp.serie_page_activity;
+import com.nineoldandroids.animation.Animator;
 
 import java.util.ArrayList;
 
@@ -231,17 +235,38 @@ public class SeriesPageFragment extends Fragment {
         card.setOnClickListener(new Card.OnCardClickListener() {
             @Override
             public void onClick(Card card, View view) {
-                Movie selectedMovie = serie;
 
-                Intent i = new Intent(getActivity(), serie_page_activity.class);
-                i.putExtra("movieId", selectedMovie.getId());
-                i.putExtra("description", selectedMovie.getDescription());
-                i.putExtra("title", selectedMovie.getTitle_en());
-                i.putExtra("date", selectedMovie.getRelease_date());
-                i.putExtra("duration", selectedMovie.getDuration());
-                i.putExtra("rating", selectedMovie.getImdb());
-                i.putExtra("imdb", selectedMovie.getImdb_id());
-                startActivity(i);
+                YoYo.with(Techniques.ZoomOutLeft).duration(500).withListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        Movie selectedMovie = serie;
+
+                        Intent i = new Intent(getActivity(), serie_page_activity.class);
+                        i.putExtra("movieId", selectedMovie.getId());
+                        i.putExtra("description", selectedMovie.getDescription());
+                        i.putExtra("title", selectedMovie.getTitle_en());
+                        i.putExtra("date", selectedMovie.getRelease_date());
+                        i.putExtra("duration", selectedMovie.getDuration());
+                        i.putExtra("rating", selectedMovie.getImdb());
+                        i.putExtra("imdb", selectedMovie.getImdb_id());
+                        startActivityForResult(i, 1);
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                }).playOn(SeriesPageFragment.view);
             }
         });
         adapter2.add(card);
