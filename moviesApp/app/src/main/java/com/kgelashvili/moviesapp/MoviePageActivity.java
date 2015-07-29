@@ -25,6 +25,8 @@ import com.daimajia.androidanimations.library.YoYo;
 import com.kgelashvili.moviesapp.Classes.FloatingActionButton;
 import com.nineoldandroids.animation.Animator;
 
+import org.w3c.dom.Text;
+
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -80,6 +82,7 @@ public class MoviePageActivity extends Activity {
                         startActivityForResult(i, 0);
                     }
                 });
+        ((TextView)findViewById(R.id.movieName)).setText(extras.getString("title"));
         ((Button) findViewById(R.id.downloadButtonSerie)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

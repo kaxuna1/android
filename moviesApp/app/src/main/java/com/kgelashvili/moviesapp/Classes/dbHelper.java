@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.net.Uri;
 
 import com.kgelashvili.moviesapp.model.Movie;
 
@@ -65,7 +64,7 @@ public class dbHelper extends SQLiteOpenHelper {
     public void createMovie(Movie movie){
         SQLiteDatabase db=getWritableDatabase();
         ContentValues contentValues=new ContentValues();
-        contentValues.put(KEY_ID,movie.getId());
+        contentValues.put(KEY_ID,movie.getMovieId());
         contentValues.put(title_en,movie.getTitle_en());
         contentValues.put(link,movie.getLink());
         contentValues.put(poster,movie.getPoster());
@@ -80,7 +79,7 @@ public class dbHelper extends SQLiteOpenHelper {
     }
     public void deleteMovie(Movie movie) {
         SQLiteDatabase db = getWritableDatabase();
-        db.delete(TABLE_MOVIES, KEY_ID + "=?", new String[]{String.valueOf(movie.getId())});
+        db.delete(TABLE_MOVIES, KEY_ID + "=?", new String[]{String.valueOf(movie.getMovieId())});
         db.close();
     }
 

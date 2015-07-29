@@ -207,7 +207,7 @@ public class SeriesActiviry extends Activity {
                 Movie selectedMovie = serie;
 
                 Intent i = new Intent(SeriesActiviry.this, serie_page_activity.class);
-                i.putExtra("movieId", selectedMovie.getId());
+                i.putExtra("movieId", selectedMovie.getMovieId());
                 i.putExtra("description", selectedMovie.getDescription());
                 i.putExtra("title", selectedMovie.getTitle_en());
                 i.putExtra("date", selectedMovie.getRelease_date());

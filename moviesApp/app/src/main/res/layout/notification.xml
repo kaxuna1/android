@@ -7,7 +7,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="ახალი კინოები"
-        android:id="@+id/textView9"
+        android:id="@+id/textViewNotification"
         android:textColor="#000000"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
@@ -15,7 +15,7 @@
     <LinearLayout
         android:layout_width="match_parent" android:layout_height="match_parent" android:id="@+id/notificationMovieList"
         android:orientation="horizontal"
-        android:layout_below="@+id/textView9"
+        android:layout_below="@+id/textViewNotification"
         android:layout_alignParentLeft="true"
         android:gravity="center"
         android:layout_alignParentStart="true">

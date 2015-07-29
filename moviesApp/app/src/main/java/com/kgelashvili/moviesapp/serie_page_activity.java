@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.MediaController;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.kgelashvili.moviesapp.Classes.FloatingActionButton;
@@ -40,6 +41,7 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardHeader;
@@ -59,6 +61,7 @@ public class serie_page_activity extends Activity {
     VideoView videoView;
     int movieTime=0;
     EpisodesListAdapter adapter;
+    Serie serie;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -83,6 +86,12 @@ public class serie_page_activity extends Activity {
                 .withDrawable(getResources().getDrawable(R.drawable.androidfullscreen))
                 .withSize(72)
                 .withMargins(0, 0, 16, 16)
+                .create();
+        final FloatingActionButton mFab2 = new FloatingActionButton.Builder(serie_page_activity.this)
+                .withColor(getResources().getColor(R.color.primary))
+                .withDrawable(getResources().getDrawable(R.drawable.starlit))
+                .withSize(72)
+                .withMargins(0, 0, 90, 16)
                 .create();
         ((Button)findViewById(R.id.downloadBtn)).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,22 +118,40 @@ public class serie_page_activity extends Activity {
         mFab.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
-            public void onClick(View v) {
-                Intent i=new Intent(serie_page_activity.this,FullScreenMovie.class);
-                i.putExtra("movieId",extras.getString("movieId"));
-                i.putExtra("description",extras.getString("description"));
-                i.putExtra("title",extras.getString("title"));
-                i.putExtra("date",extras.getString("date"));
-                i.putExtra("duration",extras.getString("duration"));
-                i.putExtra("rating",extras.getString("rating"));
-                i.putExtra("imdb",extras.getString("imdb"));
-                i.putExtra("time", videoView.getCurrentPosition());
-                i.putExtra("link",videourl);
+                    public void onClick(View v) {
+                        Intent i = new Intent(serie_page_activity.this, FullScreenMovie.class);
+                        i.putExtra("movieId", extras.getString("movieId"));
+                        i.putExtra("description", extras.getString("description"));
+                        i.putExtra("title", extras.getString("title"));
+                        i.putExtra("date", extras.getString("date"));
+                        i.putExtra("duration", extras.getString("duration"));
+                        i.putExtra("rating", extras.getString("rating"));
+                        i.putExtra("imdb", extras.getString("imdb"));
+                        i.putExtra("time", videoView.getCurrentPosition());
+                        i.putExtra("link", videourl);
 
 
-                startActivityForResult(i, 0);
+                        startActivityForResult(i, 0);
+                    }
+                });
+        serie= (Serie) getIntent().getSerializableExtra("Serie");
+        mFab2.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                Serie serie= (Serie) getIntent().getSerializableExtra("Serie");
+                List<Serie> serieList=Serie.find(Serie.class,"movie_id='"+serie.movieId+"'");
+                Log.d("seriesListSize",""+serieList.size());
+                if(serieList.size()==0){
+                    serie.save();
+                    Toast.makeText(serie_page_activity.this, "სიახლეები გამოიწერა სერიალ "+serie.getTitle_en()+"-ისთვის", Toast.LENGTH_LONG).show();
+                }else{
+                    Toast.makeText(serie_page_activity.this, "სიახლეები უკვე გამოიწერა სერიალ "+serie.getTitle_en()+"-ისთვის", Toast.LENGTH_LONG).show();
+                }
+
             }
         });
+        ((TextView)findViewById(R.id.serieName)).setText(serie.getTitle_en());
         final GetSeriesData getSeries=new GetSeriesData();
 
         new Thread(new Runnable() {
@@ -192,6 +219,7 @@ public class serie_page_activity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
 
     }
+
     private void PlayVideo()
     {
         try
@@ -287,6 +315,10 @@ public class serie_page_activity extends Activity {
             seasons.add(season);
             i++;
         }
+        serie.lastSes=seasons.size();
+        serie.lastEp=seasons.get(seasons.size()-1).getEpisodes().size();
+        Log.d("lastEp",""+serie.getLastEp());
+        Log.d("lastSes",""+serie.getLastSes());
         final String[] seasonNames=new String[seasons.size()];
         for(int k=0;k<seasons.size();k++){
             seasonNames[k]=seasons.get(k).getName();

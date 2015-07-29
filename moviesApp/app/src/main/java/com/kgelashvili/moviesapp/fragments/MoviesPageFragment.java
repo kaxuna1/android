@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.daimajia.androidanimations.library.Techniques;
@@ -27,6 +26,7 @@ import com.kgelashvili.moviesapp.model.Movie;
 import com.nineoldandroids.animation.Animator;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -198,6 +198,8 @@ public class MoviesPageFragment extends Fragment {
         //adapter.add(movie);
 
 
+
+
         Card card = new Card(getActivity());
 
         //Create a CardHeader
@@ -215,8 +217,16 @@ public class MoviesPageFragment extends Fragment {
         header.setOtherButtonClickListener(new CardHeader.OnClickCardHeaderOtherButtonListener() {
             @Override
             public void onButtonItemClick(Card card, View view) {
-                Toast.makeText(getActivity(), "დაემატა ფავორიტებში", Toast.LENGTH_LONG).show();
-                dbHelper2.createMovie(movie);
+
+        //        dbHelper2.createMovie
+                List<Movie> movieList=Movie.find(Movie.class, "movie_id = '"+movie.getMovieId()+"'");
+
+                if(movieList.size()==0) {
+                    movie.save();
+                    Toast.makeText(getActivity(), "დაემატა ვაპირებ ყრებას სიაში", Toast.LENGTH_LONG).show();
+                }else{
+                    Toast.makeText(getActivity(), "უკვე არსებობს ვაპირებ ყრებას სიაში", Toast.LENGTH_LONG).show();
+                }
 
 
             }
@@ -267,7 +277,7 @@ public class MoviesPageFragment extends Fragment {
                         Movie selectedMovie = movie;
 
                         Intent i = new Intent(getActivity(), MoviePageActivity.class);
-                        i.putExtra("movieId", selectedMovie.getId());
+                        i.putExtra("movieId", selectedMovie.getMovieId());
                         i.putExtra("description", selectedMovie.getDescription());
                         i.putExtra("title", selectedMovie.getTitle_en());
                         i.putExtra("date", selectedMovie.getRelease_date());

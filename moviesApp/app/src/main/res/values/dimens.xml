@@ -79,4 +79,9 @@
     <dimen name="circle_elevation">4dp</dimen>
     <dimen name="circle_size">70dp</dimen>
     <dimen name="carddemo_list_padding">8dp</dimen>
+    <dimen name="preference_fragment_padding_bottom">0dp</dimen>
+    <!-- Preference fragment padding, sides -->
+    <dimen name="preference_fragment_padding_side">16dp</dimen>
+
+    <integer name="preference_fragment_scrollbarStyle">0x02000000</integer>
 </resources>

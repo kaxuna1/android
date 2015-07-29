@@ -13,13 +13,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.kgelashvili.moviesapp.Classes.CustomHeaderMainMovieItem;
 import com.kgelashvili.moviesapp.Classes.MovieServices;
 import com.kgelashvili.moviesapp.Classes.dbHelper;
-import com.kgelashvili.moviesapp.MoviePageActivity;
 import com.kgelashvili.moviesapp.R;
 import com.kgelashvili.moviesapp.model.Movie;
 import com.kgelashvili.moviesapp.model.Serie;
@@ -27,11 +27,13 @@ import com.kgelashvili.moviesapp.serie_page_activity;
 import com.nineoldandroids.animation.Animator;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardArrayAdapter;
+import it.gmariotti.cardslib.library.internal.CardHeader;
 import it.gmariotti.cardslib.library.internal.CardThumbnail;
 import it.gmariotti.cardslib.library.view.CardListView;
 
@@ -191,12 +193,14 @@ public class SeriesPageFragment extends Fragment {
         Log.d("logSeries","log");
         Card card = new Card(getActivity());
 
+
         //Create a CardHeader
         CustomHeaderMainMovieItem header = new CustomHeaderMainMovieItem(getActivity(),
                 serie.getTitle_en(),serie.getRelease_date(),serie.getDescription().length()>50?serie.getDescription().substring(0,49):serie.getDescription());
 
         //Set the header title
         header.setTitle(serie.getTitle_en());
+
 
         card.addCardHeader(header);
 
@@ -244,16 +248,17 @@ public class SeriesPageFragment extends Fragment {
 
                     @Override
                     public void onAnimationEnd(Animator animation) {
-                        Movie selectedMovie = serie;
+                        Serie selectedMovie = serie;
 
                         Intent i = new Intent(getActivity(), serie_page_activity.class);
-                        i.putExtra("movieId", selectedMovie.getId());
+                        i.putExtra("movieId", selectedMovie.getMovieId());
                         i.putExtra("description", selectedMovie.getDescription());
                         i.putExtra("title", selectedMovie.getTitle_en());
                         i.putExtra("date", selectedMovie.getRelease_date());
                         i.putExtra("duration", selectedMovie.getDuration());
                         i.putExtra("rating", selectedMovie.getImdb());
                         i.putExtra("imdb", selectedMovie.getImdb_id());
+                        i.putExtra("Serie",serie);
                         startActivityForResult(i, 1);
                     }
 

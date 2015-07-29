@@ -7,27 +7,20 @@ import android.support.v4.view.ViewCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Bundle;
-import android.support.v4.view.ViewCompat;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
-import com.kgelashvili.moviesapp.Classes.CustomHeaderMainMovieItem;
 import com.kgelashvili.moviesapp.Classes.MovieServices;
 import com.kgelashvili.moviesapp.MoviePageActivity;
 import com.kgelashvili.moviesapp.R;
 import com.kgelashvili.moviesapp.model.Movie;
+import com.kgelashvili.moviesapp.model.Serie;
 import com.kgelashvili.moviesapp.serie_page_activity;
 import com.nineoldandroids.animation.Animator;
 
@@ -39,8 +32,6 @@ import it.gmariotti.cardslib.library.cards.actions.BaseSupplementalAction;
 import it.gmariotti.cardslib.library.cards.actions.IconSupplementalAction;
 import it.gmariotti.cardslib.library.cards.material.MaterialLargeImageCard;
 import it.gmariotti.cardslib.library.internal.Card;
-import it.gmariotti.cardslib.library.internal.CardHeader;
-import it.gmariotti.cardslib.library.internal.CardThumbnail;
 import it.gmariotti.cardslib.library.view.CardViewNative;
 
 /**
@@ -160,7 +151,7 @@ public class MainPageFragment extends Fragment {
                         Movie selectedMovie = movie;
 
                         Intent i = new Intent(getActivity(), MoviePageActivity.class);
-                        i.putExtra("movieId", selectedMovie.getId());
+                        i.putExtra("movieId", selectedMovie.getMovieId());
                         i.putExtra("description", selectedMovie.getDescription());
                         i.putExtra("title", selectedMovie.getTitle_en());
                         i.putExtra("date", selectedMovie.getRelease_date());
@@ -249,7 +240,7 @@ public class MainPageFragment extends Fragment {
                         Movie selectedMovie = movie;
 
                         Intent i = new Intent(getActivity(), MoviePageActivity.class);
-                        i.putExtra("movieId", selectedMovie.getId());
+                        i.putExtra("movieId", selectedMovie.getMovieId());
                         i.putExtra("description", selectedMovie.getDescription());
                         i.putExtra("title", selectedMovie.getTitle_en());
                         i.putExtra("date", selectedMovie.getRelease_date());
@@ -335,7 +326,7 @@ public class MainPageFragment extends Fragment {
                         Movie selectedMovie = movie;
 
                         Intent i = new Intent(getActivity(), MoviePageActivity.class);
-                        i.putExtra("movieId", selectedMovie.getId());
+                        i.putExtra("movieId", selectedMovie.getMovieId());
                         i.putExtra("description", selectedMovie.getDescription());
                         i.putExtra("title", selectedMovie.getTitle_en());
                         i.putExtra("date", selectedMovie.getRelease_date());
@@ -366,20 +357,20 @@ public class MainPageFragment extends Fragment {
 
     }
 
-    class getLatestEpisodes extends AsyncTask<String, ArrayList<Movie>, ArrayList<Movie>> {
+    class getLatestEpisodes extends AsyncTask<String, ArrayList<Serie>, ArrayList<Serie>> {
 
         @Override
-        protected ArrayList<Movie> doInBackground(String... strings) {
+        protected ArrayList<Serie> doInBackground(String... strings) {
 
             MovieServices movieServices = new MovieServices();
-            ArrayList<Movie> series = movieServices.getNewEpisodes();
+            ArrayList<Serie> series = movieServices.getNewEpisodes();
             //Log.d("kaxatest21",series.get(0).getTitle_en());
             publishProgress(series);
 
             return series;
         }
         @Override
-        protected void onProgressUpdate(ArrayList<Movie>... values) {
+        protected void onProgressUpdate(ArrayList<Serie>... values) {
             super.onProgressUpdate(values);
             Log.d("kaxaGeo12", "kaxaGeo12");
             for (int i = 0; i < values[0].size(); i++) {
@@ -390,7 +381,7 @@ public class MainPageFragment extends Fragment {
 
     }
 
-    private void addLatestEpisodeToColection(final Movie serie) {
+    private void addLatestEpisodeToColection(final Serie serie) {
 
         Log.d("episodes","episodes12");
         LinearLayout linearLayout = newEpisodesLayout2;
@@ -411,10 +402,10 @@ public class MainPageFragment extends Fragment {
         card.setOnClickListener(new Card.OnCardClickListener() {
             @Override
             public void onClick(Card card, View view) {
-                Movie selectedMovie = serie;
+                Serie selectedMovie = serie;
 
                 Intent i = new Intent(getActivity(), serie_page_activity.class);
-                i.putExtra("movieId", selectedMovie.getId());
+                i.putExtra("movieId", selectedMovie.getMovieId());
                 i.putExtra("description", selectedMovie.getDescription());
                 i.putExtra("title", selectedMovie.getTitle_en());
                 i.putExtra("date", selectedMovie.getRelease_date());
@@ -423,6 +414,7 @@ public class MainPageFragment extends Fragment {
                 i.putExtra("imdb", selectedMovie.getImdb_id());
                 i.putExtra("lang", selectedMovie.getLang());
                 i.putExtra("time", 0);
+                i.putExtra("Serie",serie);
                 startActivity(i);
             }
         });

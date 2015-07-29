@@ -1,4 +1,19 @@
 <resources>
+    <!--  Strings for possible PreferenceActivity Back/Next buttons -->
+
+
+
+
+    <string name="category">პარამეტრები</string>
+    <string name="newAddedPref">ახალი დამატებული ფილმები</string>
+    <string name="newAddedPrefOn">მიიღებთ შეტყობინებას ახალ კინოებზე</string>
+    <string name="newAddedPrefOff">არ მიიღებთ შეტყობინებას ახალ კინოებზე</string>
+    <string name="back_button_label">Back</string>
+    <string name="next_button_label">Next</string>
+
+    <!-- Optional button to Skip a PreferenceActivity [CHAR LIMIT=20] -->
+    <string name="skip_button_label">Skip</string>
+
     <string name="app_name">moviesApp</string>
 
     <string name="hello_world">Hello world!</string>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+
+  <com.jenzz.materialpreference.PreferenceCategory android:title="@string/category">
+
+    <com.jenzz.materialpreference.CheckBoxPreference
+        android:title="@string/newAddedPref"
+        android:summaryOn="@string/newAddedPrefOn"
+        android:summaryOff="@string/newAddedPrefOff"
+        android:key="newMovies"
+        android:defaultValue="true"
+        />
+      <com.jenzz.materialpreference.CheckBoxPreference
+          android:title="პრემიერები"
+          android:summaryOn="მიიღებთ შეტყობინებებს პრემიერების შესახებ"
+          android:summaryOff="არ მიიღებთ შეტყობინებებს პრემიერების შესახებ"
+          android:key="premiereMovies"
+          android:defaultValue="true"
+          />
+      <com.jenzz.materialpreference.CheckBoxPreference
+          android:title="ახალი ფილმები ქართულად"
+          android:summaryOn="მიიღებთ შეტყობინებებს ქართულად გახმოვანებული ფილმები შესახებ"
+          android:summaryOff="@string/newAddedPrefOff"
+          android:key="newGeoMovies"
+          android:defaultValue="true"
+          />
+      <com.kgelashvili.moviesapp.Classes.NumberPickerPreference
+          android:key="interval"
+          android:title="სიახლეების მიღების ინტერვალი"
+          android:defaultValue="6" />
+
+  </com.jenzz.materialpreference.PreferenceCategory>
+
+</PreferenceScreen>

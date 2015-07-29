@@ -9,6 +9,7 @@ import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.preference.PreferenceFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -53,13 +54,7 @@ public class settingsActivity extends AppCompatActivity {
 
    /* @InjectView(R.id.toolbar)
     Toolbar toolbar;*/
-    @InjectView(R.id.tabs)
-    com.astuetz.PagerSlidingTabStrip tabs;
-    @InjectView(R.id.pager)
-    ViewPager pager;
-    private Drawable oldBackground = null;
-    private int currentColor;
-    private SystemBarTintManager mTintManager;
+
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -70,56 +65,20 @@ public class settingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-    }
-    private void changeColor(int newColor) {
-        tabs.setBackgroundColor(newColor);
-        tabs.setTextColor(getResources().getColor(R.color.md_white_1000));
-        tabs.setUnderlineColor(getResources().getColor(R.color.md_white_1000));
-        tabs.setIndicatorColor(getResources().getColor(R.color.md_white_1000));
-        mTintManager.setTintColor(newColor);
-        // change ActionBar color just if an ActionBar is available
-        Drawable colorDrawable = new ColorDrawable(newColor);
-        Drawable bottomDrawable = new ColorDrawable(getResources().getColor(android.R.color.transparent));
-        LayerDrawable ld = new LayerDrawable(new Drawable[]{colorDrawable, bottomDrawable});
-        /*if (oldBackground == null) {
-            getSupportActionBar().setBackgroundDrawable(ld);
-        } else {
-            TransitionDrawable td = new TransitionDrawable(new Drawable[]{oldBackground, ld});
-            getSupportActionBar().setBackgroundDrawable(td);
-            td.startTransition(200);
-        }*/
-
-        oldBackground = ld;
-        currentColor = newColor;
-    }
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_settings, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (savedInstanceState == null) {
+            getFragmentManager().beginTransaction()
+                    .add(android.R.id.content, new SettingsFragment())
+                    .commit();
         }
 
-        return super.onOptionsItemSelected(item);
+    }
+    public static class SettingsFragment extends PreferenceFragment {
+
+        @Override public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.prefs);
+        }
     }
 
-
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        YoYo.with(Techniques.ZoomInLeft).playOn(findViewById(R.id.fragmentMainLinar));
-    }
 
 }

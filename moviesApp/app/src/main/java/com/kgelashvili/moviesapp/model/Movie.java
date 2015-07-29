@@ -2,26 +2,30 @@ package com.kgelashvili.moviesapp.model;
 
 import android.net.Uri;
 
+import com.orm.SugarRecord;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by KGelashvili on 7/10/2015.
  */
-public class Movie {
-    private String id;
-    private String title_en;
-    private String link;
-    private String poster;
-    private String imdb;
-    private String imdb_id;
-    private String release_date;
-    private String description;
-    private String duration;
-    private String lang;
+public class Movie extends SugarRecord<Movie> implements Serializable {
+    public String movieId;
+    public String title_en;
+    public String link;
+    public String poster;
+    public String imdb;
+    public String imdb_id;
+    public String release_date;
+    public String description;
+    public String duration;
+    public String lang;
 
-
+    public Movie(){
+    }
     public Movie(String id, String title_en, String link, String poster, String imdb, String imdb_id, String release_date, String description, String duration,String lang) {
-        this.id = id;
+        this.movieId = id;
         this.title_en = title_en;
         this.link = link;
         this.poster = poster;
@@ -33,12 +37,12 @@ public class Movie {
         this.lang=lang;
     }
 
-    public String getId() {
-        return id;
+    public String getMovieId() {
+        return movieId;
     }
 
     public void setId(String id) {
-        this.id = id;
+        this.movieId = id;
     }
 
     public String getTitle_en() {

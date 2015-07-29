@@ -166,8 +166,16 @@ public class MainActivity extends AppCompatActivity{
         Intent intent2 = new Intent(MainActivity.this, CheckEpisodesBroadcastReceiver.class);
         //intent.putExtra(ONE_TIME, Boolean.TRUE);
         PendingIntent pi = PendingIntent.getBroadcast(MainActivity.this, 0, intent2, 0);
-        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (1000 * 30), pi);
 
+
+        boolean alarmUp = (PendingIntent.getBroadcast(this, 0,
+                intent2,
+                PendingIntent.FLAG_NO_CREATE) != null);
+
+        if (!alarmUp)
+        {
+            am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (1000 * 30), pi);
+        }
         MainActivity.this.getWindow().getDecorView().setBackgroundColor(getResources().getColor(R.color.gray_background));
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout2);
         mDrawer.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
@@ -222,7 +230,7 @@ public class MainActivity extends AppCompatActivity{
 
     public class MyPagerAdapter extends FragmentPagerAdapter {
 
-        private final String[] TITLES = {"მთავარი", "ფილმები","სერიალები", "ფავორიტები"};
+        private final String[] TITLES = {"მთავარი", "ფილმები","სერიალები", "ვაპირებ ყურებას"};
 
         public MyPagerAdapter(FragmentManager fm) {
             super(fm);

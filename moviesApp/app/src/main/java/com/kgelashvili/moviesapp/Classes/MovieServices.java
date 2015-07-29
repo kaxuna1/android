@@ -32,7 +32,8 @@ public class MovieServices {
                 JSONObject movieJ=movies.getJSONObject(i);
                 Log.d("kaxa", movieJ.getString("poster"));
                 Log.d("lang",movieJ.getString("lang"));
-                Movie movie=new Movie(movieJ.getString("id"),
+                Movie movie=new Movie(
+                        movieJ.getString("id"),
                         movieJ.getString("title_en"),
                         movieJ.getString("link"),
                         movieJ.getString("poster"),
@@ -162,8 +163,8 @@ public class MovieServices {
         return Movies;
     }
 
-    public ArrayList<Movie> getNewEpisodes(){
-        ArrayList<Movie> Movies=new ArrayList<Movie>();
+    public ArrayList<Serie> getNewEpisodes(){
+        ArrayList<Serie> Movies=new ArrayList<Serie>();
         String url = "http://adjaranet.com/cache/cached_home_episodes.php?type=episodes&order=new&period=week&limit=25";
         NetworkDAO networkDAO=new NetworkDAO();
         try {
@@ -175,7 +176,7 @@ public class MovieServices {
                 JSONObject movieJ=movies.getJSONObject(i);
                 Log.d("kaxa", movieJ.getString("poster"));
                 //Log.d("lang", movieJ.getString("lang"));
-                Movie movie=new Movie(movieJ.getString("id"),
+                Serie movie=new Serie(movieJ.getString("id"),
                         movieJ.getString("title_en"),
                         movieJ.getString("link"),
                         movieJ.getString("poster"),
