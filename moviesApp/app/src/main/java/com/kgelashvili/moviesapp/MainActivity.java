@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity{
                         .setFontAttrId(R.attr.fontPath)
                         .build()
         );
-        setContentView(R.layout.activity_settings);
+        setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
         //setSupportActionBar(toolbar);
         // create our manager instance after the content view is set

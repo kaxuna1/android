@@ -7,6 +7,23 @@
     tools:ignore="MissingPrefix"
     android:id="@+id/fragmentMainLinar">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:layout_weight="0.05"
+        android:background="@color/primary">
+
+        <ImageView
+            android:paddingLeft="10dp"
+            android:layout_width="130dp"
+            android:layout_height="match_parent"
+            android:id="@+id/imageView3"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:src="@drawable/logoo" />
+    </RelativeLayout>
+
     <com.astuetz.PagerSlidingTabStrip
         android:id="@+id/tabs"
         android:layout_width="match_parent"
