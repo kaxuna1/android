@@ -1,42 +1,57 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawer_layout2"
+    layout_marginTop="?attr/actionBarSize"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:fitsSystemWindows="true"
-    tools:ignore="MissingPrefix"
-    android:id="@+id/fragmentMainLinar">
+    android:layout_height="match_parent">
 
-    <RelativeLayout
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/fragmentMainLinar"
         android:layout_width="match_parent"
-        android:layout_height="10dp"
-        android:layout_weight="0.05"
-        android:background="@color/primary">
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        android:orientation="vertical"
+        tools:ignore="MissingPrefix">
 
-        <ImageView
-            android:paddingLeft="10dp"
-            android:layout_width="130dp"
-            android:layout_height="match_parent"
-            android:id="@+id/imageView3"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:src="@drawable/logoo" />
-    </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:layout_weight="0.05"
+            android:background="@color/primary">
 
-    <com.astuetz.PagerSlidingTabStrip
-        android:id="@+id/tabs"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        fontPath="fonts/bpg_square_mtavruli_2009.ttf"
-        />
+            <ImageView
+                android:id="@+id/imageView3"
+                android:layout_width="130dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:paddingLeft="10dp"
+                android:src="@drawable/logoo" />
+        </RelativeLayout>
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/pager"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        tools:context=".MainActivity"/>
+        <com.astuetz.PagerSlidingTabStrip
+            android:id="@+id/tabs"
+            fontPath="fonts/bpg_square_mtavruli_2009.ttf"
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/pager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            tools:context=".MainActivity" />
 
 
-</LinearLayout>
+    </LinearLayout>
+    <ListView
+        android:id="@+id/drawer2"
+        android:layout_width="@dimen/drawer_width"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="#F3F3F4"
+        android:choiceMode="singleChoice"
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="1dp"></ListView>
+</android.support.v4.widget.DrawerLayout>

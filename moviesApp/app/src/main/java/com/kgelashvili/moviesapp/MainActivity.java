@@ -99,6 +99,12 @@ public class MainActivity extends AppCompatActivity{
     private int currentColor;
     private SystemBarTintManager mTintManager;
     dbHelper dbHelper2=new dbHelper(MainActivity.this);
+    private ListView mDrawerList;
+    private DrawerLayout mDrawer;
+    private CustomActionBarDrawerToggle mDrawerToggle;
+    int mCurrentTitle=R.string.app_name;
+
+    SimpleSectionedListAdapter mSectionedAdapter;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -115,6 +121,8 @@ public class MainActivity extends AppCompatActivity{
         );
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
+        /*mDrawerToggle = new CustomActionBarDrawerToggle(this, mDrawer);
+        mDrawer.setDrawerListener(mDrawerToggle);*/
         //setSupportActionBar(toolbar);
         // create our manager instance after the content view is set
         mTintManager = new SystemBarTintManager(this);
@@ -159,6 +167,14 @@ public class MainActivity extends AppCompatActivity{
         //intent.putExtra(ONE_TIME, Boolean.TRUE);
         PendingIntent pi = PendingIntent.getBroadcast(MainActivity.this, 0, intent2, 0);
         am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (1000 * 30), pi);
+
+        MainActivity.this.getWindow().getDecorView().setBackgroundColor(getResources().getColor(R.color.gray_background));
+        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout2);
+        mDrawer.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+
+        _initMenu();
+
+
     }
     private void changeColor(int newColor) {
         tabs.setBackgroundColor(newColor);
@@ -239,4 +255,76 @@ public class MainActivity extends AppCompatActivity{
         super.onActivityResult(requestCode, resultCode, data);
         YoYo.with(Techniques.ZoomInLeft).playOn(findViewById(R.id.fragmentMainLinar));
     }
+    public static final String[] options = {
+
+            "პარამეტრები"
+
+    };
+    private class CustomActionBarDrawerToggle extends ActionBarDrawerToggle {
+
+        public CustomActionBarDrawerToggle(Activity mActivity, DrawerLayout mDrawerLayout) {
+
+            super(
+                    mActivity,
+                    mDrawerLayout,
+                    com.kgelashvili.moviesapp.R.drawable.ic_navigation_drawer,
+                    com.kgelashvili.moviesapp.R.string.app_name,
+                    mCurrentTitle);
+        }
+
+        @Override
+        public void onDrawerClosed(View view) {
+            //getActionBar().setTitle("კინოები");
+            invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+        }
+
+        @Override
+        public void onDrawerOpened(View drawerView) {
+            //getActionBar().setTitle("მენიუ");
+            invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+        }
+    }
+    private void _initMenu() {
+
+        mDrawerList = (ListView) findViewById(R.id.drawer2);
+
+        if (mDrawerList != null) {
+            ArrayAdapter<String> mAdapter = new ArrayAdapter<String>(this,
+                    R.layout.demo_activity_menuitem, options);
+
+            List<SimpleSectionedListAdapter.Section> sections =
+                    new ArrayList<SimpleSectionedListAdapter.Section>();
+
+
+            SimpleSectionedListAdapter.Section[] dummy = new SimpleSectionedListAdapter.Section[sections.size()];
+            mSectionedAdapter = new SimpleSectionedListAdapter(this, R.layout.demo_activity_menusection, mAdapter);
+            mSectionedAdapter.setSections(sections.toArray(dummy));
+
+            mDrawerList.setAdapter(mSectionedAdapter);
+            mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+        }
+
+    }
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position,
+                                long id) {
+
+            // Highlight the selected item, update the title, and close the drawer
+            // update selected item and title, then close the drawer
+            position = mSectionedAdapter.sectionedPositionToPosition(position);
+            mDrawer.closeDrawer(mDrawerList);
+            Intent i;
+            switch (position) {
+                case 0:
+
+                    i = new Intent(MainActivity.this, settingsActivity.class);
+
+                    startActivity(i);
+                    break;
+            }
+        }
+    }
+
 }
