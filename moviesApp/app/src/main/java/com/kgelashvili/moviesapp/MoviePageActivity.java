@@ -9,24 +9,39 @@ import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.MediaController;
+import android.widget.RelativeLayout;
+import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.VideoView;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.kgelashvili.moviesapp.Classes.FloatingActionButton;
+import com.kgelashvili.moviesapp.Classes.MovieServices;
+import com.kgelashvili.moviesapp.model.Actor;
+import com.kgelashvili.moviesapp.model.Movie;
 import com.nineoldandroids.animation.Animator;
 
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
+
+import it.gmariotti.cardslib.library.cards.material.MaterialLargeImageCard;
+import it.gmariotti.cardslib.library.internal.Card;
+import it.gmariotti.cardslib.library.view.CardViewNative;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -38,6 +53,12 @@ public class MoviePageActivity extends Activity {
     VideoView videoView;
     String videourl = "";
     int movieTime = 0;
+    private WebView webView;
+    LinearLayout castLayout;
+    TabHost tabHost=null;
+
+    public MoviePageActivity() {
+    }
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -56,8 +77,31 @@ public class MoviePageActivity extends Activity {
         );
         setContentView(R.layout.moviepagelayout);
         final Bundle extras = getIntent().getExtras();
+
+        tabHost = (TabHost)findViewById(R.id.tabHost);
+        tabHost.setup();
+        TabHost.TabSpec tabSpec=tabHost.newTabSpec("movie");
+        tabSpec.setContent(R.id.tab1);
+        tabSpec.setIndicator(extras.getString("title"));
+        tabHost.addTab(tabSpec);
+
+        tabSpec=tabHost.newTabSpec("movie");
+        tabSpec.setContent(R.id.tab2);
+        tabSpec.setIndicator("ინფორმაცია ფილმზე");
+        tabHost.addTab(tabSpec);
+
+        tabSpec=tabHost.newTabSpec("movie");
+        tabSpec.setContent(R.id.tab3);
+        tabSpec.setIndicator("IMDB");
+        tabHost.addTab(tabSpec);
+
+
+        castLayout=(LinearLayout)findViewById(R.id.actorsLayout);
+
+
+
         final String value = extras.getString("movieId");
-        FloatingActionButton mFab = new FloatingActionButton.Builder(MoviePageActivity.this)
+        final FloatingActionButton mFab = new FloatingActionButton.Builder(MoviePageActivity.this)
                 .withColor(getResources().getColor(R.color.primary))
                 .withDrawable(getResources().getDrawable(R.drawable.androidfullscreen))
                 .withSize(72)
@@ -82,8 +126,17 @@ public class MoviePageActivity extends Activity {
                         startActivityForResult(i, 0);
                     }
                 });
-        ((TextView)findViewById(R.id.movieName)).setText(extras.getString("title"));
-        ((Button) findViewById(R.id.downloadButtonSerie)).setOnClickListener(new View.OnClickListener() {
+        tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
+            @Override
+            public void onTabChanged(String s) {
+                if (tabHost.getCurrentTab() == 0) {
+                    mFab.show();
+                }else{
+                    mFab.hide();
+                }
+            }
+        });
+        ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.downloadButtonSerie)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String url = videourl;
@@ -92,7 +145,13 @@ public class MoviePageActivity extends Activity {
                 startActivity(i);
             }
         });
-        ((Button) findViewById(R.id.langBtnSerie)).setOnClickListener(new View.OnClickListener() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                new getMovieActorsAsync().doInBackground(extras.getString("movieId"));
+            }
+        }).start();
+        ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.langBtnSerie)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MoviePageActivity.this);
@@ -133,7 +192,8 @@ public class MoviePageActivity extends Activity {
             }
         });
         ((TextView) findViewById(R.id.descriptionTxt)).setText(extras.getString("description"));
-        videourl = "http://adjaranet.com/download.php?mid=" + value + "&file=" + value + "_" + (extras.getString("lang").split(",")[0]) + "_300";
+        videourl = "http://adjaranet.com/download.php?mid="
+                + value + "&file=" + value + "_" + (extras.getString("lang").split(",")[0]) + "_300";
         setTitle(extras.getString("title"));
         movieTime = extras.getInt("time");
 
@@ -143,28 +203,34 @@ public class MoviePageActivity extends Activity {
         progressDialog.setCancelable(true);
         PlayVideo();
 
-        YoYo.with(Techniques.SlideInRight).duration(500).withListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
+        YoYo.with(Techniques.SlideInRight).duration(500)
+                .withListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
 
-            }
+                    }
 
-            @Override
-            public void onAnimationEnd(Animator animation) {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+
+                        webView = (WebView) findViewById(R.id.webView1);
+                        webView.getSettings().setJavaScriptEnabled(true);
+                        webView.setWebViewClient(new WebViewClient());
+                        webView.loadUrl("http://www.imdb.com/title/" + extras.getString("imdb"));
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                }).playOn(findViewById(R.id.moviePageRelative));
 
 
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
-            }
-        }).playOn(findViewById(R.id.moviePageRelative));
 
 
     }
@@ -234,6 +300,56 @@ public class MoviePageActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    class getMovieActorsAsync extends AsyncTask<String,ArrayList<Actor>,ArrayList<Actor>>{
+
+        @Override
+        protected ArrayList<Actor> doInBackground(String... strings) {
+            ArrayList<Actor> actors;
+            actors=new MovieServices().getMovieActors(strings[0]);
+            publishProgress(actors);
+            return actors;
+        }
+        @Override
+        protected void onProgressUpdate(ArrayList<Actor>... values) {
+            super.onProgressUpdate(values);
+            Log.d("kaxaGeo1", "kaxaGeo1");
+            for (int i = 0; i < values[0].size(); i++) {
+                addActorToCast(values[0].get(i));
+            }
+
+        }
+    }
+
+    private void addActorToCast(Actor actor) {
+
+        LinearLayout linearLayout = castLayout;
+        LayoutInflater inflater = LayoutInflater.from(this);
+        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.actorontop, null, false);
+
+
+
+
+        MaterialLargeImageCard card =
+                MaterialLargeImageCard.with(this)
+                        //.setTextOverImage(actor.actorName)
+                        .useDrawableUrl("http://static.adjaranet.com/cast/"+actor.actorId+".jpg")
+                                //.setupSupplementalActions(R.layout.carddemo_native_material_supplemental_actions_large_icon, actions)
+                        .build();
+
+
+        card.setOnClickListener(new Card.OnCardClickListener() {
+            @Override
+            public void onClick(Card card, View view) {
+
+            }
+        });
+        CardViewNative cardView = (CardViewNative) layout.findViewById(R.id.actorCard);
+        ((TextView)layout.findViewById(R.id.actorCardName)).setText(actor.actorName);
+        cardView.setCard(card);
+
+        linearLayout.addView(layout);
+    }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -245,28 +361,70 @@ public class MoviePageActivity extends Activity {
     }
 
     public void onBackPressed() {
-        YoYo.with(Techniques.SlideOutRight).withListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                finish();
+        if(tabHost.getCurrentTab()==2){
+            if(webView.canGoBack()){
+                webView.goBack();
+            }else{
+                YoYo.with(Techniques.SlideOutRight).withListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+                        finish();
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                }).duration(500).playOn(findViewById(R.id.moviePageRelative));
             }
+        }else{
+            YoYo.with(Techniques.SlideOutRight).withListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    finish();
+                }
 
-            @Override
-            public void onAnimationEnd(Animator animation) {
+                @Override
+                public void onAnimationEnd(Animator animation) {
 
-            }
+                }
 
-            @Override
-            public void onAnimationCancel(Animator animation) {
+                @Override
+                public void onAnimationCancel(Animator animation) {
 
-            }
+                }
 
-            @Override
-            public void onAnimationRepeat(Animator animation) {
+                @Override
+                public void onAnimationRepeat(Animator animation) {
 
-            }
-        }).duration(500).playOn(findViewById(R.id.moviePageRelative));
+                }
+            }).duration(500).playOn(findViewById(R.id.moviePageRelative));
+        }
+
+
     }
 
+    public class MyWebViewClient extends WebViewClient {
+
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            boolean result = false;
+
+        /* ... */
+            // Return false to proceed loading page, true to interrupt loading
+
+            return result;
+        }
+    }
 
 }

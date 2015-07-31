@@ -1,7 +1,9 @@
 package com.kgelashvili.moviesapp.Classes;
 
 import android.util.Log;
+import android.widget.ArrayAdapter;
 
+import com.kgelashvili.moviesapp.model.Actor;
 import com.kgelashvili.moviesapp.model.Movie;
 import com.kgelashvili.moviesapp.model.Serie;
 
@@ -11,6 +13,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Created by KGelashvili on 7/10/2015.
@@ -234,5 +237,57 @@ public class MovieServices {
 
         return Movies;
     }
+
+    public ArrayList<Actor> getMovieActors(String movieId){
+        ArrayList<Actor> actors=new ArrayList<Actor>();
+        String url = "http://adjaranet.com/req/jsondata/req.php?id="+movieId+"&reqId=getLangAndHd";
+        NetworkDAO networkDAO=new NetworkDAO();
+        try {
+            String rawData=networkDAO.request(url);
+            Log.d("kaxaGeo", rawData);
+            JSONObject movieData=new JSONObject(rawData);
+            JSONObject actorsObject=movieData.getJSONObject("cast");
+            Iterator<?> keys = actorsObject.keys();
+            while( keys.hasNext() ) {
+                String key = (String)keys.next();
+                Log.d("actorID", key);
+                Log.d("actorName",(actorsObject.getString(key)));
+                actors.add(new Actor(key,actorsObject.getString(key)) );
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+        return actors;
+    }
+    public ArrayList<Actor> getSerieActors(String serieId){
+        ArrayList<Actor> actors=new ArrayList<Actor>();
+        String url = "http://adjaranet.com/req/jsondata/req.php?id="+serieId+"&reqId=getInfo";
+        NetworkDAO networkDAO=new NetworkDAO();
+        try {
+            String rawData=networkDAO.request(url);
+            Log.d("kaxaGeo", rawData);
+            JSONObject movieData=new JSONObject(rawData);
+            JSONObject actorsObject=movieData.getJSONObject("cast");
+            Iterator<?> keys = actorsObject.keys();
+            while( keys.hasNext() ) {
+                String key = (String)keys.next();
+                Log.d("actorID", key);
+                Log.d("actorName",(actorsObject.getString(key)));
+                actors.add(new Actor(key,actorsObject.getString(key)) );
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+        return actors;
+    }
+
 
 }

@@ -17,22 +17,28 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.MediaController;
+import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 import com.kgelashvili.moviesapp.Classes.FloatingActionButton;
 import com.kgelashvili.moviesapp.cards.CustomThumbCard;
 import com.kgelashvili.moviesapp.model.Episode;
 import com.kgelashvili.moviesapp.model.Movie;
 import com.kgelashvili.moviesapp.model.Season;
 import com.kgelashvili.moviesapp.model.Serie;
+import com.nineoldandroids.animation.Animator;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -62,7 +68,8 @@ public class serie_page_activity extends Activity {
     int movieTime=0;
     EpisodesListAdapter adapter;
     Serie serie;
-
+    TabHost tabHost=null;
+    private WebView webView;
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
@@ -77,23 +84,58 @@ public class serie_page_activity extends Activity {
                         .build()
         );
         setContentView(R.layout.activity_serie_page_activity);
-        seasons=new ArrayList<Season>();
+
         final Bundle extras = getIntent().getExtras();
+        tabHost = (TabHost)findViewById(R.id.tabHost);
+        tabHost.setup();
+        TabHost.TabSpec tabSpec=tabHost.newTabSpec("movie");
+        tabSpec.setContent(R.id.tab1);
+        tabSpec.setIndicator(extras.getString("title"));
+        tabHost.addTab(tabSpec);
+
+        tabSpec=tabHost.newTabSpec("movie");
+        tabSpec.setContent(R.id.tab2);
+        tabSpec.setIndicator("ინფორმაცია ფილმზე");
+        tabHost.addTab(tabSpec);
+
+        tabSpec=tabHost.newTabSpec("movie");
+        tabSpec.setContent(R.id.tab3);
+        tabSpec.setIndicator("IMDB");
+        tabHost.addTab(tabSpec);
+
+
+
+        seasons=new ArrayList<Season>();
+
         id=extras.getString("movieId");
        // getActionBar().setTitle(extras.getString("title"));
         final FloatingActionButton mFab = new FloatingActionButton.Builder(serie_page_activity.this)
                 .withColor(getResources().getColor(R.color.primary))
                 .withDrawable(getResources().getDrawable(R.drawable.androidfullscreen))
                 .withSize(72)
-                .withMargins(0, 0, 16, 16)
+                .withMargins(0, 0, 16, 310)
                 .create();
         final FloatingActionButton mFab2 = new FloatingActionButton.Builder(serie_page_activity.this)
                 .withColor(getResources().getColor(R.color.primary))
                 .withDrawable(getResources().getDrawable(R.drawable.starlit))
                 .withSize(72)
-                .withMargins(0, 0, 90, 16)
+                .withMargins(0, 0, 16, 16)
                 .create();
-        ((Button)findViewById(R.id.downloadBtn)).setOnClickListener(new View.OnClickListener() {
+
+        tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
+            @Override
+            public void onTabChanged(String s) {
+                if (tabHost.getCurrentTab() == 0) {
+                    mFab.show();
+                    mFab2.show();
+                }else{
+                    mFab.hide();
+                    mFab2.hide();
+                }
+            }
+        });
+
+        ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.downloadBtn)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String url = videourl;
@@ -139,20 +181,25 @@ public class serie_page_activity extends Activity {
 
             @Override
             public void onClick(View view) {
-                Serie serie= (Serie) getIntent().getSerializableExtra("Serie");
-                List<Serie> serieList=Serie.find(Serie.class,"movie_id='"+serie.movieId+"'");
-                Log.d("seriesListSize",""+serieList.size());
-                if(serieList.size()==0){
+                Serie serie = (Serie) getIntent().getSerializableExtra("Serie");
+                List<Serie> serieList = Serie.find(Serie.class, "movie_id='" + serie.movieId + "'");
+                Log.d("seriesListSize", "" + serieList.size());
+                if (serieList.size() == 0) {
                     serie.save();
-                    Toast.makeText(serie_page_activity.this, "სიახლეები გამოიწერა სერიალ "+serie.getTitle_en()+"-ისთვის", Toast.LENGTH_LONG).show();
-                }else{
-                    Toast.makeText(serie_page_activity.this, "სიახლეები უკვე გამოიწერა სერიალ "+serie.getTitle_en()+"-ისთვის", Toast.LENGTH_LONG).show();
+                    Toast.makeText(serie_page_activity.this, "სიახლეები გამოიწერა სერიალ " + serie.getTitle_en() + "-ისთვის", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(serie_page_activity.this, "სიახლეები უკვე გამოიწერა სერიალ " + serie.getTitle_en() + "-ისთვის", Toast.LENGTH_LONG).show();
                 }
 
             }
         });
-        ((TextView)findViewById(R.id.serieName)).setText(serie.getTitle_en());
         final GetSeriesData getSeries=new GetSeriesData();
+
+        webView = (WebView) findViewById(R.id.webView1);
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.setWebViewClient(new WebViewClient());
+        webView.loadUrl("http://www.imdb.com/title/" + extras.getString("imdb"));
+
 
         new Thread(new Runnable() {
             @Override
@@ -175,7 +222,7 @@ public class serie_page_activity extends Activity {
                 progressDialog = ProgressDialog.show(serie_page_activity.this, "", "მიმდინარეობს ვიდეოს ჩატვირთა", true);
                 progressDialog.setCancelable(true);
                 //getActionBar().setTitle(extras.getString("title") + " " + currentEpisodes.get(position).getName());
-                ((Button)findViewById(R.id.langBtnSerie)).setOnClickListener(new View.OnClickListener() {
+                ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.langBtnSerie)).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(serie_page_activity.this);
@@ -328,7 +375,7 @@ public class serie_page_activity extends Activity {
             adapter.add(seasons.get(0).getEpisode(e));
         }
 
-        ((Button) findViewById(R.id.seasonChangeBtn)).setOnClickListener(new View.OnClickListener() {
+        ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.seasonChangeBtn)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(serie_page_activity.this);
@@ -382,5 +429,59 @@ public class serie_page_activity extends Activity {
             ((TextView)view.findViewById(R.id.episodeTitle)).setText(currentEpisode.getName());
             return view;
         }
+    }
+
+    public void onBackPressed() {
+        if(tabHost.getCurrentTab()==2){
+            if(webView.canGoBack()){
+                webView.goBack();
+            }else{
+                YoYo.with(Techniques.SlideOutRight).withListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+                        finish();
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                }).duration(500).playOn(findViewById(R.id.mainfragmentframe));
+            }
+        }else{
+            YoYo.with(Techniques.SlideOutRight).withListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    finish();
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {
+
+                }
+            }).duration(500).playOn(findViewById(R.id.mainfragmentframe));
+        }
+
+
     }
 }

@@ -65,7 +65,16 @@ public class CheckNewEpisodes extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
 
 
+
+
         preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+        AlarmManager am=(AlarmManager)CheckNewEpisodes.this.getSystemService(Context.ALARM_SERVICE);
+        Intent intent2 = new Intent(CheckNewEpisodes.this, CheckEpisodesBroadcastReceiver.class);
+        //intent.putExtra(ONE_TIME, Boolean.TRUE);
+        PendingIntent pi = PendingIntent.getBroadcast(CheckNewEpisodes.this, 0, intent2, 0);
+        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (1000 * 60*60*preferences.getInt("interval",6)), pi);
+
 
         if(preferences.getBoolean("newMovies",true))
         showNotificationNewAddedMovies();
@@ -85,11 +94,7 @@ public class CheckNewEpisodes extends Service {
         }).run();
 
 
-        AlarmManager am=(AlarmManager)CheckNewEpisodes.this.getSystemService(Context.ALARM_SERVICE);
-        Intent intent2 = new Intent(CheckNewEpisodes.this, CheckEpisodesBroadcastReceiver.class);
-        //intent.putExtra(ONE_TIME, Boolean.TRUE);
-        PendingIntent pi = PendingIntent.getBroadcast(CheckNewEpisodes.this, 0, intent2, 0);
-        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (1000 * 60*60*preferences.getInt("interval",6)), pi);
+
         return 1;
     }
 
@@ -293,7 +298,8 @@ public class CheckNewEpisodes extends Service {
 
 
                         //Intent intent = new Intent(CheckNewEpisodes.this, MainActivity.class);
-                        PendingIntent pendingIntent = PendingIntent.getActivity(CheckNewEpisodes.this, f, intent2, PendingIntent.FLAG_UPDATE_CURRENT);
+                        PendingIntent pendingIntent = PendingIntent.getActivity(CheckNewEpisodes.this, f, intent2,
+                                PendingIntent.FLAG_UPDATE_CURRENT);
 
                         contentView.setOnClickPendingIntent(id, pendingIntent);
 
@@ -308,7 +314,8 @@ public class CheckNewEpisodes extends Service {
 
                     }
                     Intent targetIntent = new Intent(CheckNewEpisodes.this, MainActivity.class);
-                    PendingIntent contentIntent = PendingIntent.getActivity(CheckNewEpisodes.this, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    PendingIntent contentIntent = PendingIntent.getActivity(CheckNewEpisodes.this, 0,
+                            targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
                     Notification foregroundNote;
 
@@ -394,7 +401,8 @@ public class CheckNewEpisodes extends Service {
 
 
                         //Intent intent = new Intent(CheckNewEpisodes.this, MainActivity.class);
-                        PendingIntent pendingIntent = PendingIntent.getActivity(CheckNewEpisodes.this, f*2, intent2, PendingIntent.FLAG_UPDATE_CURRENT);
+                        PendingIntent pendingIntent = PendingIntent.getActivity(CheckNewEpisodes.this, f*2,
+                                intent2, PendingIntent.FLAG_UPDATE_CURRENT);
 
                         contentView.setOnClickPendingIntent(id, pendingIntent);
 
@@ -409,7 +417,8 @@ public class CheckNewEpisodes extends Service {
 
                     }
                     Intent targetIntent = new Intent(CheckNewEpisodes.this, MainActivity.class);
-                    PendingIntent contentIntent = PendingIntent.getActivity(CheckNewEpisodes.this, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    PendingIntent contentIntent = PendingIntent.getActivity(CheckNewEpisodes.this, 0, targetIntent,
+                            PendingIntent.FLAG_UPDATE_CURRENT);
 
                     Notification foregroundNote;
 
