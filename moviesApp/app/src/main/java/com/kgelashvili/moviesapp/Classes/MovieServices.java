@@ -309,5 +309,28 @@ public class MovieServices {
         return null;
     }
 
+    public String getMovieLaguages(String movieId){
+        String langs="";
+
+        String url = "http://adjaranet.com/req/jsondata/req.php?id="+movieId+"&reqId=getLangAndHd";
+        NetworkDAO networkDAO=new NetworkDAO();
+        try {
+            String rawData=networkDAO.request(url);
+            Log.d("kaxaGeo", rawData);
+            JSONObject movieData=new JSONObject(rawData);
+            JSONObject object0=movieData.getJSONObject("0");
+            langs=object0.getString("lang");
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+        return langs;
+    }
+
 
 }

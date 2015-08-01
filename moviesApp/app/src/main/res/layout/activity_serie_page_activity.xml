@@ -209,8 +209,7 @@
                         android:layout_alignBottom="@+id/tableLayout"
                         android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="true" />
-                    w<mehdi.sakout.fancybuttons.FancyButton
-
+                    <mehdi.sakout.fancybuttons.FancyButton
                         android:id="@+id/qualBtn"
                         android:layout_width="100dp"
                         android:layout_height="30dp"
