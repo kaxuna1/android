@@ -7,6 +7,7 @@ public class Episode {
     private String link;
     private String lang;
     private String name;
+    private String qual;
 
     public Episode(String link, String lang, String name) {
         this.link = link;
@@ -36,5 +37,13 @@ public class Episode {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getQual() {
+        return qual;
+    }
+
+    public void setQual(String qual) {
+        this.qual = qual;
     }
 }

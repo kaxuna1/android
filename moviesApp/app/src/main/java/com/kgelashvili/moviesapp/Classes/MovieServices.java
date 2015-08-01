@@ -263,6 +263,7 @@ public class MovieServices {
 
         return actors;
     }
+
     public ArrayList<Actor> getSerieActors(String serieId){
         ArrayList<Actor> actors=new ArrayList<Actor>();
         String url = "http://adjaranet.com/req/jsondata/req.php?id="+serieId+"&reqId=getInfo";
@@ -287,6 +288,25 @@ public class MovieServices {
 
 
         return actors;
+    }
+
+    public JSONObject getSerieDataJson(String serieId){
+        String url = "http://adjaranet.com/req/jsondata/req.php?id="+serieId+"&reqId=getInfo";
+        NetworkDAO networkDAO=new NetworkDAO();
+        try {
+            String rawData=networkDAO.request(url);
+            Log.d("kaxaGeo", rawData);
+            JSONObject movieData=new JSONObject(rawData);
+            return movieData;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+        return null;
     }
 
 

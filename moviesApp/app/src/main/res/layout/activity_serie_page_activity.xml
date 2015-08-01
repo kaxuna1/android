@@ -69,7 +69,8 @@
                         android:layout_weight="0.93"
                         android:layout_alignParentStart="true"
                         android:layout_toStartOf="@+id/tableLayout"
-                        android:layout_below="@+id/langBtnSerie" />
+                        android:layout_below="@+id/langBtnSerie"
+                        android:layout_alignParentBottom="true" />
 
                     <TableLayout
                         android:paddingTop="23dp"
@@ -192,23 +193,40 @@
                         android:layout_alignEnd="@+id/listViewSerie" />
                     <mehdi.sakout.fancybuttons.FancyButton
                         android:id="@+id/downloadBtn"
-                        android:layout_width="wrap_content"
+                        android:layout_width="40dp"
+                        android:layout_height="30dp"
+                        fancy:fb_borderColor="#FFFFFF"
+
+                        fancy:fb_borderWidth="1dp"
+                        fancy:fb_defaultColor="#7ab800"
+                        fancy:fb_focusColor="#9bd823"
+                        fancy:fb_fontIconResource="&#xf0ed;"
+                        fancy:fb_iconPosition="left"
+                        fancy:fb_radius="30dp"
+                        fancy:fb_text=""
+                        fancy:fb_textColor="#FFFFFF"
+                        fancy:fb_textSize="18px"
+                        android:layout_alignBottom="@+id/tableLayout"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true" />
+                    w<mehdi.sakout.fancybuttons.FancyButton
+
+                        android:id="@+id/qualBtn"
+                        android:layout_width="100dp"
                         android:layout_height="30dp"
                         fancy:fb_borderColor="#FFFFFF"
                         fancy:fb_borderWidth="1dp"
                         fancy:fb_defaultColor="#7ab800"
                         fancy:fb_focusColor="#9bd823"
-                        fancy:fb_fontIconResource="&#xf019;"
+                        fancy:fb_fontIconResource="&#xf008;"
                         fancy:fb_iconPosition="left"
                         fancy:fb_radius="30dp"
-                        fancy:fb_text="გადმოწერა"
+                        fancy:fb_text="ხარისხი"
                         fancy:fb_textColor="#FFFFFF"
-                        fancy:fb_textSize="18px"
-                        android:layout_alignBottom="@+id/tableLayout"
-                        android:layout_alignParentLeft="true"
-                        android:layout_alignParentStart="true"
-                        android:layout_alignRight="@+id/seasonChangeBtn"
-                        android:layout_alignEnd="@+id/seasonChangeBtn" />
+                        fancy:fb_textSize="14px"
+                        android:layout_alignTop="@+id/downloadBtn"
+                        android:layout_toRightOf="@+id/downloadBtn"
+                        android:layout_toEndOf="@+id/downloadBtn" />
 
 
 

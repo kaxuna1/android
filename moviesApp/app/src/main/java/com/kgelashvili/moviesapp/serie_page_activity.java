@@ -13,6 +13,7 @@ import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,8 +24,10 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.MediaController;
+import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,13 +36,18 @@ import android.widget.VideoView;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.kgelashvili.moviesapp.Classes.FloatingActionButton;
+import com.kgelashvili.moviesapp.Classes.MovieServices;
 import com.kgelashvili.moviesapp.cards.CustomThumbCard;
+import com.kgelashvili.moviesapp.model.Actor;
 import com.kgelashvili.moviesapp.model.Episode;
 import com.kgelashvili.moviesapp.model.Movie;
 import com.kgelashvili.moviesapp.model.Season;
 import com.kgelashvili.moviesapp.model.Serie;
+import com.kgelashvili.moviesapp.model.SeriesDataModel;
 import com.nineoldandroids.animation.Animator;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -47,17 +55,22 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import it.gmariotti.cardslib.library.cards.material.MaterialLargeImageCard;
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardHeader;
 import it.gmariotti.cardslib.library.view.CardView;
+import it.gmariotti.cardslib.library.view.CardViewNative;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class serie_page_activity extends Activity {
     private static ProgressDialog progressDialog;
     String id;
+    String qual;
+    String lang;
     ArrayList<Season> seasons;
     int currentSeason=1;
     String currentLangs="";
@@ -68,6 +81,7 @@ public class serie_page_activity extends Activity {
     int movieTime=0;
     EpisodesListAdapter adapter;
     Serie serie;
+    LinearLayout castLayout;
     TabHost tabHost=null;
     private WebView webView;
     @Override
@@ -103,7 +117,7 @@ public class serie_page_activity extends Activity {
         tabSpec.setIndicator("IMDB");
         tabHost.addTab(tabSpec);
 
-
+        castLayout=(LinearLayout)findViewById(R.id.actorsLayout);
 
         seasons=new ArrayList<Season>();
 
@@ -138,10 +152,16 @@ public class serie_page_activity extends Activity {
         ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.downloadBtn)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String url = videourl;
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(url));
-                startActivity(i);
+                if(!videourl.isEmpty()){
+                    String url = videourl;
+                    Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setData(Uri.parse(url));
+                    startActivity(i);
+                }else{
+                    Toast.makeText(serie_page_activity.this, "გადმოწერისთვის აირჩიეთ სეზონი და ეპიზოდი", Toast.LENGTH_LONG).show();
+
+                }
+
             }
         });
         TextView date=(TextView)findViewById(R.id.movieDate);
@@ -193,7 +213,7 @@ public class serie_page_activity extends Activity {
 
             }
         });
-        final GetSeriesData getSeries=new GetSeriesData();
+        final GetSeriesDataJSON getSeries=new GetSeriesDataJSON();
 
         webView = (WebView) findViewById(R.id.webView1);
         webView.getSettings().setJavaScriptEnabled(true);
@@ -205,6 +225,7 @@ public class serie_page_activity extends Activity {
             @Override
             public void run() {
                 getSeries.doInBackground();
+                new getSerieActorsAsync().doInBackground(serie.getMovieId());
 
             }
         }).start();
@@ -230,8 +251,46 @@ public class serie_page_activity extends Activity {
                                 .setItems(currentEpisodes.get(position).getLang().split(","), new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
                                         movieTime = videoView.getCurrentPosition();
-                                        String lang = currentEpisodes.get(position).getLang().split(",")[which];
+
+                                        lang = currentEpisodes.get(position).getLang().split(",")[which];
                                         videourl=currentEpisodes.get(position).getLink().replace("{L}",lang);
+                                        if(qual==null){
+                                            qual = currentEpisodes.get(position).getQual().split(",")[0];
+                                        }
+                                        videourl.replaceAll("_\\d+\\.","_"+qual+".");
+                                        Uri video = Uri.parse(videourl);
+                                        videoView.setVideoURI(video);
+                                        videoView.requestFocus();
+                                        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+
+                                            public void onPrepared(MediaPlayer mp) {
+                                                progressDialog.dismiss();
+                                                videoView.start();
+                                                videoView.seekTo(movieTime);
+                                            }
+                                        });
+
+
+
+                                    }
+                                });
+                        builder.create();
+                        builder.show();
+                    }
+                });
+                ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.qualBtn)).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(serie_page_activity.this);
+                        builder.setTitle("აირჩიეთ ხარისხი")
+                                .setItems(currentEpisodes.get(position).getQual().split(","), new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        movieTime = videoView.getCurrentPosition();
+                                        //videourl=currentEpisodes.get(position).getLink().replace("{L}", lang);
+
+                                        qual = currentEpisodes.get(position).getQual().split(",")[which];
+                                        videourl.replaceAll("_\\d+\\.","_"+qual+".");
+                                        Log.d("qualVIdeoUrl",videourl);
                                         Uri video = Uri.parse(videourl);
                                         videoView.setVideoURI(video);
                                         videoView.requestFocus();
@@ -317,46 +376,84 @@ public class serie_page_activity extends Activity {
         return true;
     }
 
-    private class GetSeriesData extends AsyncTask<String,Elements, Elements> {
+    private class GetSeriesDataJSON extends AsyncTask<String,SeriesDataModel, SeriesDataModel> {
 
 
         @Override
-        protected Elements doInBackground(String... params) {
+        protected SeriesDataModel doInBackground(String... params) {
             Document doc = null;
+            SeriesDataModel seriesDataModel=new SeriesDataModel();
+            seriesDataModel.jsonObject = new MovieServices().getSerieDataJson(id);
             try {
                 doc = Jsoup.connect("http://adjaranet.com/Movie/main?id="+id+"&serie=1&js=1").get();
                 Elements newsHeadlines = doc.select("#episodesDiv");
-                publishProgress(newsHeadlines);
+                seriesDataModel.elements=newsHeadlines;
                 //Log.d("kaxaHtml",newsHeadlines.html());
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            publishProgress(seriesDataModel);
+
+
             return null;
         }
         @Override
-        protected void onProgressUpdate(Elements... values) {
+        protected void onProgressUpdate(SeriesDataModel... values) {
             super.onProgressUpdate(values);
-            setSeriesData(values[0]);
+            setSeriesDataJSON(values[0]);
 
         }
     }
 
-    private void setSeriesData(Elements value) {
+    private void setSeriesDataJSON(SeriesDataModel value) {
+        JSONObject jsonValue=value.jsonObject;
+        Elements elementValue=value.elements;
         //Log.d("kaxaHtml2",value.select("#sDiv2"));
         int i=1;
+        Iterator<?> keys = jsonValue.keys();
+        /*while( keys.hasNext() ) {
+            String key = (String)keys.next();
+            if(isNumeric(key)){
+                Season season =new Season("Season "+key);
+                try {
+                    JSONObject seasonEpisodesJSON=jsonValue.getJSONObject(key);
+                    Iterator<?> keysEpisodes = seasonEpisodesJSON.keys();
+                    while (keysEpisodes.hasNext()){
+                        String keyEpisode =(String)keysEpisodes.next();
+                        JSONObject episodeJSONObject=seasonEpisodesJSON.getJSONObject(keyEpisode);
+                        Episode episode=new Episode(episodeJSONObject.getString(""))
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
-        while (value.select("#sDiv"+i).hasAttr("class")){
-           //Log.d("kaxaHTML"+i,value.select("#sDiv"+i).html());
+            }
+        }*/
+
+
+
+        while (elementValue.select("#sDiv"+i).hasAttr("class")){
+            //Log.d("kaxaHTML"+i,value.select("#sDiv"+i).html());
             //Log.d("kaxaHtml" + i, value.select("#sDiv" + i).select("span").get(1).attr("data-href"));
             int f=0;
             Season season =new Season("Season "+i);
 
-            int episodes=value.select("#sDiv"+i).select("span").size();
+            int episodes=elementValue.select("#sDiv"+i).select("span").size();
             while (f<episodes){
-                Log.d("kaxaHtml"+f,value.select("#sDiv"+i).select("span").get(f).attr("data-href"));
+                Episode episode=new Episode(elementValue.select("#sDiv"+i).select("span").get(f).attr("data-href"),
+                        elementValue.select("#sDiv"+i).select("span").get(f).attr("data-lang"),"სერია  "+(f+1));
+                //Log.d("kaxaHtml" + f, elementValue.select("#sDiv" + i).select("span").get(f).attr("data-href"));
+                try {
+                    JSONObject episodeJSON=jsonValue.getJSONObject(""+i).getJSONObject(""+(f+1));
+                    episode.setName(episodeJSON.getString("name"));
+                    episode.setQual(episodeJSON.getString("quality"));
+                    episode.setLang(episodeJSON.getString("lang"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
-                season.addEpisode(new Episode(value.select("#sDiv"+i).select("span").get(f).attr("data-href"),
-                        value.select("#sDiv"+i).select("span").get(f).attr("data-lang"),"სერია  "+(f+1)));
+
+                season.addEpisode(episode);
                 f++;
             }
             seasons.add(season);
@@ -484,4 +581,68 @@ public class serie_page_activity extends Activity {
 
 
     }
+    public static boolean isNumeric(String str)
+    {
+        try
+        {
+            double d = Double.parseDouble(str);
+        }
+        catch(NumberFormatException nfe)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    class getSerieActorsAsync extends AsyncTask<String,ArrayList<Actor>,ArrayList<Actor>>{
+
+        @Override
+        protected ArrayList<Actor> doInBackground(String... strings) {
+            ArrayList<Actor> actors;
+            actors=new MovieServices().getSerieActors(strings[0]);
+            publishProgress(actors);
+            return actors;
+        }
+        @Override
+        protected void onProgressUpdate(ArrayList<Actor>... values) {
+            super.onProgressUpdate(values);
+            Log.d("kaxaGeo1", "kaxaGeo1");
+            for (int i = 0; i < values[0].size(); i++) {
+                addActorToCast(values[0].get(i));
+            }
+
+        }
+    }
+
+    private void addActorToCast(Actor actor) {
+
+        LinearLayout linearLayout = castLayout;
+        LayoutInflater inflater = LayoutInflater.from(this);
+        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.actorontop, null, false);
+
+
+
+
+        MaterialLargeImageCard card =
+                MaterialLargeImageCard.with(this)
+                        //.setTextOverImage(actor.actorName)
+                        .useDrawableUrl("http://static.adjaranet.com/cast/"+actor.actorId+".jpg")
+                                //.setupSupplementalActions(R.layout.carddemo_native_material_supplemental_actions_large_icon, actions)
+                        .build();
+
+
+        card.setOnClickListener(new Card.OnCardClickListener() {
+            @Override
+            public void onClick(Card card, View view) {
+
+            }
+        });
+        CardViewNative cardView = (CardViewNative) layout.findViewById(R.id.actorCard);
+        ((TextView)layout.findViewById(R.id.actorCardName)).setText(actor.actorName);
+        cardView.setCard(card);
+
+        linearLayout.addView(layout);
+    }
+
+
 }
