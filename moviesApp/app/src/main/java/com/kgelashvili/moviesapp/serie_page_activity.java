@@ -239,6 +239,8 @@ public class serie_page_activity extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
                 currentLang=currentEpisodes.get(position).getLang().split(",")[0];
                 videourl=currentEpisodes.get(position).getLink().replace("{L}",currentEpisodes.get(position).getLang().split(",")[0]);
+                qual = currentEpisodes.get(position).getQual().split(",")[0];
+                videourl.replaceAll("_\\d+\\.","_"+qual+".");
                 Log.d("currentSerieUrl",videourl);
                 progressDialog = ProgressDialog.show(serie_page_activity.this, "", "მიმდინარეობს ვიდეოს ჩატვირთა", true);
                 progressDialog.setCancelable(true);

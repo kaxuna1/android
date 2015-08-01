@@ -247,8 +247,7 @@ public class MoviesPageFragment extends Fragment {
 
         //Set URL resource
         //thumb.setUrlResource(movie.getPoster());
-
-
+        
         //Error Resource ID
         thumbnail.setErrorResource(R.drawable.ic_error_loadingorangesmall);
 

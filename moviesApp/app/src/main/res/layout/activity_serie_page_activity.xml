@@ -68,7 +68,9 @@
                         android:id="@+id/listViewSerie"
                         android:layout_weight="0.93"
                         android:layout_alignParentStart="true"
+                        android:layout_alignParentLeft="true"
                         android:layout_toStartOf="@+id/tableLayout"
+                        android:layout_toLeftOf="@+id/tableLayout"
                         android:layout_below="@+id/langBtnSerie"
                         android:layout_alignParentBottom="true" />
 
@@ -78,6 +80,7 @@
                         android:layout_height="50dp"
                         android:layout_alignParentTop="true"
                         android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
                         android:id="@+id/tableLayout">
 
                         <TableRow
@@ -113,7 +116,9 @@
                         android:layout_height="50dp"
                         android:id="@+id/tableLayout2"
                         android:layout_below="@+id/tableLayout"
-                        android:layout_toEndOf="@+id/listViewSerie">
+                        android:layout_toEndOf="@+id/listViewSerie"
+                        android:layout_toRightOf="@+id/listViewSerie">
+
 
 
 
@@ -148,6 +153,7 @@
                         android:layout_height="match_parent"
                         android:layout_below="@+id/tableLayout2"
                         android:layout_toEndOf="@+id/listViewSerie"
+                        android:layout_toRightOf="@+id/listViewSerie"
                         android:id="@+id/relativeLayout2">
 
                         <TextView
@@ -158,7 +164,8 @@
                             android:text="შინაარსი"
                             android:id="@+id/textView2"
                             android:layout_alignParentTop="true"
-                            android:layout_alignParentStart="true" />
+                            android:layout_alignParentStart="true"
+                            android:layout_alignParentLeft="true"/>
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -168,7 +175,9 @@
                             android:id="@+id/descriptionTxt"
                             android:layout_below="@+id/textView2"
                             android:layout_alignParentStart="true"
-                            android:layout_alignParentEnd="true" />
+                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentEnd="true"
+                            android:layout_alignParentRight="true"/>
                     </RelativeLayout>
 
                     <mehdi.sakout.fancybuttons.FancyButton
@@ -285,6 +294,7 @@
 
 
                             <TextView
+                                android:paddingTop="10dp"
                                 android:id="@+id/textView6"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"

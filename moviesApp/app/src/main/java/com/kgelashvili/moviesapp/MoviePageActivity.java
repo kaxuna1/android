@@ -49,7 +49,11 @@ public class MoviePageActivity extends Activity {
 
     //Uri video = Uri.parse("http://212.72.157.137/fast2/storage/10246/10246_Georgian_300.mp4");
     private static ProgressDialog progressDialog;
-
+    String movieId=null;
+    String quality="";
+    String currentQuality=null;
+    String langs=null;
+    String lang=null;
     VideoView videoView;
     String videourl = "";
     int movieTime = 0;
@@ -95,12 +99,15 @@ public class MoviePageActivity extends Activity {
         tabSpec.setIndicator("IMDB");
         tabHost.addTab(tabSpec);
 
+        langs=extras.getString("lang");
 
         castLayout=(LinearLayout)findViewById(R.id.actorsLayout);
 
-
+        ((TextView)findViewById(R.id.durationTxt)).setText(extras.getString("duration")+"-სთ");
 
         final String value = extras.getString("movieId");
+        movieId=extras.getString("movieId");
+
         final FloatingActionButton mFab = new FloatingActionButton.Builder(MoviePageActivity.this)
                 .withColor(getResources().getColor(R.color.primary))
                 .withDrawable(getResources().getDrawable(R.drawable.androidfullscreen))
@@ -131,7 +138,7 @@ public class MoviePageActivity extends Activity {
             public void onTabChanged(String s) {
                 if (tabHost.getCurrentTab() == 0) {
                     mFab.show();
-                }else{
+                } else {
                     mFab.hide();
                 }
             }
@@ -159,8 +166,12 @@ public class MoviePageActivity extends Activity {
                         .setItems(extras.getString("lang").split(","), new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 movieTime = videoView.getCurrentPosition();
-                                String lang = extras.getString("lang").split(",")[which];
-                                videourl = "http://adjaranet.com/download.php?mid=" + value + "&file=" + value + "_" + lang + "_300";
+                                if (currentQuality == null) {
+                                    currentQuality = quality.split(",")[0];
+                                }
+                                lang = extras.getString("lang").split(",")[which];
+                                videourl = "http://adjaranet.com/download.php?mid=" + value + "&file=" + value + "_" +
+                                        lang + "_" + currentQuality;
                                 Uri video = Uri.parse(videourl);
                                 videoView.setVideoURI(video);
                                 videoView.requestFocus();
@@ -172,6 +183,39 @@ public class MoviePageActivity extends Activity {
                                         videoView.seekTo(movieTime);
                                     }
                                 });
+
+                            }
+                        });
+                builder.create();
+                builder.show();
+            }
+        });
+        ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.qualBtn)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MoviePageActivity.this);
+                builder.setTitle("აირჩიეთ ხარისხი")
+                        .setItems(quality.split(","), new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                movieTime = videoView.getCurrentPosition();
+                                //videourl=currentEpisodes.get(position).getLink().replace("{L}", lang);
+
+                                currentQuality = quality.split(",")[which];
+
+                                videourl = "http://adjaranet.com/download.php?mid=" + value + "&file=" + value + "_" +
+                                        lang + "_" + currentQuality;
+                                Uri video = Uri.parse(videourl);
+                                videoView.setVideoURI(video);
+                                videoView.requestFocus();
+                                videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+
+                                    public void onPrepared(MediaPlayer mp) {
+                                        progressDialog.dismiss();
+                                        videoView.start();
+                                        videoView.seekTo(movieTime);
+                                    }
+                                });
+
 
                             }
                         });
@@ -192,8 +236,7 @@ public class MoviePageActivity extends Activity {
             }
         });
         ((TextView) findViewById(R.id.descriptionTxt)).setText(extras.getString("description"));
-        videourl = "http://adjaranet.com/download.php?mid="
-                + value + "&file=" + value + "_" + (extras.getString("lang").split(",")[0]) + "_300";
+
         setTitle(extras.getString("title"));
         movieTime = extras.getInt("time");
 
@@ -201,7 +244,7 @@ public class MoviePageActivity extends Activity {
         videoView = (VideoView) findViewById(R.id.myvideoview);
         progressDialog = ProgressDialog.show(MoviePageActivity.this, "", "მიმდინარეობს ვიდეოს ჩატვირთა", true);
         progressDialog.setCancelable(true);
-        PlayVideo();
+
 
         YoYo.with(Techniques.SlideInRight).duration(500)
                 .withListener(new Animator.AnimatorListener() {
@@ -306,6 +349,7 @@ public class MoviePageActivity extends Activity {
         protected ArrayList<Actor> doInBackground(String... strings) {
             ArrayList<Actor> actors;
             actors=new MovieServices().getMovieActors(strings[0]);
+            quality=new MovieServices().getMovieQuality(strings[0]);
             publishProgress(actors);
             return actors;
         }
@@ -313,6 +357,9 @@ public class MoviePageActivity extends Activity {
         protected void onProgressUpdate(ArrayList<Actor>... values) {
             super.onProgressUpdate(values);
             Log.d("kaxaGeo1", "kaxaGeo1");
+            videourl = "http://adjaranet.com/download.php?mid="
+                    + movieId + "&file=" + movieId + "_" + (langs.split(",")[0]) + "_"+quality.split(",")[0];
+            PlayVideo();
             for (int i = 0; i < values[0].size(); i++) {
                 addActorToCast(values[0].get(i));
             }

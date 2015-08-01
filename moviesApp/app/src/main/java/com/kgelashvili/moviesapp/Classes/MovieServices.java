@@ -309,8 +309,8 @@ public class MovieServices {
         return null;
     }
 
-    public String getMovieLaguages(String movieId){
-        String langs="";
+    public String getMovieQuality(String movieId){
+        String quality="";
 
         String url = "http://adjaranet.com/req/jsondata/req.php?id="+movieId+"&reqId=getLangAndHd";
         NetworkDAO networkDAO=new NetworkDAO();
@@ -319,7 +319,7 @@ public class MovieServices {
             Log.d("kaxaGeo", rawData);
             JSONObject movieData=new JSONObject(rawData);
             JSONObject object0=movieData.getJSONObject("0");
-            langs=object0.getString("lang");
+            quality=object0.getString("quality");
 
 
         } catch (IOException e) {
@@ -329,7 +329,7 @@ public class MovieServices {
         }
 
 
-        return langs;
+        return quality;
     }
 
 

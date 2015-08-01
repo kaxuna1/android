@@ -58,6 +58,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="horizontal"
+                        android:minHeight="150dp"
                         android:paddingLeft="@dimen/carddemo_list_padding"
                         android:paddingRight="@dimen/carddemo_list_padding">
 
@@ -86,6 +87,8 @@
                         android:layout_height="match_parent"
                         android:orientation="horizontal"
                         android:paddingLeft="@dimen/carddemo_list_padding"
+                        android:minHeight="150dp"
+
                         android:paddingRight="@dimen/carddemo_list_padding">
 
                     </LinearLayout>
@@ -113,6 +116,8 @@
                         android:layout_height="match_parent"
                         android:orientation="horizontal"
                         android:paddingLeft="@dimen/carddemo_list_padding"
+                        android:minHeight="150dp"
+
                         android:paddingRight="@dimen/carddemo_list_padding">
 
                     </LinearLayout>
@@ -140,6 +145,8 @@
                         android:layout_height="match_parent"
                         android:orientation="horizontal"
                         android:paddingLeft="@dimen/carddemo_list_padding"
+                        android:minHeight="150dp"
+
                         android:paddingRight="@dimen/carddemo_list_padding">
 
                     </LinearLayout>
