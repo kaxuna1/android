@@ -332,5 +332,61 @@ public class MovieServices {
         return quality;
     }
 
+    public String getMovieLangs(String movieId){
+        String langs="";
+
+        String url = "http://adjaranet.com/req/jsondata/req.php?id="+movieId+"&reqId=getLangAndHd";
+        NetworkDAO networkDAO=new NetworkDAO();
+        try {
+            String rawData=networkDAO.request(url);
+            Log.d("kaxaGeo", rawData);
+            JSONObject movieData=new JSONObject(rawData);
+            JSONObject object0=movieData.getJSONObject("0");
+            langs=object0.getString("lang");
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+        return langs;
+    }
+
+    public ArrayList<Movie> getRelateMovies(String movieId){
+        ArrayList<Movie> Movies=new ArrayList<Movie>();
+        String url = "http://adjaranet.com/Movie/BuildSliderRelated?ajax=1&movie_id="+movieId+"&isepisode=0&type=related&order=top&period=day&limit=25";
+        NetworkDAO networkDAO=new NetworkDAO();
+        try {
+            String rawMoviesData=networkDAO.request(url);
+            Log.d("kaxaGeo", rawMoviesData);
+            JSONArray movies=new JSONArray(rawMoviesData);
+            //JSONArray movies=jsonObject.getJSONArray("data");
+            for (int i=0;i<movies.length();i++){
+                JSONObject movieJ=movies.getJSONObject(i);
+                Movie movie=new Movie(movieJ.getString("id"),
+                        movieJ.getString("title_en"),
+                        movieJ.getString("link"),
+                        movieJ.getString("poster"),
+                        movieJ.getString("imdb"),
+                        "",
+                        movieJ.getString("release_date"),
+                        movieJ.getString("description"),
+                        "",
+                        "");
+                Movies.add(movie);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+
+        return Movies;
+    }
 
 }

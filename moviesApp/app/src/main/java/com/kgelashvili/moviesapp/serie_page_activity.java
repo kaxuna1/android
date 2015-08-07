@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
@@ -25,6 +26,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.MediaController;
 import android.widget.RelativeLayout;
@@ -84,6 +86,7 @@ public class serie_page_activity extends Activity {
     LinearLayout castLayout;
     TabHost tabHost=null;
     private WebView webView;
+    ListView episodesListView;
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
@@ -123,12 +126,6 @@ public class serie_page_activity extends Activity {
 
         id=extras.getString("movieId");
        // getActionBar().setTitle(extras.getString("title"));
-        final FloatingActionButton mFab = new FloatingActionButton.Builder(serie_page_activity.this)
-                .withColor(getResources().getColor(R.color.primary))
-                .withDrawable(getResources().getDrawable(R.drawable.androidfullscreen))
-                .withSize(72)
-                .withMargins(0, 0, 16, 310)
-                .create();
         final FloatingActionButton mFab2 = new FloatingActionButton.Builder(serie_page_activity.this)
                 .withColor(getResources().getColor(R.color.primary))
                 .withDrawable(getResources().getDrawable(R.drawable.starlit))
@@ -136,31 +133,38 @@ public class serie_page_activity extends Activity {
                 .withMargins(0, 0, 16, 16)
                 .create();
 
-        tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
-            @Override
-            public void onTabChanged(String s) {
-                if (tabHost.getCurrentTab() == 0) {
-                    mFab.show();
-                    mFab2.show();
-                }else{
-                    mFab.hide();
-                    mFab2.hide();
-                }
-            }
-        });
 
         ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.downloadBtn)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!videourl.isEmpty()){
+                if (!videourl.isEmpty()) {
                     String url = videourl;
                     Intent i = new Intent(Intent.ACTION_VIEW);
                     i.setData(Uri.parse(url));
                     startActivity(i);
-                }else{
+                } else {
                     Toast.makeText(serie_page_activity.this, "გადმოწერისთვის აირჩიეთ სეზონი და ეპიზოდი", Toast.LENGTH_LONG).show();
 
                 }
+
+            }
+        });
+        ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.fullScreenButton)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(serie_page_activity.this, FullScreenMovie.class);
+                i.putExtra("movieId", extras.getString("movieId"));
+                i.putExtra("description", extras.getString("description"));
+                i.putExtra("title", extras.getString("title"));
+                i.putExtra("date", extras.getString("date"));
+                i.putExtra("duration", extras.getString("duration"));
+                i.putExtra("rating", extras.getString("rating"));
+                i.putExtra("imdb", extras.getString("imdb"));
+                i.putExtra("time", videoView.getCurrentPosition());
+                i.putExtra("link", videourl);
+
+
+                startActivityForResult(i, 0);
 
             }
         });
@@ -177,28 +181,11 @@ public class serie_page_activity extends Activity {
         ((TextView) findViewById(R.id.descriptionTxt)).setText(extras.getString("description"));
 
 
-        mFab.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent i = new Intent(serie_page_activity.this, FullScreenMovie.class);
-                        i.putExtra("movieId", extras.getString("movieId"));
-                        i.putExtra("description", extras.getString("description"));
-                        i.putExtra("title", extras.getString("title"));
-                        i.putExtra("date", extras.getString("date"));
-                        i.putExtra("duration", extras.getString("duration"));
-                        i.putExtra("rating", extras.getString("rating"));
-                        i.putExtra("imdb", extras.getString("imdb"));
-                        i.putExtra("time", videoView.getCurrentPosition());
-                        i.putExtra("link", videourl);
-
-
-                        startActivityForResult(i, 0);
-                    }
-                });
         serie= (Serie) getIntent().getSerializableExtra("Serie");
-        mFab2.setOnClickListener(new View.OnClickListener() {
 
+
+
+        mFab2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Serie serie = (Serie) getIntent().getSerializableExtra("Serie");
@@ -230,10 +217,20 @@ public class serie_page_activity extends Activity {
             }
         }).start();
 
-        ListView episodesListView=(ListView)findViewById(R.id.listViewSerie);
+
+        episodesListView = (ListView)findViewById(R.id.listViewSerie);
         adapter=new EpisodesListAdapter();
         videoView = (VideoView) findViewById(R.id.myserieview);
         episodesListView.setAdapter(adapter);
+        episodesListView.setOnTouchListener(new View.OnTouchListener() {
+            // Setting on Touch Listener for handling the touch inside ScrollView
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                // Disallow the touch request for parent scroll on touch of child view
+                v.getParent().requestDisallowInterceptTouchEvent(true);
+                return false;
+            }
+        });
         episodesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
@@ -447,7 +444,7 @@ public class serie_page_activity extends Activity {
                 //Log.d("kaxaHtml" + f, elementValue.select("#sDiv" + i).select("span").get(f).attr("data-href"));
                 try {
                     JSONObject episodeJSON=jsonValue.getJSONObject(""+i).getJSONObject(""+(f+1));
-                    episode.setName(episodeJSON.getString("name"));
+                    episode.setName(f+". "+episodeJSON.getString("name"));
                     episode.setQual(episodeJSON.getString("quality"));
                     episode.setLang(episodeJSON.getString("lang"));
                 } catch (JSONException e) {
@@ -473,6 +470,7 @@ public class serie_page_activity extends Activity {
         for(int e=0;e<seasons.get(0).getEpisodes().size();e++){
             adapter.add(seasons.get(0).getEpisode(e));
         }
+        //setListViewHeightBasedOnChildren(episodesListView);
 
         ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.seasonChangeBtn)).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -486,6 +484,7 @@ public class serie_page_activity extends Activity {
                                 for(int e=0;e<seasons.get(which).getEpisodes().size();e++){
                                     adapter.add(seasons.get(which).getEpisode(e));
                                 }
+                                //setListViewHeightBasedOnChildren(episodesListView);
                                 currentSeason=(which);
 
                             }
@@ -644,6 +643,25 @@ public class serie_page_activity extends Activity {
         cardView.setCard(card);
 
         linearLayout.addView(layout);
+    }
+    public static void setListViewHeightBasedOnChildren(ListView listView) {
+        ListAdapter listAdapter = listView.getAdapter();
+        if (listAdapter == null) {
+            // pre-condition
+            return;
+        }
+
+        int totalHeight = 0;
+        for (int i = 0; i < listAdapter.getCount(); i++) {
+            View listItem = listAdapter.getView(i, null, listView);
+            listItem.measure(0, 0);
+            totalHeight += listItem.getMeasuredHeight()+10;
+        }
+
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        listView.setLayoutParams(params);
+        listView.requestLayout();
     }
 
 

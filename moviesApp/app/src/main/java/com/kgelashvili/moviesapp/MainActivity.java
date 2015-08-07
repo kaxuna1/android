@@ -172,10 +172,10 @@ public class MainActivity extends AppCompatActivity{
                 intent2,
                 PendingIntent.FLAG_NO_CREATE) != null);
 
-        if (!alarmUp)
-        {
-            am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (1000 * 30), pi);
-        }
+        //if (!alarmUp)
+        //{
+        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (1000 * 30), pi);
+        //}
         MainActivity.this.getWindow().getDecorView().setBackgroundColor(getResources().getColor(R.color.gray_background));
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout2);
         mDrawer.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);

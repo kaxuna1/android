@@ -3,10 +3,11 @@
     android:layout_width="match_parent" android:layout_height="match_parent">
 
     <TextView
-        android:padding="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Large Text"
         android:id="@+id/episodeTitle" />
 </LinearLayout>

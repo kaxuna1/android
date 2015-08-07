@@ -33,6 +33,7 @@ import com.kgelashvili.moviesapp.Classes.FloatingActionButton;
 import com.kgelashvili.moviesapp.Classes.MovieServices;
 import com.kgelashvili.moviesapp.model.Actor;
 import com.kgelashvili.moviesapp.model.Movie;
+import com.kgelashvili.moviesapp.model.Serie;
 import com.nineoldandroids.animation.Animator;
 
 import org.w3c.dom.Text;
@@ -59,6 +60,7 @@ public class MoviePageActivity extends Activity {
     int movieTime = 0;
     private WebView webView;
     LinearLayout castLayout;
+    LinearLayout relatedLayout;
     TabHost tabHost=null;
 
     public MoviePageActivity() {
@@ -90,11 +92,6 @@ public class MoviePageActivity extends Activity {
         tabHost.addTab(tabSpec);
 
         tabSpec=tabHost.newTabSpec("movie");
-        tabSpec.setContent(R.id.tab2);
-        tabSpec.setIndicator("ინფორმაცია ფილმზე");
-        tabHost.addTab(tabSpec);
-
-        tabSpec=tabHost.newTabSpec("movie");
         tabSpec.setContent(R.id.tab3);
         tabSpec.setIndicator("IMDB");
         tabHost.addTab(tabSpec);
@@ -102,45 +99,30 @@ public class MoviePageActivity extends Activity {
         langs=extras.getString("lang");
 
         castLayout=(LinearLayout)findViewById(R.id.actorsLayout);
+        relatedLayout=(LinearLayout)findViewById(R.id.relatedMoviesLayout);
 
         ((TextView)findViewById(R.id.durationTxt)).setText(extras.getString("duration")+"-სთ");
 
         final String value = extras.getString("movieId");
         movieId=extras.getString("movieId");
 
-        final FloatingActionButton mFab = new FloatingActionButton.Builder(MoviePageActivity.this)
-                .withColor(getResources().getColor(R.color.primary))
-                .withDrawable(getResources().getDrawable(R.drawable.androidfullscreen))
-                .withSize(72)
-                .withMargins(0, 0, 16, 16)
-                .create();
-        mFab.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent i = new Intent(MoviePageActivity.this, FullScreenMovie.class);
-                        i.putExtra("movieId", extras.getString("movieId"));
-                        i.putExtra("description", extras.getString("description"));
-                        i.putExtra("title", extras.getString("title"));
-                        i.putExtra("date", extras.getString("date"));
-                        i.putExtra("duration", extras.getString("duration"));
-                        i.putExtra("rating", extras.getString("rating"));
-                        i.putExtra("imdb", extras.getString("imdb"));
-                        i.putExtra("time", videoView.getCurrentPosition());
-                        i.putExtra("link", videourl);
 
-
-                        startActivityForResult(i, 0);
-                    }
-                });
-        tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
+        ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.fullScreenButton)).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onTabChanged(String s) {
-                if (tabHost.getCurrentTab() == 0) {
-                    mFab.show();
-                } else {
-                    mFab.hide();
-                }
+            public void onClick(View view) {
+                Intent i = new Intent(MoviePageActivity.this, FullScreenMovie.class);
+                i.putExtra("movieId", extras.getString("movieId"));
+                i.putExtra("description", extras.getString("description"));
+                i.putExtra("title", extras.getString("title"));
+                i.putExtra("date", extras.getString("date"));
+                i.putExtra("duration", extras.getString("duration"));
+                i.putExtra("rating", extras.getString("rating"));
+                i.putExtra("imdb", extras.getString("imdb"));
+                i.putExtra("time", videoView.getCurrentPosition());
+                i.putExtra("link", videourl);
+
+
+                startActivityForResult(i, 0);
             }
         });
         ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.downloadButtonSerie)).setOnClickListener(new View.OnClickListener() {
@@ -156,6 +138,7 @@ public class MoviePageActivity extends Activity {
             @Override
             public void run() {
                 new getMovieActorsAsync().doInBackground(extras.getString("movieId"));
+                new getMovieRelated().doInBackground(extras.getString("movieId"));
             }
         }).start();
         ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.langBtnSerie)).setOnClickListener(new View.OnClickListener() {
@@ -226,7 +209,7 @@ public class MoviePageActivity extends Activity {
 
 
         TextView date = (TextView) findViewById(R.id.movieDate);
-        date.setText(extras.getString("date"));
+        date.setText("("+extras.getString("date")+")");
         ((TextView) findViewById(R.id.imdbRating)).setText(extras.getString("rating"));
         ((ImageView) findViewById(R.id.imdbImg)).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -350,6 +333,8 @@ public class MoviePageActivity extends Activity {
             ArrayList<Actor> actors;
             actors=new MovieServices().getMovieActors(strings[0]);
             quality=new MovieServices().getMovieQuality(strings[0]);
+            langs=new MovieServices().getMovieLangs(strings[0]);
+
             publishProgress(actors);
             return actors;
         }
@@ -365,6 +350,72 @@ public class MoviePageActivity extends Activity {
             }
 
         }
+
+
+    }
+
+    class getMovieRelated extends AsyncTask<String, ArrayList<Movie>, ArrayList<Movie>> {
+
+        @Override
+        protected ArrayList<Movie> doInBackground(String... strings) {
+            Log.d("kinoLoad", "gamodzaxda");
+            MovieServices movieServices = new MovieServices();
+            ArrayList<Movie> movies = movieServices.getRelateMovies(strings[0]);
+            publishProgress(movies);
+
+            return movies;
+        }
+
+        @Override
+        protected void onProgressUpdate(ArrayList<Movie>... values) {
+            super.onProgressUpdate(values);
+            for (int i = 0; i < values[0].size(); i++) {
+                addMovieToRelatedData(values[0].get(i));
+            }
+        }
+
+    }
+
+    private void addMovieToRelatedData(final Movie movie) {
+        LinearLayout linearLayout = relatedLayout;
+        LayoutInflater inflater = LayoutInflater.from(this);
+        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.actorontop, null, false);
+
+
+
+
+        MaterialLargeImageCard card =
+                MaterialLargeImageCard.with(this)
+                        //.setTextOverImage(actor.actorName)
+                        .useDrawableUrl(movie.getPoster())
+                                //.setupSupplementalActions(R.layout.carddemo_native_material_supplemental_actions_large_icon, actions)
+                        .build();
+
+
+        card.setOnClickListener(new Card.OnCardClickListener() {
+            @Override
+            public void onClick(Card card, View view) {
+
+
+                Intent i = new Intent(MoviePageActivity.this, MoviePageActivity.class);
+                i.putExtra("movieId", movie.getMovieId());
+                i.putExtra("description", movie.getDescription());
+                i.putExtra("title", movie.getTitle_en());
+                i.putExtra("date", movie.getRelease_date());
+                i.putExtra("duration", movie.getDuration());
+                i.putExtra("rating", movie.getImdb());
+                i.putExtra("imdb", movie.getImdb_id());
+                i.putExtra("lang", movie.getLang());
+                i.putExtra("time", 0);
+                startActivity(i);
+            }
+        });
+        CardViewNative cardView = (CardViewNative) layout.findViewById(R.id.actorCard);
+        ((TextView)layout.findViewById(R.id.actorCardName)).setText(movie.getTitle_en());
+        cardView.setCard(card);
+
+        linearLayout.addView(layout);
+
     }
 
     private void addActorToCast(Actor actor) {
@@ -408,7 +459,7 @@ public class MoviePageActivity extends Activity {
     }
 
     public void onBackPressed() {
-        if(tabHost.getCurrentTab()==2){
+        if(tabHost.getCurrentTab()==1){
             if(webView.canGoBack()){
                 webView.goBack();
             }else{

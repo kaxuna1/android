@@ -34,7 +34,7 @@ public class StartUpService extends Service {
         boolean alarmUp = (PendingIntent.getBroadcast(this, 0,
                 intent2,
                 PendingIntent.FLAG_NO_CREATE) != null);
-        if(!alarmUp)
+        //if(!alarmUp)
         am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (1000 * 60*60*preferences.getInt("interval",6)), pi);
 
         return 1;
