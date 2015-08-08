@@ -160,6 +160,7 @@ public class MainPageFragment extends Fragment {
                         i.putExtra("imdb", selectedMovie.getImdb_id());
                         i.putExtra("lang", selectedMovie.getLang());
                         i.putExtra("time", 0);
+                        i.putExtra("Movie",selectedMovie);
                         startActivityForResult(i, 1);
                     }
 
@@ -249,6 +250,7 @@ public class MainPageFragment extends Fragment {
                         i.putExtra("imdb", selectedMovie.getImdb_id());
                         i.putExtra("lang", selectedMovie.getLang());
                         i.putExtra("time", 0);
+                        i.putExtra("Movie",selectedMovie);
                         startActivityForResult(i, 1);
                     }
 
@@ -335,6 +337,7 @@ public class MainPageFragment extends Fragment {
                         i.putExtra("imdb", selectedMovie.getImdb_id());
                         i.putExtra("lang", selectedMovie.getLang());
                         i.putExtra("time", 0);
+                        i.putExtra("Movie",selectedMovie);
                         startActivityForResult(i, 1);
                     }
 

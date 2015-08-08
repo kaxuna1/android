@@ -87,6 +87,8 @@ public class serie_page_activity extends Activity {
     TabHost tabHost=null;
     private WebView webView;
     ListView episodesListView;
+    LinearLayout relatedLayout;
+
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
@@ -111,27 +113,17 @@ public class serie_page_activity extends Activity {
         tabHost.addTab(tabSpec);
 
         tabSpec=tabHost.newTabSpec("movie");
-        tabSpec.setContent(R.id.tab2);
-        tabSpec.setIndicator("ინფორმაცია ფილმზე");
-        tabHost.addTab(tabSpec);
-
-        tabSpec=tabHost.newTabSpec("movie");
         tabSpec.setContent(R.id.tab3);
         tabSpec.setIndicator("IMDB");
         tabHost.addTab(tabSpec);
 
+        relatedLayout=(LinearLayout)findViewById(R.id.relatedMoviesLayout);
         castLayout=(LinearLayout)findViewById(R.id.actorsLayout);
 
         seasons=new ArrayList<Season>();
 
         id=extras.getString("movieId");
        // getActionBar().setTitle(extras.getString("title"));
-        final FloatingActionButton mFab2 = new FloatingActionButton.Builder(serie_page_activity.this)
-                .withColor(getResources().getColor(R.color.primary))
-                .withDrawable(getResources().getDrawable(R.drawable.starlit))
-                .withSize(72)
-                .withMargins(0, 0, 16, 16)
-                .create();
 
 
         ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.downloadBtn)).setOnClickListener(new View.OnClickListener() {
@@ -145,6 +137,22 @@ public class serie_page_activity extends Activity {
                 } else {
                     Toast.makeText(serie_page_activity.this, "გადმოწერისთვის აირჩიეთ სეზონი და ეპიზოდი", Toast.LENGTH_LONG).show();
 
+                }
+
+            }
+        });
+        serie= (Serie) getIntent().getSerializableExtra("Serie");
+        ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.getNewsBtn)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //Serie serie = (Serie) getIntent().getSerializableExtra("Serie");
+                List<Serie> serieList = Serie.find(Serie.class, "movie_id='" + serie.movieId + "'");
+                Log.d("seriesListSize", "" + serieList.size());
+                if (serieList.size() == 0) {
+                    serie.save();
+                    Toast.makeText(serie_page_activity.this, "სიახლეები გამოიწერა სერიალ " + serie.getTitle_en() + "-ისთვის", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(serie_page_activity.this, "სიახლეები უკვე გამოიწერა სერიალ " + serie.getTitle_en() + "-ისთვის", Toast.LENGTH_LONG).show();
                 }
 
             }
@@ -181,25 +189,7 @@ public class serie_page_activity extends Activity {
         ((TextView) findViewById(R.id.descriptionTxt)).setText(extras.getString("description"));
 
 
-        serie= (Serie) getIntent().getSerializableExtra("Serie");
 
-
-
-        mFab2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Serie serie = (Serie) getIntent().getSerializableExtra("Serie");
-                List<Serie> serieList = Serie.find(Serie.class, "movie_id='" + serie.movieId + "'");
-                Log.d("seriesListSize", "" + serieList.size());
-                if (serieList.size() == 0) {
-                    serie.save();
-                    Toast.makeText(serie_page_activity.this, "სიახლეები გამოიწერა სერიალ " + serie.getTitle_en() + "-ისთვის", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(serie_page_activity.this, "სიახლეები უკვე გამოიწერა სერიალ " + serie.getTitle_en() + "-ისთვის", Toast.LENGTH_LONG).show();
-                }
-
-            }
-        });
         final GetSeriesDataJSON getSeries=new GetSeriesDataJSON();
 
         webView = (WebView) findViewById(R.id.webView1);
@@ -213,7 +203,7 @@ public class serie_page_activity extends Activity {
             public void run() {
                 getSeries.doInBackground();
                 new getSerieActorsAsync().doInBackground(serie.getMovieId());
-
+                new getMovieRelated().doInBackground(extras.getString("movieId"));
             }
         }).start();
 
@@ -530,7 +520,7 @@ public class serie_page_activity extends Activity {
     }
 
     public void onBackPressed() {
-        if(tabHost.getCurrentTab()==2){
+        if(tabHost.getCurrentTab()==1){
             if(webView.canGoBack()){
                 webView.goBack();
             }else{
@@ -664,5 +654,69 @@ public class serie_page_activity extends Activity {
         listView.requestLayout();
     }
 
+    class getMovieRelated extends AsyncTask<String, ArrayList<Movie>, ArrayList<Movie>> {
+
+        @Override
+        protected ArrayList<Movie> doInBackground(String... strings) {
+            Log.d("kinoLoad", "gamodzaxda");
+            MovieServices movieServices = new MovieServices();
+            ArrayList<Movie> movies = movieServices.getRelateMovies(strings[0]);
+            publishProgress(movies);
+
+            return movies;
+        }
+
+        @Override
+        protected void onProgressUpdate(ArrayList<Movie>... values) {
+            super.onProgressUpdate(values);
+            for (int i = 0; i < values[0].size(); i++) {
+                addMovieToRelatedData(values[0].get(i));
+            }
+        }
+
+    }
+    private void addMovieToRelatedData(final Movie movie) {
+        LinearLayout linearLayout = relatedLayout;
+        LayoutInflater inflater = LayoutInflater.from(this);
+        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.actorontop, null, false);
+        final Serie serie=new Serie(movie.getMovieId(),movie.getTitle_en(),movie.getLink(),movie.getPoster(),movie.getImdb(),movie.getImdb_id(),
+                movie.getRelease_date(),movie.getDescription(),movie.getDuration(),movie.getLang());
+
+
+
+        MaterialLargeImageCard card =
+                MaterialLargeImageCard.with(this)
+                        //.setTextOverImage(actor.actorName)
+                        .useDrawableUrl(movie.getPoster())
+                                //.setupSupplementalActions(R.layout.carddemo_native_material_supplemental_actions_large_icon, actions)
+                        .build();
+
+
+        card.setOnClickListener(new Card.OnCardClickListener() {
+            @Override
+            public void onClick(Card card, View view) {
+
+
+                Intent i = new Intent(serie_page_activity.this, serie_page_activity.class);
+                i.putExtra("movieId", serie.getMovieId());
+                i.putExtra("description", serie.getDescription());
+                i.putExtra("title", serie.getTitle_en());
+                i.putExtra("date", serie.getRelease_date());
+                i.putExtra("duration", serie.getDuration());
+                i.putExtra("rating", serie.getImdb());
+                i.putExtra("imdb", serie.getImdb_id());
+                i.putExtra("lang", serie.getLang());
+                i.putExtra("Serie",serie);
+                i.putExtra("time", 0);
+                startActivity(i);
+            }
+        });
+        CardViewNative cardView = (CardViewNative) layout.findViewById(R.id.actorCard);
+        ((TextView)layout.findViewById(R.id.actorCardName)).setText(movie.getTitle_en());
+        cardView.setCard(card);
+
+        linearLayout.addView(layout);
+
+    }
 
 }

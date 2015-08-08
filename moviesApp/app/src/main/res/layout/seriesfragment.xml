@@ -28,8 +28,7 @@
                     xmlns:tools="http://schemas.android.com/tools"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:paddingLeft="@dimen/activity_horizontal_margin"
-                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:descendantFocusability="beforeDescendants"
                     tools:context="com.kgelashvili.moviesapp.SeriesActiviry">
 
                     <EditText
@@ -41,7 +40,9 @@
                         android:layout_alignParentTop="true"
                         android:gravity="center"
                         android:hint="ძებნა"
-                        android:singleLine="true" />
+                        android:singleLine="true"
+                        android:textSize="22sp" />
+
 
                     <it.gmariotti.cardslib.library.view.CardListView
                         android:id="@+id/seriesList"

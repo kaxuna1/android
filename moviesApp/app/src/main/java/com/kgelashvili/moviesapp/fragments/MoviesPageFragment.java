@@ -12,12 +12,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.kgelashvili.moviesapp.Classes.CustomHeaderMainMovieItem;
+import com.kgelashvili.moviesapp.Classes.CustomThumbNail;
 import com.kgelashvili.moviesapp.Classes.MovieServices;
 import com.kgelashvili.moviesapp.Classes.dbHelper;
 import com.kgelashvili.moviesapp.MoviePageActivity;
@@ -57,6 +60,9 @@ public class MoviesPageFragment extends Fragment {
 
     @InjectView(R.id.carddemo_list_cursor2)
     CardListView mListView;
+
+    @InjectView(R.id.janrebi)
+    LinearLayout janrebi;
 
 
     public static MoviesPageFragment newInstance(int position,View view,dbHelper dbHelper2) {
@@ -141,6 +147,7 @@ public class MoviesPageFragment extends Fragment {
             }
         });
 
+
         searchBox.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -161,6 +168,12 @@ public class MoviesPageFragment extends Fragment {
 
             }
         });
+        for(int i=0;i<10;i++){
+            CheckBox checkBox=new CheckBox(getActivity());
+            checkBox.setText("test");
+            janrebi.addView(checkBox);
+
+        }
 
         return rootView;
     }
@@ -202,6 +215,7 @@ public class MoviesPageFragment extends Fragment {
 
         Card card = new Card(getActivity());
 
+
         //Create a CardHeader
         CustomHeaderMainMovieItem header = new CustomHeaderMainMovieItem(getActivity(),
                 movie.getTitle_en(),movie.getRelease_date(),movie.getDescription().length()>50?movie.getDescription().substring(0,49):movie.getDescription());
@@ -211,29 +225,13 @@ public class MoviesPageFragment extends Fragment {
 
         card.addCardHeader(header);
 
-        header.setOtherButtonVisible(true);
+        //header.setOtherButtonVisible(true);
 
         //Add a callback
-        header.setOtherButtonClickListener(new CardHeader.OnClickCardHeaderOtherButtonListener() {
-            @Override
-            public void onButtonItemClick(Card card, View view) {
 
-        //        dbHelper2.createMovie
-                List<Movie> movieList=Movie.find(Movie.class, "movie_id = '"+movie.getMovieId()+"'");
-
-                if(movieList.size()==0) {
-                    movie.save();
-                    Toast.makeText(getActivity(), "დაემატა ვაპირებ ყრებას სიაში", Toast.LENGTH_LONG).show();
-                }else{
-                    Toast.makeText(getActivity(), "უკვე არსებობს ვაპირებ ყრებას სიაში", Toast.LENGTH_LONG).show();
-                }
-
-
-            }
-        });
 
         //Use this code to set your drawable
-        header.setOtherButtonDrawable(R.drawable.card_menu_button_other_add);
+        //header.setOtherButtonDrawable(R.drawable.card_menu_button_other_add);
 
 
 
@@ -241,7 +239,7 @@ public class MoviesPageFragment extends Fragment {
         //Create thumbnail
         //CustomThumbCard thumb = new CustomThumbCard(MainActivity.this);
 
-        CardThumbnail thumbnail=new CardThumbnail(getActivity());
+        CustomThumbNail thumbnail=new CustomThumbNail(getActivity());
 
         thumbnail.setUrlResource(movie.getPoster());
 
@@ -285,6 +283,7 @@ public class MoviesPageFragment extends Fragment {
                         i.putExtra("imdb", selectedMovie.getImdb_id());
                         i.putExtra("lang", selectedMovie.getLang());
                         i.putExtra("time", 0);
+                        i.putExtra("Movie", selectedMovie);
                         startActivityForResult(i, 1);
                     }
 
@@ -300,6 +299,7 @@ public class MoviesPageFragment extends Fragment {
                 }).playOn(MoviesPageFragment.view);
             }
         });
+
         adapter2.add(card);
 
 

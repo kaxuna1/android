@@ -25,6 +25,7 @@ import android.widget.MediaController;
 import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.daimajia.androidanimations.library.Techniques;
@@ -39,6 +40,7 @@ import com.nineoldandroids.animation.Animator;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import it.gmariotti.cardslib.library.cards.material.MaterialLargeImageCard;
 import it.gmariotti.cardslib.library.internal.Card;
@@ -62,13 +64,9 @@ public class MoviePageActivity extends Activity {
     LinearLayout castLayout;
     LinearLayout relatedLayout;
     TabHost tabHost=null;
+    Movie movie=null;
 
     public MoviePageActivity() {
-    }
-
-    @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
     @Override
@@ -95,7 +93,7 @@ public class MoviePageActivity extends Activity {
         tabSpec.setContent(R.id.tab3);
         tabSpec.setIndicator("IMDB");
         tabHost.addTab(tabSpec);
-
+        movie= (Movie) getIntent().getSerializableExtra("Movie");
         langs=extras.getString("lang");
 
         castLayout=(LinearLayout)findViewById(R.id.actorsLayout);
@@ -123,6 +121,19 @@ public class MoviePageActivity extends Activity {
 
 
                 startActivityForResult(i, 0);
+            }
+        });
+        ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.watchLaterBtn)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                List<Movie> movieList=Movie.find(Movie.class, "movie_id = '"+movie.getMovieId()+"'");
+
+                if(movieList.size()==0) {
+                    movie.save();
+                    Toast.makeText(MoviePageActivity.this, "დაემატა ვაპირებ ყრებას სიაში", Toast.LENGTH_LONG).show();
+                }else{
+                    Toast.makeText(MoviePageActivity.this, "უკვე არსებობს ვაპირებ ყრებას სიაში", Toast.LENGTH_LONG).show();
+                }
             }
         });
         ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.downloadButtonSerie)).setOnClickListener(new View.OnClickListener() {
@@ -261,6 +272,13 @@ public class MoviePageActivity extends Activity {
 
     }
 
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
+
+
     private void PlayVideo() {
         try {
             getWindow().setFormat(PixelFormat.TRANSLUCENT);
@@ -334,6 +352,7 @@ public class MoviePageActivity extends Activity {
             actors=new MovieServices().getMovieActors(strings[0]);
             quality=new MovieServices().getMovieQuality(strings[0]);
             langs=new MovieServices().getMovieLangs(strings[0]);
+            movie.setLang(langs);
 
             publishProgress(actors);
             return actors;
@@ -395,7 +414,6 @@ public class MoviePageActivity extends Activity {
         card.setOnClickListener(new Card.OnCardClickListener() {
             @Override
             public void onClick(Card card, View view) {
-
 
                 Intent i = new Intent(MoviePageActivity.this, MoviePageActivity.class);
                 i.putExtra("movieId", movie.getMovieId());

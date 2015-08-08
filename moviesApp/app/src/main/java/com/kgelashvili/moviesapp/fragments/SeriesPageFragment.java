@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.kgelashvili.moviesapp.Classes.CustomHeaderMainMovieItem;
+import com.kgelashvili.moviesapp.Classes.CustomThumbNail;
 import com.kgelashvili.moviesapp.Classes.MovieServices;
 import com.kgelashvili.moviesapp.Classes.dbHelper;
 import com.kgelashvili.moviesapp.R;
@@ -215,7 +216,7 @@ public class SeriesPageFragment extends Fragment {
         //Create thumbnail
         //CustomThumbCard thumb = new CustomThumbCard(MainActivity.this);
 
-        CardThumbnail thumbnail=new CardThumbnail(getActivity());
+        CustomThumbNail thumbnail=new CustomThumbNail(getActivity());
 
         thumbnail.setUrlResource(serie.getPoster());
 
