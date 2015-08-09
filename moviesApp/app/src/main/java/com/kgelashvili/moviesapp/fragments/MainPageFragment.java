@@ -28,6 +28,7 @@ import java.util.ArrayList;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.OnClick;
 import it.gmariotti.cardslib.library.cards.actions.BaseSupplementalAction;
 import it.gmariotti.cardslib.library.cards.actions.IconSupplementalAction;
 import it.gmariotti.cardslib.library.cards.material.MaterialLargeImageCard;

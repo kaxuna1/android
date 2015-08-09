@@ -30,6 +30,7 @@ import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -58,6 +59,7 @@ import com.kgelashvili.moviesapp.broadcastreceivers.CheckEpisodesBroadcastReceiv
 import com.kgelashvili.moviesapp.cards.CustomThumbCard;
 import com.kgelashvili.moviesapp.fragments.FavoritesPageFragment;
 import com.kgelashvili.moviesapp.fragments.MainPageFragment;
+import com.kgelashvili.moviesapp.fragments.MoviesGridFragment;
 import com.kgelashvili.moviesapp.fragments.MoviesPageFragment;
 import com.kgelashvili.moviesapp.fragments.SeriesPageFragment;
 import com.kgelashvili.moviesapp.model.Movie;
@@ -172,10 +174,10 @@ public class MainActivity extends AppCompatActivity{
                 intent2,
                 PendingIntent.FLAG_NO_CREATE) != null);
 
-        //if (!alarmUp)
-        //{
+        if (!alarmUp)
+        {
         am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (1000 * 30), pi);
-        //}
+        }
         MainActivity.this.getWindow().getDecorView().setBackgroundColor(getResources().getColor(R.color.gray_background));
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout2);
         mDrawer.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
@@ -230,7 +232,7 @@ public class MainActivity extends AppCompatActivity{
 
     public class MyPagerAdapter extends FragmentPagerAdapter {
 
-        private final String[] TITLES = {"მთავარი", "ფილმები","სერიალები", "ვაპირებ ყურებას"};
+        private final String[] TITLES = {"მთავარი", "ფილმები","სერიალები", "ვაპირებ ყურებას","ფილმების კედელი"};
 
         public MyPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -253,6 +255,7 @@ public class MainActivity extends AppCompatActivity{
                 case 1:return MoviesPageFragment.newInstance(position, findViewById(R.id.fragmentMainLinar),dbHelper2);
                 case 2:return SeriesPageFragment.newInstance(position, findViewById(R.id.fragmentMainLinar));
                 case 3:return FavoritesPageFragment.newInstance(position, findViewById(R.id.fragmentMainLinar),dbHelper2);
+                case 4:return MoviesGridFragment.newInstance(position, findViewById(R.id.fragmentMainLinar), dbHelper2);
                 default:return MainPageFragment.newInstance(position,findViewById(R.id.fragmentMainLinar));
             }
         }
@@ -264,9 +267,7 @@ public class MainActivity extends AppCompatActivity{
         YoYo.with(Techniques.ZoomInLeft).playOn(findViewById(R.id.fragmentMainLinar));
     }
     public static final String[] options = {
-
             "პარამეტრები"
-
     };
     private class CustomActionBarDrawerToggle extends ActionBarDrawerToggle {
 

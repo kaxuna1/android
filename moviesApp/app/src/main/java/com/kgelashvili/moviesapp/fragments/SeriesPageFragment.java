@@ -12,16 +12,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.kgelashvili.moviesapp.Classes.CustomHeaderMainMovieItem;
 import com.kgelashvili.moviesapp.Classes.CustomThumbNail;
+import com.kgelashvili.moviesapp.Classes.JanrebiData;
 import com.kgelashvili.moviesapp.Classes.MovieServices;
 import com.kgelashvili.moviesapp.Classes.dbHelper;
 import com.kgelashvili.moviesapp.R;
+import com.kgelashvili.moviesapp.model.Janri;
 import com.kgelashvili.moviesapp.model.Movie;
 import com.kgelashvili.moviesapp.model.Serie;
 import com.kgelashvili.moviesapp.serie_page_activity;
@@ -52,11 +57,16 @@ public class SeriesPageFragment extends Fragment {
     ArrayList<Card> cards=new ArrayList<Card>();
     CardArrayAdapter adapter2;
     GetSeries getSeries=new GetSeries();
+    ArrayList<Janri> currentJanrebi;
+
     @InjectView(R.id.searchBoxSeries)
     EditText searchBox;
 
     @InjectView(R.id.seriesList)
     CardListView mListView;
+
+    @InjectView(R.id.janrebi)
+    LinearLayout janrebiLayout;
 
     public static SeriesPageFragment newInstance(int position,View view) {
         SeriesPageFragment f = new SeriesPageFragment();
@@ -98,7 +108,7 @@ public class SeriesPageFragment extends Fragment {
 
                 int lastInScreen = firstVisibleItem + visibleItemCount;
                 if ((lastInScreen == totalItemCount) && !(loadingMore)) {
-                    if (!loadingMore){
+                    if (!loadingMore) {
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
@@ -137,7 +147,7 @@ public class SeriesPageFragment extends Fragment {
                 }
             }
         });
-
+        currentJanrebi=new ArrayList<Janri>();
         searchBox.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -159,6 +169,33 @@ public class SeriesPageFragment extends Fragment {
             }
         });
 
+        final ArrayList<Janri> janrebi=new JanrebiData().getJanrebi();
+        for(int i=0;i<janrebi.size();i++){
+
+            CheckBox checkBox=new CheckBox(getActivity());
+            checkBox.setText(janrebi.get(i).getName());
+            final int finalI = i;
+            checkBox.setOnCheckedChangeListener(
+                    new CompoundButton.OnCheckedChangeListener() {
+                        @Override
+                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                            //Toast.makeText(getActivity(), "ჟანრი "+janrebi.get(finalI).getName()+" "+isChecked, Toast.LENGTH_SHORT).show();
+                            if(isChecked){
+                                currentJanrebi.add(janrebi.get(finalI));
+
+                            }else{
+                                currentJanrebi.remove(janrebi.get(finalI));
+                            }
+                            cards.clear();
+                            adapter2.clear();
+                            currentLoaded = 0;
+                        }
+                    }
+            );
+            janrebiLayout.addView(checkBox);
+
+        }
+
         return rootView;
     }
 
@@ -168,7 +205,7 @@ public class SeriesPageFragment extends Fragment {
         protected ArrayList<Serie> doInBackground(String... strings) {
 
             MovieServices movieServices = new MovieServices();
-            ArrayList<Serie> series = movieServices.getMainSeries(strings[0], "false", "1900", "2015", keyWord);
+            ArrayList<Serie> series = movieServices.getMainSeries(strings[0], "false", "1900", "2015", keyWord,getJanrebi());
             publishProgress(series);
             return series;
         }
@@ -282,7 +319,15 @@ public class SeriesPageFragment extends Fragment {
     }
 
 
+    String getJanrebi(){
+        String value="";
+        for(int i=0;i<currentJanrebi.size();i++){
+            value+="searchTags%5B%5D="+currentJanrebi.get(i).getValue()+"&";
+        }
 
+
+        return value;
+    }
 
 
 }

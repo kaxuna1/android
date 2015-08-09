@@ -54,15 +54,6 @@
                 android:value="com.kgelashvili.moviesapp.MainActivity" />
         </activity>
         <activity
-            android:name=".SeriesActiviry"
-            android:label="@string/title_activity_series_activiry"
-            android:parentActivityName=".MainActivity"
-            android:screenOrientation="portrait" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.kgelashvili.moviesapp.MainActivity" />
-        </activity>
-        <activity
             android:name=".serie_page_activity"
             android:label="@string/title_activity_serie_page_activity"
             android:parentActivityName=".SeriesActiviry"

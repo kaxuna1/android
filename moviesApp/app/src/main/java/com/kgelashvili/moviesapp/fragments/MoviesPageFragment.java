@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -21,10 +22,12 @@ import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.kgelashvili.moviesapp.Classes.CustomHeaderMainMovieItem;
 import com.kgelashvili.moviesapp.Classes.CustomThumbNail;
+import com.kgelashvili.moviesapp.Classes.JanrebiData;
 import com.kgelashvili.moviesapp.Classes.MovieServices;
 import com.kgelashvili.moviesapp.Classes.dbHelper;
 import com.kgelashvili.moviesapp.MoviePageActivity;
 import com.kgelashvili.moviesapp.R;
+import com.kgelashvili.moviesapp.model.Janri;
 import com.kgelashvili.moviesapp.model.Movie;
 import com.nineoldandroids.animation.Animator;
 
@@ -54,6 +57,10 @@ public class MoviesPageFragment extends Fragment {
     ArrayList<Card> cards=new ArrayList<Card>();
     CardArrayAdapter adapter2;
     final getMovies getmovies = new getMovies();
+    ArrayList<Janri> currentJanrebi;
+
+
+
 
     @InjectView(R.id.searchBox)
     EditText searchBox;
@@ -62,7 +69,7 @@ public class MoviesPageFragment extends Fragment {
     CardListView mListView;
 
     @InjectView(R.id.janrebi)
-    LinearLayout janrebi;
+    LinearLayout janrebiLayout;
 
 
     public static MoviesPageFragment newInstance(int position,View view,dbHelper dbHelper2) {
@@ -95,6 +102,8 @@ public class MoviesPageFragment extends Fragment {
                 getmovies.doInBackground("" + currentLoaded);
             }
         }).start();
+
+
         mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
 
             @Override
@@ -107,17 +116,17 @@ public class MoviesPageFragment extends Fragment {
 
                 int lastInScreen = firstVisibleItem + visibleItemCount;
                 if ((lastInScreen == totalItemCount) && !(loadingMore)) {
-                    if (!loadingMore){
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
+                    if (!loadingMore) {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
 
                                 loadingMore = true;
                                 getmovies.doInBackground("" + currentLoaded);
 
 
-                        }
-                    }).start();
+                            }
+                        }).start();
                     }
                 }
             }
@@ -134,19 +143,21 @@ public class MoviesPageFragment extends Fragment {
 
                 int lastInScreen = firstVisibleItem + visibleItemCount;
                 if ((lastInScreen == totalItemCount) && !(loadingMore)) {
-                    if(!loadingMore){
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            loadingMore = true;
-                            getmovies.doInBackground("" + currentLoaded);
-                        }
-                    }).start();
+                    if (!loadingMore) {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                loadingMore = true;
+                                getmovies.doInBackground("" + currentLoaded);
+                            }
+                        }).start();
                     }
                 }
             }
         });
 
+
+        currentJanrebi=new ArrayList<Janri>();
 
         searchBox.addTextChangedListener(new TextWatcher() {
             @Override
@@ -160,7 +171,6 @@ public class MoviesPageFragment extends Fragment {
                 cards.clear();
                 adapter2.clear();
                 currentLoaded = 0;
-                //loadMore();
             }
 
             @Override
@@ -168,15 +178,37 @@ public class MoviesPageFragment extends Fragment {
 
             }
         });
-        for(int i=0;i<10;i++){
+        final ArrayList<Janri> janrebi=new JanrebiData().getJanrebi();
+
+        for(int i=0;i<janrebi.size();i++){
+
             CheckBox checkBox=new CheckBox(getActivity());
-            checkBox.setText("test");
-            janrebi.addView(checkBox);
+            checkBox.setText(janrebi.get(i).getName());
+            final int finalI = i;
+            checkBox.setOnCheckedChangeListener(
+                    new CompoundButton.OnCheckedChangeListener() {
+                                                    @Override
+                                                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                                        //Toast.makeText(getActivity(), "ჟანრი "+janrebi.get(finalI).getName()+" "+isChecked, Toast.LENGTH_SHORT).show();
+                                                        if(isChecked){
+                                                            currentJanrebi.add(janrebi.get(finalI));
+
+                                                        }else{
+                                                            currentJanrebi.remove(janrebi.get(finalI));
+                                                        }
+                                                        cards.clear();
+                                                        adapter2.clear();
+                                                        currentLoaded = 0;
+                                                    }
+                                                }
+            );
+            janrebiLayout.addView(checkBox);
 
         }
 
         return rootView;
     }
+
 
     class getMovies extends AsyncTask<String, ArrayList<Movie>, ArrayList<Movie>> {
 
@@ -184,7 +216,7 @@ public class MoviesPageFragment extends Fragment {
         protected ArrayList<Movie> doInBackground(String... strings) {
             Log.d("kinoLoad", "gamodzaxda");
             MovieServices movieServices = new MovieServices();
-            ArrayList<Movie> movies = movieServices.getMainMovies(strings[0], "false", "1900", "2015", keyWord);
+            ArrayList<Movie> movies = movieServices.getMainMovies(strings[0], "false", "1900", "2015", keyWord, getJanrebi());
             publishProgress(movies);
 
             return movies;
@@ -199,7 +231,7 @@ public class MoviesPageFragment extends Fragment {
             //adapter.notifyDataSetChanged();
             Log.d("moviesLogKaxa","gamodzaxda");
             Log.d("moviesLog", "" + currentLoaded);
-            currentLoaded += 15;
+            currentLoaded += 30;
             //populateMoviesListViev();
             loadingMore = false;
         }
@@ -305,5 +337,14 @@ public class MoviesPageFragment extends Fragment {
 
 
 
+    }
+    String getJanrebi(){
+        String value="";
+        for(int i=0;i<currentJanrebi.size();i++){
+            value+="searchTags%5B%5D="+currentJanrebi.get(i).getValue()+"&";
+        }
+
+
+        return value;
     }
 }
