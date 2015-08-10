@@ -109,15 +109,11 @@ public class CheckNewEpisodes extends Service {
                     Elements value=new GetSeriesData().doInBackground(serieToBeChecked.getMovieId());
                     int i=1;
                     while (value.select("#sDiv"+i).hasAttr("class")){
-                        //Log.d("kaxaHTML"+i,value.select("#sDiv"+i).html());
-                        //Log.d("kaxaHtml" + i, value.select("#sDiv" + i).select("span").get(1).attr("data-href"));
                         int f=0;
                         Season season =new Season("Season "+i);
 
                         int episodes=value.select("#sDiv"+i).select("span").size();
                         while (f<episodes){
-                            Log.d("kaxaHtml"+f,value.select("#sDiv"+i).select("span").get(f).attr("data-href"));
-
                             season.addEpisode(new Episode(value.select("#sDiv"+i).select("span").get(f).attr("data-href"),
                                     value.select("#sDiv"+i).select("span").get(f).attr("data-lang"),"სერია  "+(f+1)));
                             f++;
@@ -165,7 +161,7 @@ public class CheckNewEpisodes extends Service {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Log.d("notificationd2","image");
+
                 new getNewGeoMovies().doInBackground("");
 
             }
@@ -176,7 +172,7 @@ public class CheckNewEpisodes extends Service {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Log.d("notificationd2","image");
+
                 new getPremiereMovies().doInBackground("");
 
             }
@@ -186,12 +182,11 @@ public class CheckNewEpisodes extends Service {
 
     public void showNotificationNewAddedMovies() {
 
-        Log.d("notificationd3","image");
+
 
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Log.d("notificationd2","image");
                 new getNewAddedMovies().doInBackground("");
 
             }
@@ -208,7 +203,7 @@ public class CheckNewEpisodes extends Service {
 
 
         @Override protected ArrayList<Bitmap> doInBackground(String... params) {
-            Log.d("notificationd1", "image");
+
             ArrayList<Bitmap> bitmaps=new ArrayList<>();
             for(int i=0;i<5;i++){
                 Bitmap bm = null;
@@ -222,7 +217,6 @@ public class CheckNewEpisodes extends Service {
                     bis.close();
                     is.close();
                 } catch (IOException e) {
-                    Log.d("notificationd4","image");
                 }
                 bitmaps.add(bm);
             }
@@ -233,7 +227,6 @@ public class CheckNewEpisodes extends Service {
         @Override
         protected void onProgressUpdate(ArrayList<Bitmap>... value) {
             super.onProgressUpdate(value);
-            Log.d("notificationd", "image");
 
 
 
@@ -258,7 +251,7 @@ public class CheckNewEpisodes extends Service {
         protected void onProgressUpdate(final ArrayList<Movie>... values) {
             super.onProgressUpdate(values);
             final String[] posters=new String[5];
-            Log.d("kaxaGeo1", "kaxaGeo1");
+
             final Movie[] movies2=values[0].toArray(new Movie[values[0].size()]);
             for (int i = 0; i < 5; i++) {
                 posters[i]=movies2[i].getPoster();
@@ -268,7 +261,7 @@ public class CheckNewEpisodes extends Service {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d("notificationd2","image");
+
                     ArrayList<Bitmap> bitmaps=new NotificationImageAsyncTask().doInBackground(posters);
                     final RemoteViews contentView=new RemoteViews(CheckNewEpisodes.this.getPackageName(), R.layout.notification);
                     for(int f=0;f<4;f++){
@@ -360,7 +353,7 @@ public class CheckNewEpisodes extends Service {
         protected void onProgressUpdate(final ArrayList<Movie>... values) {
             super.onProgressUpdate(values);
             final String[] posters=new String[5];
-            Log.d("kaxaGeo1", "kaxaGeo1");
+
             final Movie[] movies2=values[0].toArray(new Movie[values[0].size()]);
             for (int i = 0; i < 5; i++) {
                 posters[i]=movies2[i].getPoster();
@@ -370,7 +363,7 @@ public class CheckNewEpisodes extends Service {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d("notificationd2","image");
+
                     ArrayList<Bitmap> bitmaps=new NotificationImageAsyncTask().doInBackground(posters);
                     final RemoteViews contentView=new RemoteViews(CheckNewEpisodes.this.getPackageName(), R.layout.notification);
                     for(int f=0;f<4;f++){
@@ -463,7 +456,7 @@ public class CheckNewEpisodes extends Service {
         protected void onProgressUpdate(final ArrayList<Movie>... values) {
             super.onProgressUpdate(values);
             final String[] posters=new String[5];
-            Log.d("kaxaGeo1", "kaxaGeo1");
+
             final Movie[] movies2=values[0].toArray(new Movie[values[0].size()]);
             for (int i = 0; i < 5; i++) {
                 posters[i]=movies2[i].getPoster();
@@ -473,7 +466,7 @@ public class CheckNewEpisodes extends Service {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d("notificationd2","image");
+
                     ArrayList<Bitmap> bitmaps=new NotificationImageAsyncTask().doInBackground(posters);
                     final RemoteViews contentView=new RemoteViews(CheckNewEpisodes.this.getPackageName(), R.layout.notification);
                     for(int f=0;f<4;f++){
@@ -567,9 +560,7 @@ public class CheckNewEpisodes extends Service {
             try {
                 doc = Jsoup.connect("http://adjaranet.com/Movie/main?id=" + params[0] + "&serie=1&js=1").get();
                 Elements newsHeadlines = doc.select("#episodesDiv");
-                //publishProgress(newsHeadlines);
                 return newsHeadlines;
-                //Log.d("kaxaHtml",newsHeadlines.html());
             } catch (IOException e) {
                 e.printStackTrace();
             }

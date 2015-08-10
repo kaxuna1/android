@@ -200,7 +200,6 @@ public class FavoritesPageFragment extends Fragment {
         for(int i=0;i<seriesList.size();i++){
 
             final Serie serie=seriesList.get(i);
-            Log.d("lastEp"+serie.getTitle_en(),""+serie.getLastEp());
             final Card card = new Card(getActivity());
 
 

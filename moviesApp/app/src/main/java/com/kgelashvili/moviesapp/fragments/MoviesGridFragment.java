@@ -148,7 +148,6 @@ public class MoviesGridFragment extends Fragment{
 
         @Override
         protected ArrayList<Movie> doInBackground(String... strings) {
-            Log.d("kinoLoad", "gamodzaxda");
             MovieServices movieServices = new MovieServices();
             ArrayList<Movie> movies = movieServices.getMainMovies(strings[0], "false", "1900", "2015", "", "");
             publishProgress(movies);
@@ -162,8 +161,7 @@ public class MoviesGridFragment extends Fragment{
             addMovieToLoadidData(values[0]);
 
             //adapter.notifyDataSetChanged();
-            Log.d("moviesLogKaxa","gamodzaxda");
-            Log.d("moviesLog", "" + currentLoaded);
+
             currentLoaded += 30;
             //populateMoviesListViev();
             loadingMore = false;

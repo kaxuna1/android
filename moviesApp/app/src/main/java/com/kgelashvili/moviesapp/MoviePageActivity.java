@@ -286,7 +286,7 @@ public class MoviePageActivity extends Activity {
 
             final Uri video = Uri.parse(videourl);
             //videoView.setMediaController(mediaController);
-            Log.d("moviePageLink", videourl);
+
             videoView.setVideoURI(Uri.parse(videourl));
             videoView.requestFocus();
             videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -300,7 +300,6 @@ public class MoviePageActivity extends Activity {
                         @Override
                         public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
                             movieTime = mediaPlayer.getCurrentPosition();
-                            Log.d("kaxaError", "error");
                             PlayVideo();
                             return true;
                         }
@@ -315,7 +314,6 @@ public class MoviePageActivity extends Activity {
 
         } catch (Exception e) {
             progressDialog.dismiss();
-            System.out.println("Video Play Error :" + e.toString());
             finish();
         }
 
@@ -360,7 +358,7 @@ public class MoviePageActivity extends Activity {
         @Override
         protected void onProgressUpdate(ArrayList<Actor>... values) {
             super.onProgressUpdate(values);
-            Log.d("kaxaGeo1", "kaxaGeo1");
+
             videourl = "http://adjaranet.com/download.php?mid="
                     + movieId + "&file=" + movieId + "_" + (langs.split(",")[0]) + "_"+quality.split(",")[0];
             PlayVideo();
@@ -377,7 +375,6 @@ public class MoviePageActivity extends Activity {
 
         @Override
         protected ArrayList<Movie> doInBackground(String... strings) {
-            Log.d("kinoLoad", "gamodzaxda");
             MovieServices movieServices = new MovieServices();
             ArrayList<Movie> movies = movieServices.getRelateMovies(strings[0]);
             publishProgress(movies);
@@ -471,8 +468,7 @@ public class MoviePageActivity extends Activity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         movieTime = resultCode;
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d("requestCodekaxa", "" + requestCode);
-        Log.d("resultCodekaxa", "" + resultCode);
+
 
     }
 

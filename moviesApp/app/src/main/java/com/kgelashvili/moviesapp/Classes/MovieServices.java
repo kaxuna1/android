@@ -5,6 +5,7 @@ import android.widget.ArrayAdapter;
 
 import com.kgelashvili.moviesapp.model.Actor;
 import com.kgelashvili.moviesapp.model.Movie;
+import com.kgelashvili.moviesapp.model.MovieAndSerie;
 import com.kgelashvili.moviesapp.model.Serie;
 
 import org.json.JSONArray;
@@ -28,13 +29,11 @@ public class MovieServices {
         NetworkDAO networkDAO=new NetworkDAO();
         try {
             String rawMoviesData=networkDAO.request(url);
-            Log.d("kaxa", rawMoviesData);
             JSONObject jsonObject=new JSONObject(rawMoviesData);
             JSONArray movies=jsonObject.getJSONArray("data");
             for (int i=0;i<movies.length();i++){
                 JSONObject movieJ=movies.getJSONObject(i);
-                Log.d("kaxa", movieJ.getString("poster"));
-                Log.d("lang",movieJ.getString("lang"));
+
                 Movie movie=new Movie(
                         movieJ.getString("id"),
                         movieJ.getString("title_en"),
@@ -67,7 +66,6 @@ public class MovieServices {
         NetworkDAO networkDAO=new NetworkDAO();
         try {
             String rawMoviesData=networkDAO.request(url);
-            Log.d("kaxa", rawMoviesData);
             JSONObject jsonObject=new JSONObject(rawMoviesData);
             JSONArray movies=jsonObject.getJSONArray("data");
             for (int i=0;i<movies.length();i++){
@@ -100,13 +98,10 @@ public class MovieServices {
         NetworkDAO networkDAO=new NetworkDAO();
         try {
             String rawMoviesData=networkDAO.request(url);
-            Log.d("kaxaGeo", rawMoviesData);
             JSONArray movies=new JSONArray(rawMoviesData);
             //JSONArray movies=jsonObject.getJSONArray("data");
             for (int i=0;i<movies.length();i++){
                 JSONObject movieJ=movies.getJSONObject(i);
-                Log.d("kaxa", movieJ.getString("poster"));
-                Log.d("lang",movieJ.getString("lang"));
                 Movie movie=new Movie(movieJ.getString("id"),
                         movieJ.getString("title_en"),
                         movieJ.getString("link"),
@@ -136,13 +131,11 @@ public class MovieServices {
         NetworkDAO networkDAO=new NetworkDAO();
         try {
             String rawMoviesData=networkDAO.request(url);
-            Log.d("kaxaGeo", rawMoviesData);
             JSONArray movies=new JSONArray(rawMoviesData);
             //JSONArray movies=jsonObject.getJSONArray("data");
             for (int i=0;i<movies.length();i++){
                 JSONObject movieJ=movies.getJSONObject(i);
-                Log.d("kaxa", movieJ.getString("poster"));
-                Log.d("lang",movieJ.getString("lang"));
+
                 Movie movie=new Movie(movieJ.getString("id"),
                         movieJ.getString("title_en"),
                         movieJ.getString("link"),
@@ -172,13 +165,10 @@ public class MovieServices {
         NetworkDAO networkDAO=new NetworkDAO();
         try {
             String rawMoviesData=networkDAO.request(url);
-            Log.d("kaxaGeo", rawMoviesData);
             JSONArray movies=new JSONArray(rawMoviesData);
             //JSONArray movies=jsonObject.getJSONArray("data");
             for (int i=0;i<movies.length();i++){
                 JSONObject movieJ=movies.getJSONObject(i);
-                Log.d("kaxa", movieJ.getString("poster"));
-                //Log.d("lang", movieJ.getString("lang"));
                 Serie movie=new Serie(movieJ.getString("id"),
                         movieJ.getString("title_en"),
                         movieJ.getString("link"),
@@ -208,13 +198,10 @@ public class MovieServices {
         NetworkDAO networkDAO=new NetworkDAO();
         try {
             String rawMoviesData=networkDAO.request(url);
-            Log.d("kaxaGeo", rawMoviesData);
             JSONArray movies=new JSONArray(rawMoviesData);
             //JSONArray movies=jsonObject.getJSONArray("data");
             for (int i=0;i<movies.length();i++){
                 JSONObject movieJ=movies.getJSONObject(i);
-                Log.d("kaxa", movieJ.getString("poster"));
-                //Log.d("lang", movieJ.getString("lang"));
                 Serie movie=new Serie(movieJ.getString("id"),
                         movieJ.getString("title_en"),
                         movieJ.getString("link"),
@@ -244,13 +231,12 @@ public class MovieServices {
         NetworkDAO networkDAO=new NetworkDAO();
         try {
             String rawMoviesData=networkDAO.request(url);
-            Log.d("kaxaGeo", rawMoviesData);
+
             JSONArray movies=new JSONArray(rawMoviesData);
             //JSONArray movies=jsonObject.getJSONArray("data");
             for (int i=0;i<movies.length();i++){
                 JSONObject movieJ=movies.getJSONObject(i);
-                Log.d("kaxa", movieJ.getString("poster"));
-                Log.d("lang",movieJ.getString("lang"));
+
                 Movie movie=new Movie(movieJ.getString("id"),
                         movieJ.getString("title_en"),
                         movieJ.getString("link"),
@@ -280,14 +266,12 @@ public class MovieServices {
         NetworkDAO networkDAO=new NetworkDAO();
         try {
             String rawData=networkDAO.request(url);
-            Log.d("kaxaGeo", rawData);
+
             JSONObject movieData=new JSONObject(rawData);
             JSONObject actorsObject=movieData.getJSONObject("cast");
             Iterator<?> keys = actorsObject.keys();
             while( keys.hasNext() ) {
                 String key = (String)keys.next();
-                Log.d("actorID", key);
-                Log.d("actorName",(actorsObject.getString(key)));
                 actors.add(new Actor(key,actorsObject.getString(key)) );
             }
         } catch (IOException e) {
@@ -306,14 +290,11 @@ public class MovieServices {
         NetworkDAO networkDAO=new NetworkDAO();
         try {
             String rawData=networkDAO.request(url);
-            Log.d("kaxaGeo", rawData);
             JSONObject movieData=new JSONObject(rawData);
             JSONObject actorsObject=movieData.getJSONObject("cast");
             Iterator<?> keys = actorsObject.keys();
             while( keys.hasNext() ) {
                 String key = (String)keys.next();
-                Log.d("actorID", key);
-                Log.d("actorName",(actorsObject.getString(key)));
                 actors.add(new Actor(key,actorsObject.getString(key)) );
             }
         } catch (IOException e) {
@@ -331,7 +312,6 @@ public class MovieServices {
         NetworkDAO networkDAO=new NetworkDAO();
         try {
             String rawData=networkDAO.request(url);
-            Log.d("kaxaGeo", rawData);
             JSONObject movieData=new JSONObject(rawData);
             return movieData;
 
@@ -352,7 +332,7 @@ public class MovieServices {
         NetworkDAO networkDAO=new NetworkDAO();
         try {
             String rawData=networkDAO.request(url);
-            Log.d("kaxaGeo", rawData);
+
             JSONObject movieData=new JSONObject(rawData);
             JSONObject object0=movieData.getJSONObject("0");
             quality=object0.getString("quality");
@@ -375,7 +355,6 @@ public class MovieServices {
         NetworkDAO networkDAO=new NetworkDAO();
         try {
             String rawData=networkDAO.request(url);
-            Log.d("kaxaGeo", rawData);
             JSONObject movieData=new JSONObject(rawData);
             JSONObject object0=movieData.getJSONObject("0");
             langs=object0.getString("lang");
@@ -397,7 +376,6 @@ public class MovieServices {
         NetworkDAO networkDAO=new NetworkDAO();
         try {
             String rawMoviesData=networkDAO.request(url);
-            Log.d("kaxaGeo", rawMoviesData);
             JSONArray movies=new JSONArray(rawMoviesData);
             //JSONArray movies=jsonObject.getJSONArray("data");
             for (int i=0;i<movies.length();i++){
@@ -423,6 +401,44 @@ public class MovieServices {
 
 
         return Movies;
+    }
+
+    public ArrayList<MovieAndSerie> getMainGeo(String offset,String janrebi){
+        ArrayList<MovieAndSerie> movieAndSeries=new ArrayList<MovieAndSerie>();
+        //offset=0,language=false,startYear=1900,endYear=2015
+        String url = "http://adjaranet.com/Search/SearchResults?ajax=1"+janrebi+"&display=15" +
+                "&startYear=1900&endYear=2015&offset="+offset+"&isnew=0&needtags=0" +
+                "&orderBy=date&order%5Border%5D=desc&order%5Bdata%5D=movies" +
+                "&order%5Bmeta%5D=desc&language=false&country=false&game=0" +
+                "&georgians=1&episode=0&trailers=0&tvshow=0&videos=0" +
+                "&xvideos=0&xphotos=0&flashgames=0";
+        NetworkDAO networkDAO=new NetworkDAO();
+        try {
+            String rawMoviesData=networkDAO.request(url);
+            JSONObject jsonObject=new JSONObject(rawMoviesData);
+            JSONArray movies=jsonObject.getJSONArray("data");
+            for (int i=0;i<movies.length();i++){
+                JSONObject movieJ=movies.getJSONObject(i);
+                MovieAndSerie movieAndSerie=new MovieAndSerie(movieJ.getString("id"),
+                        movieJ.getString("title_en"),
+                        movieJ.getString("link"),
+                        movieJ.getString("poster"),
+                        movieJ.getString("imdb"),
+                        movieJ.getString("imdb_id"),
+                        movieJ.getString("release_date"),
+                        movieJ.getString("description"),
+                        movieJ.getString("duration"),
+                        "");
+                movieAndSeries.add(movieAndSerie);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+        return movieAndSeries;
     }
 
 }

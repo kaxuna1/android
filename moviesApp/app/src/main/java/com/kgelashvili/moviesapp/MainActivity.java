@@ -64,6 +64,7 @@ import com.kgelashvili.moviesapp.fragments.MoviesPageFragment;
 import com.kgelashvili.moviesapp.fragments.SeriesPageFragment;
 import com.kgelashvili.moviesapp.model.Movie;
 import com.kgelashvili.moviesapp.model.Serie;
+import com.kgelashvili.moviesapp.utils.GeoMoviesCollecitonActivity;
 import com.kgelashvili.moviesapp.utils.SimpleSectionedListAdapter;
 import com.nineoldandroids.animation.Animator;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
@@ -267,6 +268,8 @@ public class MainActivity extends AppCompatActivity{
         YoYo.with(Techniques.ZoomInLeft).playOn(findViewById(R.id.fragmentMainLinar));
     }
     public static final String[] options = {
+            "ქართულად გახმოვანებული",
+            "გამოწერილი სიახლეები",
             "პარამეტრები"
     };
     private class CustomActionBarDrawerToggle extends ActionBarDrawerToggle {
@@ -326,12 +329,24 @@ public class MainActivity extends AppCompatActivity{
             mDrawer.closeDrawer(mDrawerList);
             Intent i;
             switch (position) {
-                case 0:
+                case 2:
 
                     i = new Intent(MainActivity.this, settingsActivity.class);
 
                     startActivity(i);
                     break;
+                case 1:
+
+                    i = new Intent(MainActivity.this, NewsCollectionActivity.class);
+
+                    startActivity(i);
+                    break;
+                case 0:
+                    i = new Intent(MainActivity.this, GeoMoviesCollecitonActivity.class);
+
+                    startActivity(i);
+                    break;
+
             }
         }
     }

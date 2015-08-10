@@ -1,22 +1,19 @@
-package com.kgelashvili.moviesapp.fragments;
+package com.kgelashvili.moviesapp.utils;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewCompat;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
@@ -24,76 +21,77 @@ import com.kgelashvili.moviesapp.Classes.CustomHeaderMainMovieItem;
 import com.kgelashvili.moviesapp.Classes.CustomThumbNail;
 import com.kgelashvili.moviesapp.Classes.JanrebiData;
 import com.kgelashvili.moviesapp.Classes.MovieServices;
-import com.kgelashvili.moviesapp.Classes.dbHelper;
 import com.kgelashvili.moviesapp.MoviePageActivity;
 import com.kgelashvili.moviesapp.R;
 import com.kgelashvili.moviesapp.model.Janri;
 import com.kgelashvili.moviesapp.model.Movie;
+import com.kgelashvili.moviesapp.model.MovieAndSerie;
 import com.nineoldandroids.animation.Animator;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import butterknife.ButterKnife;
-import butterknife.InjectView;
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardArrayAdapter;
-import it.gmariotti.cardslib.library.internal.CardHeader;
-import it.gmariotti.cardslib.library.internal.CardThumbnail;
 import it.gmariotti.cardslib.library.view.CardListView;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-/**
- * Created by KGelashvili on 7/27/2015.
- */
-public class MoviesPageFragment extends Fragment {
-    private static final String ARG_POSITION = "position";
+public class GeoMoviesCollecitonActivity extends AppCompatActivity {
 
-    private int position;
-    String keyWord = "";
     boolean loadingMore = true;
-    private static View view;
-    private static dbHelper dbHelper2;
     private int currentLoaded = 0;
     ArrayList<Card> cards=new ArrayList<Card>();
     CardArrayAdapter adapter2;
     final getMovies getmovies = new getMovies();
+    CardListView mListView;
     ArrayList<Janri> currentJanrebi;
 
 
-
-
-    @InjectView(R.id.searchBox)
-    EditText searchBox;
-
-    @InjectView(R.id.carddemo_list_cursor2)
-    CardListView mListView;
-
-    @InjectView(R.id.janrebi)
-    LinearLayout janrebiLayout;
-
-
-    public static MoviesPageFragment newInstance(int position,View view,dbHelper dbHelper2) {
-        MoviesPageFragment f = new MoviesPageFragment();
-        Bundle b = new Bundle();
-        b.putInt(ARG_POSITION, position);
-        f.setArguments(b);
-        MoviesPageFragment.view=view;
-        MoviesPageFragment.dbHelper2=dbHelper2;
-        return f;
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        position = getArguments().getInt(ARG_POSITION);
-    }
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                        .setDefaultFontPath("fonts/bpg_square_mtavruli_2009.ttf")
+                        .setFontAttrId(R.attr.fontPath)
+                        .build()
+        );
+        setContentView(R.layout.activity_geo_movies_colleciton);
+        currentJanrebi=new ArrayList<Janri>();
+        final ArrayList<Janri> janrebi=new JanrebiData().getJanrebi();
+        LinearLayout janrebiLayout=(LinearLayout)findViewById(R.id.janrebi);
+        for(int i=0;i<janrebi.size();i++){
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.moviepagefragment, container, false);
-        ButterKnife.inject(this, rootView);
-        ViewCompat.setElevation(rootView, 50);
-        adapter2=new CardArrayAdapter(getActivity(),cards);
+            CheckBox checkBox=new CheckBox(this);
+            checkBox.setText(janrebi.get(i).getName());
+            final int finalI = i;
+            checkBox.setOnCheckedChangeListener(
+                    new CompoundButton.OnCheckedChangeListener() {
+                        @Override
+                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                            //Toast.makeText(getActivity(), "ჟანრი "+janrebi.get(finalI).getName()+" "+isChecked, Toast.LENGTH_SHORT).show();
+                            if(isChecked){
+                                currentJanrebi.add(janrebi.get(finalI));
+
+                            }else{
+                                currentJanrebi.remove(janrebi.get(finalI));
+                            }
+                            Log.d("janrebi",getJanrebi());
+                            cards.clear();
+                            adapter2.clear();
+                            currentLoaded = 0;
+                        }
+                    }
+            );
+            janrebiLayout.addView(checkBox);
+
+        }
+        mListView=(CardListView)findViewById(R.id.carddemo_list_cursor2);
+        adapter2=new CardArrayAdapter(this,cards);
         mListView.setAdapter(adapter2);
         new Thread(new Runnable() {
             @Override
@@ -102,8 +100,6 @@ public class MoviesPageFragment extends Fragment {
                 getmovies.doInBackground("" + currentLoaded);
             }
         }).start();
-
-
         mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
 
             @Override
@@ -156,99 +152,72 @@ public class MoviesPageFragment extends Fragment {
             }
         });
 
-
-        currentJanrebi=new ArrayList<Janri>();
-
-        searchBox.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                keyWord = searchBox.getText().toString().replace(" ", "%20");
-                cards.clear();
-                adapter2.clear();
-                currentLoaded = 0;
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
-        final ArrayList<Janri> janrebi=new JanrebiData().getJanrebi();
-
-        for(int i=0;i<janrebi.size();i++){
-
-            CheckBox checkBox=new CheckBox(getActivity());
-            checkBox.setText(janrebi.get(i).getName());
-            final int finalI = i;
-            checkBox.setOnCheckedChangeListener(
-                    new CompoundButton.OnCheckedChangeListener() {
-                                                    @Override
-                                                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                                                        //Toast.makeText(getActivity(), "ჟანრი "+janrebi.get(finalI).getName()+" "+isChecked, Toast.LENGTH_SHORT).show();
-                                                        if(isChecked){
-                                                            currentJanrebi.add(janrebi.get(finalI));
-
-                                                        }else{
-                                                            currentJanrebi.remove(janrebi.get(finalI));
-                                                        }
-                                                        cards.clear();
-                                                        adapter2.clear();
-                                                        currentLoaded = 0;
-                                                    }
-                                                }
-            );
-            janrebiLayout.addView(checkBox);
-
-        }
-
-        return rootView;
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_geo_movies_colleciton, menu);
+        return true;
+    }
 
-    class getMovies extends AsyncTask<String, ArrayList<Movie>, ArrayList<Movie>> {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    class getMovies extends AsyncTask<String, ArrayList<MovieAndSerie>, ArrayList<MovieAndSerie>> {
 
         @Override
-        protected ArrayList<Movie> doInBackground(String... strings) {
-
+        protected ArrayList<MovieAndSerie> doInBackground(String... strings) {
+            Log.d("kinoLoad", "gamodzaxda");
             MovieServices movieServices = new MovieServices();
-            ArrayList<Movie> movies = movieServices.getMainMovies(strings[0], "false", "1900", "2015", keyWord, getJanrebi());
+            ArrayList<MovieAndSerie> movies = movieServices.getMainGeo(strings[0],getJanrebi());
             publishProgress(movies);
 
             return movies;
         }
 
         @Override
-        protected void onProgressUpdate(ArrayList<Movie>... values) {
+        protected void onProgressUpdate(ArrayList<MovieAndSerie>... values) {
             super.onProgressUpdate(values);
             for (int i = 0; i < values[0].size(); i++) {
                 addMovieToLoadidData(values[0].get(i));
             }
             //adapter.notifyDataSetChanged();
+            Log.d("moviesLogKaxa","gamodzaxda");
+            Log.d("moviesLog", "" + currentLoaded);
             currentLoaded += 30;
             //populateMoviesListViev();
             loadingMore = false;
         }
 
     }
-    
-    public void addMovieToLoadidData(final Movie movie) {
+
+    public void addMovieToLoadidData(final MovieAndSerie movie) {
 
         //adapter.add(movie);
 
 
 
 
-        Card card = new Card(getActivity());
+        Card card = new Card(GeoMoviesCollecitonActivity.this);
 
 
         //Create a CardHeader
-        CustomHeaderMainMovieItem header = new CustomHeaderMainMovieItem(getActivity(),
-                movie.getTitle_en(),movie.getRelease_date(),movie.getDescription().length()>50?movie.getDescription().substring(0,49):movie.getDescription());
+        CustomHeaderMainMovieItem header = new CustomHeaderMainMovieItem(this,
+                movie.getTitle_en(),movie.getRelease_date()
+                ,movie.getDescription().length()>50?movie.getDescription().substring(0,49):movie.getDescription());
 
         //Set the header title
         header.setTitle(movie.getTitle_en());
@@ -269,13 +238,13 @@ public class MoviesPageFragment extends Fragment {
         //Create thumbnail
         //CustomThumbCard thumb = new CustomThumbCard(MainActivity.this);
 
-        CustomThumbNail thumbnail=new CustomThumbNail(getActivity());
+        CustomThumbNail thumbnail=new CustomThumbNail(this);
 
         thumbnail.setUrlResource(movie.getPoster());
 
         //Set URL resource
         //thumb.setUrlResource(movie.getPoster());
-        
+
         //Error Resource ID
         thumbnail.setErrorResource(R.drawable.ic_error_loadingorangesmall);
 
@@ -303,7 +272,7 @@ public class MoviesPageFragment extends Fragment {
                     public void onAnimationEnd(Animator animation) {
                         Movie selectedMovie = movie;
 
-                        Intent i = new Intent(getActivity(), MoviePageActivity.class);
+                        Intent i = new Intent(GeoMoviesCollecitonActivity.this, MoviePageActivity.class);
                         i.putExtra("movieId", selectedMovie.getMovieId());
                         i.putExtra("description", selectedMovie.getDescription());
                         i.putExtra("title", selectedMovie.getTitle_en());
@@ -326,15 +295,17 @@ public class MoviesPageFragment extends Fragment {
                     public void onAnimationRepeat(Animator animation) {
 
                     }
-                }).playOn(MoviesPageFragment.view);
+                }).playOn(findViewById(R.id.geoColectionMain));
             }
         });
 
         adapter2.add(card);
 
-
-
-
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        YoYo.with(Techniques.ZoomInLeft).playOn(findViewById(R.id.geoColectionMain));
     }
 
     String getJanrebi(){
@@ -346,4 +317,5 @@ public class MoviesPageFragment extends Fragment {
 
         return value;
     }
+
 }

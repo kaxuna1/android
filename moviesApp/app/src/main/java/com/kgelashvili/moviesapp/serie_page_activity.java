@@ -147,7 +147,7 @@ public class serie_page_activity extends Activity {
             public void onClick(View view) {
                 //Serie serie = (Serie) getIntent().getSerializableExtra("Serie");
                 List<Serie> serieList = Serie.find(Serie.class, "movie_id='" + serie.movieId + "'");
-                Log.d("seriesListSize", "" + serieList.size());
+
                 if (serieList.size() == 0) {
                     serie.save();
                     Toast.makeText(serie_page_activity.this, "სიახლეები გამოიწერა სერიალ " + serie.getTitle_en() + "-ისთვის", Toast.LENGTH_LONG).show();
@@ -228,7 +228,7 @@ public class serie_page_activity extends Activity {
                 videourl=currentEpisodes.get(position).getLink().replace("{L}",currentEpisodes.get(position).getLang().split(",")[0]);
                 qual = currentEpisodes.get(position).getQual().split(",")[0];
                 videourl.replaceAll("_\\d+\\.","_"+qual+".");
-                Log.d("currentSerieUrl",videourl);
+
                 progressDialog = ProgressDialog.show(serie_page_activity.this, "", "მიმდინარეობს ვიდეოს ჩატვირთა", true);
                 progressDialog.setCancelable(true);
                 //getActionBar().setTitle(extras.getString("title") + " " + currentEpisodes.get(position).getName());
@@ -279,7 +279,7 @@ public class serie_page_activity extends Activity {
 
                                         qual = currentEpisodes.get(position).getQual().split(",")[which];
                                         videourl.replaceAll("_\\d+\\.","_"+qual+".");
-                                        Log.d("qualVIdeoUrl",videourl);
+
                                         Uri video = Uri.parse(videourl);
                                         videoView.setVideoURI(video);
                                         videoView.requestFocus();
@@ -338,7 +338,7 @@ public class serie_page_activity extends Activity {
                         @Override
                         public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
                             movieTime = mediaPlayer.getCurrentPosition();
-                            Log.d("kaxaError", "error");
+
                             PlayVideo();
                             return true;
                         }
@@ -377,7 +377,6 @@ public class serie_page_activity extends Activity {
                 doc = Jsoup.connect("http://adjaranet.com/Movie/main?id="+id+"&serie=1&js=1").get();
                 Elements newsHeadlines = doc.select("#episodesDiv");
                 seriesDataModel.elements=newsHeadlines;
-                //Log.d("kaxaHtml",newsHeadlines.html());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -397,7 +396,6 @@ public class serie_page_activity extends Activity {
     private void setSeriesDataJSON(SeriesDataModel value) {
         JSONObject jsonValue=value.jsonObject;
         Elements elementValue=value.elements;
-        //Log.d("kaxaHtml2",value.select("#sDiv2"));
         int i=1;
         Iterator<?> keys = jsonValue.keys();
         /*while( keys.hasNext() ) {
@@ -422,8 +420,7 @@ public class serie_page_activity extends Activity {
 
 
         while (elementValue.select("#sDiv"+i).hasAttr("class")){
-            //Log.d("kaxaHTML"+i,value.select("#sDiv"+i).html());
-            //Log.d("kaxaHtml" + i, value.select("#sDiv" + i).select("span").get(1).attr("data-href"));
+
             int f=0;
             Season season =new Season("Season "+i);
 
@@ -431,7 +428,6 @@ public class serie_page_activity extends Activity {
             while (f<episodes){
                 Episode episode=new Episode(elementValue.select("#sDiv"+i).select("span").get(f).attr("data-href"),
                         elementValue.select("#sDiv"+i).select("span").get(f).attr("data-lang"),"სერია  "+(f+1));
-                //Log.d("kaxaHtml" + f, elementValue.select("#sDiv" + i).select("span").get(f).attr("data-href"));
                 try {
                     JSONObject episodeJSON=jsonValue.getJSONObject(""+i).getJSONObject(""+(f+1));
                     episode.setName(f+". "+episodeJSON.getString("name"));
@@ -450,8 +446,7 @@ public class serie_page_activity extends Activity {
         }
         serie.lastSes=seasons.size();
         serie.lastEp=seasons.get(seasons.size()-1).getEpisodes().size();
-        Log.d("lastEp",""+serie.getLastEp());
-        Log.d("lastSes",""+serie.getLastSes());
+
         final String[] seasonNames=new String[seasons.size()];
         for(int k=0;k<seasons.size();k++){
             seasonNames[k]=seasons.get(k).getName();
@@ -597,7 +592,7 @@ public class serie_page_activity extends Activity {
         @Override
         protected void onProgressUpdate(ArrayList<Actor>... values) {
             super.onProgressUpdate(values);
-            Log.d("kaxaGeo1", "kaxaGeo1");
+
             for (int i = 0; i < values[0].size(); i++) {
                 addActorToCast(values[0].get(i));
             }
@@ -658,7 +653,7 @@ public class serie_page_activity extends Activity {
 
         @Override
         protected ArrayList<Movie> doInBackground(String... strings) {
-            Log.d("kinoLoad", "gamodzaxda");
+
             MovieServices movieServices = new MovieServices();
             ArrayList<Movie> movies = movieServices.getRelateMovies(strings[0]);
             publishProgress(movies);

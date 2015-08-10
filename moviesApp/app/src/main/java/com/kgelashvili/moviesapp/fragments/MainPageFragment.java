@@ -22,6 +22,7 @@ import com.kgelashvili.moviesapp.R;
 import com.kgelashvili.moviesapp.model.Movie;
 import com.kgelashvili.moviesapp.model.Serie;
 import com.kgelashvili.moviesapp.serie_page_activity;
+import com.kgelashvili.moviesapp.utils.GeoMoviesCollecitonActivity;
 import com.nineoldandroids.animation.Animator;
 
 import java.util.ArrayList;
@@ -49,6 +50,9 @@ public class MainPageFragment extends Fragment {
     @InjectView(R.id.geoMoviesLayout2)
     LinearLayout geoMoviesLayout2;
 
+    @InjectView(R.id.geoSeriesLayout2)
+    LinearLayout geoSeriesLayout2;
+
     @InjectView(R.id.premierMoviesLayout2)
     LinearLayout premierMoviesLayout2;
 
@@ -68,6 +72,11 @@ public class MainPageFragment extends Fragment {
         f.setArguments(b);
         MainPageFragment.view=view;
         return f;
+    }
+    @OnClick(R.id.textView5)
+    public void openGeoMovies(){
+        Intent i = new Intent(getActivity(), GeoMoviesCollecitonActivity.class);
+        startActivity(i);
     }
 
     @Override
@@ -92,6 +101,8 @@ public class MainPageFragment extends Fragment {
                 premierMovies.doInBackground("");
                 latestEpisodes.doInBackground("");
                 newAddedMovies.doInBackground("");
+                new getGeoEpisodes().doInBackground("");
+
 
             }
         }).start();
@@ -113,7 +124,6 @@ public class MainPageFragment extends Fragment {
         @Override
         protected void onProgressUpdate(ArrayList<Movie>... values) {
             super.onProgressUpdate(values);
-            Log.d("kaxaGeo1", "kaxaGeo1");
             for (int i = 0; i < values[0].size(); i++) {
                 addGeoMovieToColection(values[0].get(i));
             }
@@ -123,7 +133,7 @@ public class MainPageFragment extends Fragment {
     }
 
     private void addGeoMovieToColection(final Movie movie) {
-        Log.d("gamodzaxda","qartuli");
+
         LinearLayout linearLayout = geoMoviesLayout2;
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.movieontop, null, false);
@@ -197,7 +207,6 @@ public class MainPageFragment extends Fragment {
         @Override
         protected void onProgressUpdate(ArrayList<Movie>... values) {
             super.onProgressUpdate(values);
-            Log.d("kaxaGeo1", "kaxaGeo1");
             for (int i = 0; i < values[0].size(); i++) {
                 addPremiereMovieToColection(values[0].get(i));
             }
@@ -290,7 +299,7 @@ public class MainPageFragment extends Fragment {
         @Override
         protected void onProgressUpdate(ArrayList<Movie>... values) {
             super.onProgressUpdate(values);
-            Log.d("kaxaGeo1", "kaxaGeo1");
+
             for (int i = 0; i < values[0].size(); i++) {
                 addNewAddedMoviesToColection(values[0].get(i));
             }
@@ -368,7 +377,7 @@ public class MainPageFragment extends Fragment {
 
             MovieServices movieServices = new MovieServices();
             ArrayList<Serie> series = movieServices.getNewEpisodes();
-            //Log.d("kaxatest21",series.get(0).getTitle_en());
+
             publishProgress(series);
 
             return series;
@@ -376,7 +385,7 @@ public class MainPageFragment extends Fragment {
         @Override
         protected void onProgressUpdate(ArrayList<Serie>... values) {
             super.onProgressUpdate(values);
-            Log.d("kaxaGeo12", "kaxaGeo12");
+
             for (int i = 0; i < values[0].size(); i++) {
                 addLatestEpisodeToColection(values[0].get(i));
             }
@@ -387,8 +396,74 @@ public class MainPageFragment extends Fragment {
 
     private void addLatestEpisodeToColection(final Serie serie) {
 
-        Log.d("episodes","episodes12");
+
+
         LinearLayout linearLayout = newEpisodesLayout2;
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.movieontop, null, false);
+
+
+
+
+
+        MaterialLargeImageCard card =
+                MaterialLargeImageCard.with(getActivity())
+                        //.setTextOverImage("Se "+serie.getLastSes()+" Ep "+serie.getLastEp())
+                        .useDrawableUrl(serie.getPoster())
+                        .build();
+
+
+        card.setOnClickListener(new Card.OnCardClickListener() {
+            @Override
+            public void onClick(Card card, View view) {
+                Serie selectedMovie = serie;
+
+                Intent i = new Intent(getActivity(), serie_page_activity.class);
+                i.putExtra("movieId", selectedMovie.getMovieId());
+                i.putExtra("description", selectedMovie.getDescription());
+                i.putExtra("title", selectedMovie.getTitle_en());
+                i.putExtra("date", selectedMovie.getRelease_date());
+                i.putExtra("duration", selectedMovie.getDuration());
+                i.putExtra("rating", selectedMovie.getImdb());
+                i.putExtra("imdb", selectedMovie.getImdb_id());
+                i.putExtra("lang", selectedMovie.getLang());
+                i.putExtra("time", 0);
+                i.putExtra("Serie",serie);
+                startActivity(i);
+            }
+        });
+        CardViewNative cardView = (CardViewNative) layout.findViewById(R.id.movieCard);
+        cardView.setCard(card);
+
+        linearLayout.addView(layout);
+
+    }
+
+    class getGeoEpisodes extends AsyncTask<String, ArrayList<Serie>, ArrayList<Serie>> {
+
+        @Override
+        protected ArrayList<Serie> doInBackground(String... strings) {
+
+            MovieServices movieServices = new MovieServices();
+            ArrayList<Serie> series = movieServices.getGeoEpisodes();
+            publishProgress(series);
+
+            return series;
+        }
+        @Override
+        protected void onProgressUpdate(ArrayList<Serie>... values) {
+            super.onProgressUpdate(values);
+            for (int i = 0; i < values[0].size(); i++) {
+                addGeoEpisodeToColection(values[0].get(i));
+            }
+
+        }
+
+    }
+
+    private void addGeoEpisodeToColection(final Serie serie) {
+
+        LinearLayout linearLayout = geoSeriesLayout2;
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.movieontop, null, false);
 

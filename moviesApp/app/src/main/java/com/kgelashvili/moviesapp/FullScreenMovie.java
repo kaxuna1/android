@@ -129,7 +129,6 @@ public class FullScreenMovie extends Activity {
         videoView=((VideoView)findViewById(R.id.fullScreenMovieView));
         videourl=extras.getString("link");
         movieTime=extras.getInt("time");
-        Log.d("timeK", "" + movieTime);
         PlayVideo();
 
     }
@@ -170,7 +169,6 @@ public class FullScreenMovie extends Activity {
                         public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
                             movieTime = mediaPlayer.getCurrentPosition();
 
-                            Log.d("kaxaError", "error");
                             PlayVideo();
                             return true;
 
@@ -190,7 +188,6 @@ public class FullScreenMovie extends Activity {
     }
 
     public void onBackPressed(){
-        Log.d("fullScreen","backPressed");
 
 
         setResult(videoView.getCurrentPosition());

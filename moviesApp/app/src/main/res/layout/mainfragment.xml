@@ -64,12 +64,40 @@
 
                     </LinearLayout>
                 </HorizontalScrollView>
+                <TextView
+                    android:id="@+id/textView9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/horizontalScrollView"
+                    android:paddingTop="10dp"
+                    android:text="ქართულად გახმოვანებული სერიეალები"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <HorizontalScrollView
+                    android:id="@+id/horizontalScrollVie4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/textView9"
+                    android:layout_weight="0.04"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:id="@+id/geoSeriesLayout2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:minHeight="150dp"
+                        android:paddingLeft="@dimen/carddemo_list_padding"
+                        android:paddingRight="@dimen/carddemo_list_padding">
+
+                    </LinearLayout>
+                </HorizontalScrollView>
 
                 <TextView
                     android:id="@+id/textView6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/horizontalScrollView"
+                    android:layout_below="@id/horizontalScrollVie4"
                     android:text="პრემიერა"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
 
