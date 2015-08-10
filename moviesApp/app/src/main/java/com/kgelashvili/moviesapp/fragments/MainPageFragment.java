@@ -97,10 +97,10 @@ public class MainPageFragment extends Fragment {
             @Override
             public void run() {
                 geoMovies.doInBackground("");
+                new getGeoEpisodes().doInBackground("");
                 premierMovies.doInBackground("");
                 latestEpisodes.doInBackground("");
                 newAddedMovies.doInBackground("");
-                new getGeoEpisodes().doInBackground("");
 
 
             }

@@ -36,7 +36,7 @@ public class HistoryPageActivity extends AppCompatActivity {
 
     CardListView mListView;
     CardArrayAdapter adapter3;
-    ArrayList<Card> cardsFav=new ArrayList<Card>();
+    ArrayList<Card> cardsFav;
     getMoviesFav getMoviesFav=new getMoviesFav();
 
     @Override
@@ -54,7 +54,9 @@ public class HistoryPageActivity extends AppCompatActivity {
                         .setFontAttrId(R.attr.fontPath)
                         .build()
         );
+
         setContentView(R.layout.activity_history_page);
+        cardsFav=new ArrayList<Card>();
         mListView=(CardListView)findViewById(R.id.carddemo_list_cursor2);
         adapter3=new CardArrayAdapter(this, cardsFav);
         mListView.setAdapter(adapter3);
@@ -166,7 +168,7 @@ public class HistoryPageActivity extends AppCompatActivity {
 
                         @Override
                         public void onAnimationEnd(Animator animation) {
-                            if(historyModel.getLang().isEmpty()){
+                            if(historyModel.getType()==2){
                                 Serie serie=new Serie(historyModel.getMovieId(),historyModel.getTitle_en(),historyModel.getLink(),
                                         historyModel.getPoster(),historyModel.getImdb(),
                                         historyModel.getImdb_id(),historyModel.getRelease_date(),historyModel.getDescription(),
@@ -221,6 +223,18 @@ public class HistoryPageActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        cardsFav=new ArrayList<Card>();
+        mListView=(CardListView)findViewById(R.id.carddemo_list_cursor2);
+        adapter3=new CardArrayAdapter(this, cardsFav);
+        mListView.setAdapter(adapter3);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                adapter3.clear();
+                getMoviesFav.doInBackground("");
+            }
+        }).run();
         YoYo.with(Techniques.ZoomInLeft).playOn(findViewById(R.id.historyMain));
+
     }
 }

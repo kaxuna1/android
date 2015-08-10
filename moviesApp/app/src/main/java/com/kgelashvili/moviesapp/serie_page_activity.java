@@ -42,6 +42,7 @@ import com.kgelashvili.moviesapp.Classes.MovieServices;
 import com.kgelashvili.moviesapp.cards.CustomThumbCard;
 import com.kgelashvili.moviesapp.model.Actor;
 import com.kgelashvili.moviesapp.model.Episode;
+import com.kgelashvili.moviesapp.model.HistoryModel;
 import com.kgelashvili.moviesapp.model.Movie;
 import com.kgelashvili.moviesapp.model.Season;
 import com.kgelashvili.moviesapp.model.Serie;
@@ -304,7 +305,21 @@ public class serie_page_activity extends Activity {
             }
         });
 
+        HistoryModel historyModel=new HistoryModel(serie.getMovieId(),serie.getTitle_en(),serie.getLink(),
+                serie.getPoster(),serie.getImdb(),serie.getImdb_id(),serie.getRelease_date(),serie.getDescription(),
+                serie.getDuration(),serie.getLang()
+        );
 
+        historyModel.setType(2);
+
+        List<HistoryModel> movieList=HistoryModel.find(HistoryModel.class, "movie_id = '"+historyModel.getMovieId()+"'");
+
+        if(movieList.size()==0) {
+            historyModel.save();
+        }else{
+            movieList.get(0).delete();
+            historyModel.save();
+        }
 
 
     }
@@ -703,6 +718,7 @@ public class serie_page_activity extends Activity {
                 i.putExtra("lang", serie.getLang());
                 i.putExtra("Serie",serie);
                 i.putExtra("time", 0);
+                i.putExtra("Serie",serie);
                 startActivity(i);
             }
         });

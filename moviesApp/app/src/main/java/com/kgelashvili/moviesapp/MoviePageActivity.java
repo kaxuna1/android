@@ -158,13 +158,13 @@ public class MoviePageActivity extends Activity {
             public void onClick(View view) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MoviePageActivity.this);
                 builder.setTitle("აირჩიეთ ენა")
-                        .setItems(extras.getString("lang").split(","), new DialogInterface.OnClickListener() {
+                        .setItems(langs.split(","), new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 movieTime = videoView.getCurrentPosition();
                                 if (currentQuality == null) {
                                     currentQuality = quality.split(",")[0];
                                 }
-                                lang = extras.getString("lang").split(",")[which];
+                                lang = langs.split(",")[which];
                                 videourl = "http://adjaranet.com/download.php?mid=" + value + "&file=" + value + "_" +
                                         lang + "_" + currentQuality;
                                 Uri video = Uri.parse(videourl);
@@ -268,21 +268,7 @@ public class MoviePageActivity extends Activity {
                     }
                 }).playOn(findViewById(R.id.moviePageRelative));
 
-        HistoryModel historyModel=new HistoryModel(movie.getMovieId(),movie.getTitle_en(),movie.getLink(),
-                movie.getPoster(),movie.getImdb(),movie.getImdb_id(),movie.getRelease_date(),movie.getDescription(),
-                movie.getDuration(),movie.getLang()
-        );
 
-        historyModel.setType(1);
-
-        List<HistoryModel> movieList=HistoryModel.find(HistoryModel.class, "movie_id = '"+historyModel.getMovieId()+"'");
-
-        if(movieList.size()==0) {
-            historyModel.save();
-        }else{
-            movieList.get(0).delete();
-            historyModel.save();
-        }
 
 
     }
@@ -368,6 +354,24 @@ public class MoviePageActivity extends Activity {
             langs=new MovieServices().getMovieLangs(strings[0]);
             movie.setLang(langs);
 
+            HistoryModel historyModel=new HistoryModel(movie.getMovieId(),movie.getTitle_en(),movie.getLink(),
+                    movie.getPoster(),movie.getImdb(),movie.getImdb_id(),movie.getRelease_date(),movie.getDescription(),
+                    movie.getDuration(),movie.getLang()
+            );
+
+            historyModel.setType(1);
+
+            List<HistoryModel> movieList=HistoryModel.find(HistoryModel.class, "movie_id = '"+historyModel.getMovieId()+"'");
+
+            if(movieList.size()==0) {
+                historyModel.save();
+            }else{
+                movieList.get(0).delete();
+                historyModel.save();
+            }
+
+
+
             publishProgress(actors);
             return actors;
         }
@@ -438,7 +442,8 @@ public class MoviePageActivity extends Activity {
                 i.putExtra("imdb", movie.getImdb_id());
                 i.putExtra("lang", movie.getLang());
                 i.putExtra("time", 0);
-                startActivity(i);
+                i.putExtra("Movie",movie);
+                startActivityForResult(i, 1);
             }
         });
         CardViewNative cardView = (CardViewNative) layout.findViewById(R.id.actorCard);
