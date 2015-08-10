@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -22,7 +21,7 @@ import com.kgelashvili.moviesapp.R;
 import com.kgelashvili.moviesapp.model.Movie;
 import com.kgelashvili.moviesapp.model.Serie;
 import com.kgelashvili.moviesapp.serie_page_activity;
-import com.kgelashvili.moviesapp.utils.GeoMoviesCollecitonActivity;
+import com.kgelashvili.moviesapp.GeoMoviesCollecitonActivity;
 import com.nineoldandroids.animation.Animator;
 
 import java.util.ArrayList;

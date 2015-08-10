@@ -1,9 +1,8 @@
-package com.kgelashvili.moviesapp.utils;
+package com.kgelashvili.moviesapp;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -21,8 +20,6 @@ import com.kgelashvili.moviesapp.Classes.CustomHeaderMainMovieItem;
 import com.kgelashvili.moviesapp.Classes.CustomThumbNail;
 import com.kgelashvili.moviesapp.Classes.JanrebiData;
 import com.kgelashvili.moviesapp.Classes.MovieServices;
-import com.kgelashvili.moviesapp.MoviePageActivity;
-import com.kgelashvili.moviesapp.R;
 import com.kgelashvili.moviesapp.model.Janri;
 import com.kgelashvili.moviesapp.model.Movie;
 import com.kgelashvili.moviesapp.model.MovieAndSerie;

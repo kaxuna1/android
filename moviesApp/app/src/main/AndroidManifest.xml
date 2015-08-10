@@ -88,7 +88,7 @@
             android:value="adjaranet.db" />
         <meta-data
             android:name="VERSION"
-            android:value="3" />
+            android:value="4" />
         <meta-data
             android:name="QUERY_LOG"
             android:value="true" />
@@ -97,7 +97,7 @@
             android:value="com.kgelashvili.moviesapp" />
 
         <activity
-            android:name=".utils.GeoMoviesCollecitonActivity"
+            android:name=".GeoMoviesCollecitonActivity"
             android:label="@string/title_activity_geo_movies_colleciton"
             android:parentActivityName=".MainActivity" >
             <meta-data
@@ -107,6 +107,14 @@
         <activity
             android:name=".NewsCollectionActivity"
             android:label="@string/title_activity_news_collection"
+            android:parentActivityName=".MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.kgelashvili.moviesapp.MainActivity" />
+        </activity>
+        <activity
+            android:name=".HistoryPageActivity"
+            android:label="@string/title_activity_history_page"
             android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

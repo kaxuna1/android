@@ -1,16 +1,14 @@
 package com.kgelashvili.moviesapp.model;
 
-import android.net.Uri;
+import android.content.Context;
 
 import com.orm.SugarRecord;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-
 /**
- * Created by KGelashvili on 7/10/2015.
+ * Created by vakhtanggelashvili on 8/10/15.
  */
-public class Movie extends SugarRecord<HistoryModel> implements Serializable {
+public class HistoryModel extends SugarRecord<HistoryModel> {
+    int type;
     public String movieId;
     public String title_en;
     public String link;
@@ -22,9 +20,8 @@ public class Movie extends SugarRecord<HistoryModel> implements Serializable {
     public String duration;
     public String lang;
 
-    public Movie(){
-    }
-    public Movie(String id, String title_en, String link, String poster, String imdb, String imdb_id, String release_date, String description, String duration,String lang) {
+    public HistoryModel(String id, String title_en, String link, String poster, String imdb,
+                        String imdb_id, String release_date, String description, String duration, String lang) {
         this.movieId = id;
         this.title_en = title_en;
         this.link = link;
@@ -35,6 +32,18 @@ public class Movie extends SugarRecord<HistoryModel> implements Serializable {
         this.description = description;
         this.duration = duration;
         this.lang=lang;
+    }
+    public HistoryModel(){
+
+    }
+
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     public String getMovieId() {
@@ -115,12 +124,5 @@ public class Movie extends SugarRecord<HistoryModel> implements Serializable {
 
     public void setLang(String lang) {
         this.lang = lang;
-    }
-    public String[] getLanguages(){
-        ArrayList<String> data=new ArrayList<String>();
-
-        String[] languages=this.lang.split(",");
-
-        return languages;
     }
 }

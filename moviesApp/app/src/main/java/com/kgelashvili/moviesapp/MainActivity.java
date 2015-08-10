@@ -1,17 +1,13 @@
 package com.kgelashvili.moviesapp;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -22,70 +18,32 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
 import android.util.TypedValue;
-import android.view.ActionMode;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.TabHost;
 import android.widget.Toast;
 
-import com.astuetz.*;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
-import com.kgelashvili.moviesapp.Classes.CustomHeaderMainMovieItem;
-import com.kgelashvili.moviesapp.Classes.FloatingActionButton;
-import com.kgelashvili.moviesapp.Classes.MovieServices;
-import com.kgelashvili.moviesapp.Classes.ScrollViewExt;
-import com.kgelashvili.moviesapp.Classes.ScrollViewListener;
 import com.kgelashvili.moviesapp.Classes.dbHelper;
 import com.kgelashvili.moviesapp.broadcastreceivers.CheckEpisodesBroadcastReceiver;
-import com.kgelashvili.moviesapp.cards.CustomThumbCard;
 import com.kgelashvili.moviesapp.fragments.FavoritesPageFragment;
 import com.kgelashvili.moviesapp.fragments.MainPageFragment;
 import com.kgelashvili.moviesapp.fragments.MoviesGridFragment;
 import com.kgelashvili.moviesapp.fragments.MoviesPageFragment;
 import com.kgelashvili.moviesapp.fragments.SeriesPageFragment;
-import com.kgelashvili.moviesapp.model.Movie;
-import com.kgelashvili.moviesapp.model.Serie;
-import com.kgelashvili.moviesapp.utils.GeoMoviesCollecitonActivity;
 import com.kgelashvili.moviesapp.utils.SimpleSectionedListAdapter;
-import com.nineoldandroids.animation.Animator;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import it.gmariotti.cardslib.library.cards.actions.BaseSupplementalAction;
-import it.gmariotti.cardslib.library.cards.actions.IconSupplementalAction;
-import it.gmariotti.cardslib.library.cards.material.MaterialLargeImageCard;
-import it.gmariotti.cardslib.library.internal.Card;
-import it.gmariotti.cardslib.library.internal.CardArrayAdapter;
-import it.gmariotti.cardslib.library.internal.CardExpand;
-import it.gmariotti.cardslib.library.internal.CardHeader;
-import it.gmariotti.cardslib.library.internal.CardThumbnail;
-import it.gmariotti.cardslib.library.view.CardListView;
-import it.gmariotti.cardslib.library.view.CardView;
-import it.gmariotti.cardslib.library.view.CardViewNative;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -270,6 +228,7 @@ public class MainActivity extends AppCompatActivity{
     public static final String[] options = {
             "ქართულად გახმოვანებული",
             "გამოწერილი სიახლეები",
+            "ისტორია",
             "პარამეტრები"
     };
     private class CustomActionBarDrawerToggle extends ActionBarDrawerToggle {
@@ -329,21 +288,24 @@ public class MainActivity extends AppCompatActivity{
             mDrawer.closeDrawer(mDrawerList);
             Intent i;
             switch (position) {
-                case 2:
+                case 3:
 
                     i = new Intent(MainActivity.this, settingsActivity.class);
+                    startActivity(i);
+                    break;
+                case 2:
 
+                    i = new Intent(MainActivity.this, HistoryPageActivity.class);
                     startActivity(i);
                     break;
                 case 1:
 
                     i = new Intent(MainActivity.this, NewsCollectionActivity.class);
-
                     startActivity(i);
                     break;
                 case 0:
-                    i = new Intent(MainActivity.this, GeoMoviesCollecitonActivity.class);
 
+                    i = new Intent(MainActivity.this, GeoMoviesCollecitonActivity.class);
                     startActivity(i);
                     break;
 

@@ -326,6 +326,7 @@
     <string name="title_activity_serie_page_activity">serie_page_activity</string>
     <string name="title_activity_geo_movies_colleciton">GeoMoviesCollecitonActivity</string>
     <string name="title_activity_news_collection">NewsCollectionActivity</string>
+    <string name="title_activity_history_page">HistoryPageActivity</string>
 
 
 </resources>

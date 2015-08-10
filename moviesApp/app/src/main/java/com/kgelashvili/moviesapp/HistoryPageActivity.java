@@ -3,6 +3,7 @@ package com.kgelashvili.moviesapp;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -14,8 +15,11 @@ import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.kgelashvili.moviesapp.Classes.CustomHeaderMainMovieItem;
 import com.kgelashvili.moviesapp.Classes.CustomThumbNail;
+import com.kgelashvili.moviesapp.model.HistoryModel;
+import com.kgelashvili.moviesapp.model.Movie;
 import com.kgelashvili.moviesapp.model.Serie;
 import com.nineoldandroids.animation.Animator;
+import com.orm.query.Select;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +32,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 
-public class NewsCollectionActivity extends AppCompatActivity {
-
+public class HistoryPageActivity extends AppCompatActivity {
 
     CardListView mListView;
     CardArrayAdapter adapter3;
@@ -42,6 +45,7 @@ public class NewsCollectionActivity extends AppCompatActivity {
     }
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,7 +54,7 @@ public class NewsCollectionActivity extends AppCompatActivity {
                         .setFontAttrId(R.attr.fontPath)
                         .build()
         );
-        setContentView(R.layout.activity_news_collection);
+        setContentView(R.layout.activity_history_page);
         mListView=(CardListView)findViewById(R.id.carddemo_list_cursor2);
         adapter3=new CardArrayAdapter(this, cardsFav);
         mListView.setAdapter(adapter3);
@@ -66,7 +70,7 @@ public class NewsCollectionActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_news_collection, menu);
+        getMenuInflater().inflate(R.menu.menu_history_page, menu);
         return true;
     }
 
@@ -84,7 +88,6 @@ public class NewsCollectionActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
     class getMoviesFav extends AsyncTask<String,ArrayList<Card>,ArrayList<Card>> {
 
         @Override
@@ -96,31 +99,23 @@ public class NewsCollectionActivity extends AppCompatActivity {
 
     private void populateFavorites(){
 
-        List<Serie> seriesList=Serie.listAll(Serie.class);
-        for(int i=0;i<seriesList.size();i++){
+        List<HistoryModel> historyModels=Select.from(HistoryModel.class).orderBy("Id DESC").limit("30").list();
+        for(int i=0;i<historyModels.size();i++){
 
-            final Serie serie=seriesList.get(i);
-            final Card card = new Card(NewsCollectionActivity.this);
+            final HistoryModel historyModel=historyModels.get(i);
+            final Card card = new Card(HistoryPageActivity.this);
 
 
             //Create a CardHeader
             CustomHeaderMainMovieItem header = new CustomHeaderMainMovieItem(this,
-                    serie.getTitle_en(),serie.getRelease_date(),serie.getDescription().length()>50?serie.getDescription().substring(0,49):serie.getDescription());
+                    historyModel.getTitle_en(),historyModel.getRelease_date(),historyModel.getDescription().length()>50
+                    ?historyModel.getDescription().substring(0,49):historyModel.getDescription());
 
             //Set the header title
-            header.setTitle(serie.getTitle_en());
-            header.setOtherButtonVisible(true);
+            header.setTitle(historyModel.getTitle_en());
 
             //Add a callback
-            header.setOtherButtonClickListener(new CardHeader.OnClickCardHeaderOtherButtonListener() {
-                @Override
-                public void onButtonItemClick(Card card, View view) {
-                    Toast.makeText(NewsCollectionActivity.this, "წაიშალა ვაპირებ ყურებას სიიდან და შეწყდა სიახლეების გამოწერა", Toast.LENGTH_LONG).show();
-                    serie.delete();
-                    adapter3.remove(card);
-                    adapter3.notifyDataSetChanged();
-                }
-            });
+
 
             //Use this code to set your drawable
             header.setOtherButtonDrawable(R.drawable.card_menu_button_other_dismiss);
@@ -140,7 +135,7 @@ public class NewsCollectionActivity extends AppCompatActivity {
 
             CustomThumbNail thumbnail=new CustomThumbNail(this);
 
-            thumbnail.setUrlResource(serie.getPoster());
+            thumbnail.setUrlResource(historyModel.getPoster());
 
             //Set URL resource
             //thumb.setUrlResource(movie.getPoster());
@@ -171,18 +166,40 @@ public class NewsCollectionActivity extends AppCompatActivity {
 
                         @Override
                         public void onAnimationEnd(Animator animation) {
-                            Serie selectedMovie = serie;
+                            if(historyModel.getLang().isEmpty()){
+                                Serie serie=new Serie(historyModel.getMovieId(),historyModel.getTitle_en(),historyModel.getLink(),
+                                        historyModel.getPoster(),historyModel.getImdb(),
+                                        historyModel.getImdb_id(),historyModel.getRelease_date(),historyModel.getDescription(),
+                                        historyModel.getDuration(),historyModel.getLang());
+                                Intent i = new Intent(HistoryPageActivity.this, serie_page_activity.class);
+                                i.putExtra("movieId", serie.getMovieId());
+                                i.putExtra("description", serie.getDescription());
+                                i.putExtra("title", serie.getTitle_en());
+                                i.putExtra("date", serie.getRelease_date());
+                                i.putExtra("duration", serie.getDuration());
+                                i.putExtra("rating", serie.getImdb());
+                                i.putExtra("imdb", serie.getImdb_id());
+                                i.putExtra("Serie",serie);
+                                startActivityForResult(i, 1);
+                            }else{
+                                Movie movie=new Movie(historyModel.getMovieId(),historyModel.getTitle_en(),historyModel.getLink(),
+                                        historyModel.getPoster(),historyModel.getImdb(),
+                                        historyModel.getImdb_id(),historyModel.getRelease_date(),historyModel.getDescription(),
+                                        historyModel.getDuration(),historyModel.getLang());
+                                Intent i = new Intent(HistoryPageActivity.this, MoviePageActivity.class);
+                                i.putExtra("movieId", movie.getMovieId());
+                                i.putExtra("description", movie.getDescription());
+                                i.putExtra("title", movie.getTitle_en());
+                                i.putExtra("date", movie.getRelease_date());
+                                i.putExtra("duration", movie.getDuration());
+                                i.putExtra("rating", movie.getImdb());
+                                i.putExtra("imdb", movie.getImdb_id());
+                                i.putExtra("lang", movie.getLang());
+                                i.putExtra("time", 0);
+                                i.putExtra("Movie", movie);
+                                startActivityForResult(i, 1);
+                            }
 
-                            Intent i = new Intent(NewsCollectionActivity.this, serie_page_activity.class);
-                            i.putExtra("movieId", selectedMovie.getMovieId());
-                            i.putExtra("description", selectedMovie.getDescription());
-                            i.putExtra("title", selectedMovie.getTitle_en());
-                            i.putExtra("date", selectedMovie.getRelease_date());
-                            i.putExtra("duration", selectedMovie.getDuration());
-                            i.putExtra("rating", selectedMovie.getImdb());
-                            i.putExtra("imdb", selectedMovie.getImdb_id());
-                            i.putExtra("Serie",serie);
-                            startActivityForResult(i, 1);
                         }
 
                         @Override
@@ -194,7 +211,7 @@ public class NewsCollectionActivity extends AppCompatActivity {
                         public void onAnimationRepeat(Animator animation) {
 
                         }
-                    }).playOn(findViewById(R.id.newsColectionMain));
+                    }).playOn(findViewById(R.id.historyMain));
                 }
             });
             adapter3.add(card);
@@ -204,7 +221,6 @@ public class NewsCollectionActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        YoYo.with(Techniques.ZoomInLeft).playOn(findViewById(R.id.newsColectionMain));
+        YoYo.with(Techniques.ZoomInLeft).playOn(findViewById(R.id.historyMain));
     }
-
 }

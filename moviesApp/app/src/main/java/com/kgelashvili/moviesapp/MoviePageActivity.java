@@ -33,6 +33,7 @@ import com.daimajia.androidanimations.library.YoYo;
 import com.kgelashvili.moviesapp.Classes.FloatingActionButton;
 import com.kgelashvili.moviesapp.Classes.MovieServices;
 import com.kgelashvili.moviesapp.model.Actor;
+import com.kgelashvili.moviesapp.model.HistoryModel;
 import com.kgelashvili.moviesapp.model.Movie;
 import com.kgelashvili.moviesapp.model.Serie;
 import com.nineoldandroids.animation.Animator;
@@ -99,7 +100,7 @@ public class MoviePageActivity extends Activity {
         castLayout=(LinearLayout)findViewById(R.id.actorsLayout);
         relatedLayout=(LinearLayout)findViewById(R.id.relatedMoviesLayout);
 
-        ((TextView)findViewById(R.id.durationTxt)).setText(extras.getString("duration")+"-სთ");
+        ((TextView)findViewById(R.id.durationTxt)).setText(extras.getString("duration") + "-სთ");
 
         final String value = extras.getString("movieId");
         movieId=extras.getString("movieId");
@@ -126,12 +127,12 @@ public class MoviePageActivity extends Activity {
         ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.watchLaterBtn)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                List<Movie> movieList=Movie.find(Movie.class, "movie_id = '"+movie.getMovieId()+"'");
+                List<Movie> movieList = Movie.find(Movie.class, "movie_id = '" + movie.getMovieId() + "'");
 
-                if(movieList.size()==0) {
+                if (movieList.size() == 0) {
                     movie.save();
                     Toast.makeText(MoviePageActivity.this, "დაემატა ვაპირებ ყრებას სიაში", Toast.LENGTH_LONG).show();
-                }else{
+                } else {
                     Toast.makeText(MoviePageActivity.this, "უკვე არსებობს ვაპირებ ყრებას სიაში", Toast.LENGTH_LONG).show();
                 }
             }
@@ -220,7 +221,7 @@ public class MoviePageActivity extends Activity {
 
 
         TextView date = (TextView) findViewById(R.id.movieDate);
-        date.setText("("+extras.getString("date")+")");
+        date.setText("(" + extras.getString("date") + ")");
         ((TextView) findViewById(R.id.imdbRating)).setText(extras.getString("rating"));
         ((ImageView) findViewById(R.id.imdbImg)).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -267,7 +268,21 @@ public class MoviePageActivity extends Activity {
                     }
                 }).playOn(findViewById(R.id.moviePageRelative));
 
+        HistoryModel historyModel=new HistoryModel(movie.getMovieId(),movie.getTitle_en(),movie.getLink(),
+                movie.getPoster(),movie.getImdb(),movie.getImdb_id(),movie.getRelease_date(),movie.getDescription(),
+                movie.getDuration(),movie.getLang()
+        );
 
+        historyModel.setType(1);
+
+        List<HistoryModel> movieList=HistoryModel.find(HistoryModel.class, "movie_id = '"+historyModel.getMovieId()+"'");
+
+        if(movieList.size()==0) {
+            historyModel.save();
+        }else{
+            movieList.get(0).delete();
+            historyModel.save();
+        }
 
 
     }
@@ -301,6 +316,7 @@ public class MoviePageActivity extends Activity {
                         public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
                             movieTime = mediaPlayer.getCurrentPosition();
                             PlayVideo();
+
                             return true;
                         }
                     });

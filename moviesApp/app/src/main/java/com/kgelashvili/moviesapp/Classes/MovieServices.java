@@ -406,12 +406,13 @@ public class MovieServices {
     public ArrayList<MovieAndSerie> getMainGeo(String offset,String janrebi){
         ArrayList<MovieAndSerie> movieAndSeries=new ArrayList<MovieAndSerie>();
         //offset=0,language=false,startYear=1900,endYear=2015
-        String url = "http://adjaranet.com/Search/SearchResults?ajax=1"+janrebi+"&display=15" +
+        String url = "http://adjaranet.com/Search/SearchResults?ajax=1&"+janrebi+"display=15" +
                 "&startYear=1900&endYear=2015&offset="+offset+"&isnew=0&needtags=0" +
                 "&orderBy=date&order%5Border%5D=desc&order%5Bdata%5D=movies" +
                 "&order%5Bmeta%5D=desc&language=false&country=false&game=0" +
                 "&georgians=1&episode=0&trailers=0&tvshow=0&videos=0" +
                 "&xvideos=0&xphotos=0&flashgames=0";
+        Log.d("geoMoviesUrl",url);
         NetworkDAO networkDAO=new NetworkDAO();
         try {
             String rawMoviesData=networkDAO.request(url);
