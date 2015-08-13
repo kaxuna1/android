@@ -4,6 +4,7 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 
 import com.kgelashvili.moviesapp.model.Actor;
+import com.kgelashvili.moviesapp.model.ColectionModel;
 import com.kgelashvili.moviesapp.model.Movie;
 import com.kgelashvili.moviesapp.model.MovieAndSerie;
 import com.kgelashvili.moviesapp.model.Serie;
@@ -442,4 +443,29 @@ public class MovieServices {
         return movieAndSeries;
     }
 
+    public ArrayList<ColectionModel> getColections(){
+        ArrayList<ColectionModel> Colections=new ArrayList<ColectionModel>();
+        //offset=0,language=false,startYear=1900,endYear=2015
+        String url = "http://adjaranet.com/req/jsondata/req.php?reqId=getCollections";
+        NetworkDAO networkDAO=new NetworkDAO();
+        try {
+            String rawMoviesData=networkDAO.request(url);
+            JSONObject jsonObject=new JSONObject(rawMoviesData);
+            Iterator<?> keys = jsonObject.keys();
+            while( keys.hasNext() ) {
+                String key = (String)keys.next();
+                JSONObject collection=jsonObject.getJSONObject(key);
+                Colections.add(new ColectionModel(collection.getString("name"),key,collection.getString("cnt")) );
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+        return Colections;
+
+    }
 }

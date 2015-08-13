@@ -44,6 +44,7 @@ import com.kgelashvili.moviesapp.model.Actor;
 import com.kgelashvili.moviesapp.model.Episode;
 import com.kgelashvili.moviesapp.model.HistoryModel;
 import com.kgelashvili.moviesapp.model.Movie;
+import com.kgelashvili.moviesapp.model.MovieSerieLastMomentModel;
 import com.kgelashvili.moviesapp.model.Season;
 import com.kgelashvili.moviesapp.model.Serie;
 import com.kgelashvili.moviesapp.model.SeriesDataModel;
@@ -89,6 +90,8 @@ public class serie_page_activity extends Activity {
     private WebView webView;
     ListView episodesListView;
     LinearLayout relatedLayout;
+    MovieSerieLastMomentModel movieSerieLastMomentModel;
+
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -198,6 +201,16 @@ public class serie_page_activity extends Activity {
         webView.setWebViewClient(new WebViewClient());
         webView.loadUrl("http://www.imdb.com/title/" + extras.getString("imdb"));
 
+        List<MovieSerieLastMomentModel> movieSerieLastMomentModels=MovieSerieLastMomentModel.find(MovieSerieLastMomentModel.class, "movie_id = '"+serie.getMovieId()+"'");
+        if(movieSerieLastMomentModels.size()>0){
+            movieSerieLastMomentModel=movieSerieLastMomentModels.get(0);
+        }else{
+            movieSerieLastMomentModel=new MovieSerieLastMomentModel(serie.getMovieId());
+            movieSerieLastMomentModel.time=0;
+            movieSerieLastMomentModel.setSeason(0);
+            movieSerieLastMomentModel.setSerie(0);
+            movieSerieLastMomentModel.save();
+        }
 
         new Thread(new Runnable() {
             @Override
@@ -229,7 +242,8 @@ public class serie_page_activity extends Activity {
                 videourl=currentEpisodes.get(position).getLink().replace("{L}",currentEpisodes.get(position).getLang().split(",")[0]);
                 qual = currentEpisodes.get(position).getQual().split(",")[0];
                 videourl.replaceAll("_\\d+\\.","_"+qual+".");
-
+                movieSerieLastMomentModel.setSerie(position);
+                movieSerieLastMomentModel.save();
                 progressDialog = ProgressDialog.show(serie_page_activity.this, "", "მიმდინარეობს ვიდეოს ჩატვირთა", true);
                 progressDialog.setCancelable(true);
                 //getActionBar().setTitle(extras.getString("title") + " " + currentEpisodes.get(position).getName());
@@ -320,6 +334,9 @@ public class serie_page_activity extends Activity {
             movieList.get(0).delete();
             historyModel.save();
         }
+
+
+
 
 
     }
@@ -467,9 +484,102 @@ public class serie_page_activity extends Activity {
             seasonNames[k]=seasons.get(k).getName();
         }
         adapter.clear();
-        for(int e=0;e<seasons.get(0).getEpisodes().size();e++){
+        for(int e=0;e<seasons.get(movieSerieLastMomentModel.getSeason()).getEpisodes().size();e++){
             adapter.add(seasons.get(0).getEpisode(e));
         }
+
+
+        //playLastEpisode
+
+        currentLang=currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getLang().split(",")[0];
+        videourl=currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getLink().replace("{L}",currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getLang().split(",")[0]);
+        qual = currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getQual().split(",")[0];
+        videourl.replaceAll("_\\d+\\.","_"+qual+".");
+        movieSerieLastMomentModel.setSerie(movieSerieLastMomentModel.getSerie());
+        progressDialog = ProgressDialog.show(serie_page_activity.this, "", "მიმდინარეობს ვიდეოს ჩატვირთა", true);
+        progressDialog.setCancelable(true);
+        //getActionBar().setTitle(extras.getString("title") + " " + currentEpisodes.get(position).getName());
+        ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.langBtnSerie)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(serie_page_activity.this);
+                builder.setTitle("აირჩიეთ ენა")
+                        .setItems(currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getLang().split(","), new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                movieTime = videoView.getCurrentPosition();
+
+                                lang = currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getLang().split(",")[which];
+                                videourl=currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getLink().replace("{L}",lang);
+                                if(qual==null){
+                                    qual = currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getQual().split(",")[0];
+                                }
+                                videourl.replaceAll("_\\d+\\.","_"+qual+".");
+                                Uri video = Uri.parse(videourl);
+                                videoView.setVideoURI(video);
+                                videoView.requestFocus();
+                                videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+
+                                    public void onPrepared(MediaPlayer mp) {
+                                        progressDialog.dismiss();
+                                        videoView.start();
+                                        videoView.seekTo(movieTime);
+                                    }
+                                });
+
+
+
+                            }
+                        });
+                builder.create();
+                builder.show();
+            }
+        });
+        ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.qualBtn)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(serie_page_activity.this);
+                builder.setTitle("აირჩიეთ ხარისხი")
+                        .setItems(currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getQual().split(","), new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                movieTime = videoView.getCurrentPosition();
+                                //videourl=currentEpisodes.get(position).getLink().replace("{L}", lang);
+
+                                qual = currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getQual().split(",")[which];
+                                videourl.replaceAll("_\\d+\\.","_"+qual+".");
+
+                                Uri video = Uri.parse(videourl);
+                                videoView.setVideoURI(video);
+                                videoView.requestFocus();
+                                videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+
+                                    public void onPrepared(MediaPlayer mp) {
+                                        progressDialog.dismiss();
+                                        videoView.start();
+                                        videoView.seekTo(movieTime);
+                                    }
+                                });
+
+
+
+                            }
+                        });
+                builder.create();
+                builder.show();
+            }
+        });
+        PlayVideo();
+
+
+
+
+
+
+
+
+
+
+
+
         //setListViewHeightBasedOnChildren(episodesListView);
 
         ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.seasonChangeBtn)).setOnClickListener(new View.OnClickListener() {
@@ -486,6 +596,9 @@ public class serie_page_activity extends Activity {
                                 }
                                 //setListViewHeightBasedOnChildren(episodesListView);
                                 currentSeason=(which);
+                                movieSerieLastMomentModel.setSeason(currentSeason);
+                                movieSerieLastMomentModel.setSerie(0);
+                                movieSerieLastMomentModel.save();
 
                             }
                         });
@@ -582,6 +695,7 @@ public class serie_page_activity extends Activity {
 
 
     }
+
     public static boolean isNumeric(String str)
     {
         try
@@ -644,6 +758,7 @@ public class serie_page_activity extends Activity {
 
         linearLayout.addView(layout);
     }
+
     public static void setListViewHeightBasedOnChildren(ListView listView) {
         ListAdapter listAdapter = listView.getAdapter();
         if (listAdapter == null) {

@@ -35,6 +35,7 @@ import com.kgelashvili.moviesapp.Classes.MovieServices;
 import com.kgelashvili.moviesapp.model.Actor;
 import com.kgelashvili.moviesapp.model.HistoryModel;
 import com.kgelashvili.moviesapp.model.Movie;
+import com.kgelashvili.moviesapp.model.MovieSerieLastMomentModel;
 import com.kgelashvili.moviesapp.model.Serie;
 import com.nineoldandroids.animation.Animator;
 
@@ -42,6 +43,8 @@ import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import it.gmariotti.cardslib.library.cards.material.MaterialLargeImageCard;
 import it.gmariotti.cardslib.library.internal.Card;
@@ -66,6 +69,8 @@ public class MoviePageActivity extends Activity {
     LinearLayout relatedLayout;
     TabHost tabHost=null;
     Movie movie=null;
+    private static Timer myTimer;
+    MovieSerieLastMomentModel movieSerieLastMomentModel;
 
     public MoviePageActivity() {
     }
@@ -120,6 +125,9 @@ public class MoviePageActivity extends Activity {
                 i.putExtra("time", videoView.getCurrentPosition());
                 i.putExtra("link", videourl);
 
+                myTimer.cancel();
+                myTimer.purge();
+
 
                 startActivityForResult(i, 0);
             }
@@ -161,23 +169,17 @@ public class MoviePageActivity extends Activity {
                         .setItems(langs.split(","), new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 movieTime = videoView.getCurrentPosition();
+                                myTimer.cancel();
+                                myTimer.purge();
+                                movieSerieLastMomentModel.setTime(videoView.getCurrentPosition());
+                                movieSerieLastMomentModel.save();
                                 if (currentQuality == null) {
                                     currentQuality = quality.split(",")[0];
                                 }
                                 lang = langs.split(",")[which];
                                 videourl = "http://adjaranet.com/download.php?mid=" + value + "&file=" + value + "_" +
                                         lang + "_" + currentQuality;
-                                Uri video = Uri.parse(videourl);
-                                videoView.setVideoURI(video);
-                                videoView.requestFocus();
-                                videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-
-                                    public void onPrepared(MediaPlayer mp) {
-                                        progressDialog.dismiss();
-                                        videoView.start();
-                                        videoView.seekTo(movieTime);
-                                    }
-                                });
+                                PlayVideo();
 
                             }
                         });
@@ -194,22 +196,16 @@ public class MoviePageActivity extends Activity {
                             public void onClick(DialogInterface dialog, int which) {
                                 movieTime = videoView.getCurrentPosition();
                                 //videourl=currentEpisodes.get(position).getLink().replace("{L}", lang);
+                                myTimer.cancel();
+                                myTimer.purge();
+                                movieSerieLastMomentModel.setTime(videoView.getCurrentPosition());
+                                movieSerieLastMomentModel.save();
 
                                 currentQuality = quality.split(",")[which];
 
                                 videourl = "http://adjaranet.com/download.php?mid=" + value + "&file=" + value + "_" +
                                         lang + "_" + currentQuality;
-                                Uri video = Uri.parse(videourl);
-                                videoView.setVideoURI(video);
-                                videoView.requestFocus();
-                                videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-
-                                    public void onPrepared(MediaPlayer mp) {
-                                        progressDialog.dismiss();
-                                        videoView.start();
-                                        videoView.seekTo(movieTime);
-                                    }
-                                });
+                                PlayVideo();
 
 
                             }
@@ -238,7 +234,7 @@ public class MoviePageActivity extends Activity {
 
         videoView = (VideoView) findViewById(R.id.myvideoview);
         progressDialog = ProgressDialog.show(MoviePageActivity.this, "", "მიმდინარეობს ვიდეოს ჩატვირთა", true);
-        progressDialog.setCancelable(true);
+        progressDialog.setCancelable(false);
 
 
         YoYo.with(Techniques.SlideInRight).duration(500)
@@ -294,13 +290,32 @@ public class MoviePageActivity extends Activity {
 
                 public void onPrepared(MediaPlayer mp) {
 
+                    List<MovieSerieLastMomentModel> movieSerieLastMomentModels=MovieSerieLastMomentModel.find(MovieSerieLastMomentModel.class, "movie_id = '"+movie.getMovieId()+"'");
+                    if(movieSerieLastMomentModels.size()>0){
+                        movieSerieLastMomentModel=movieSerieLastMomentModels.get(0);
+                    }else{
+                        movieSerieLastMomentModel=new MovieSerieLastMomentModel(movie.getMovieId());
+                        movieSerieLastMomentModel.time=0;
+                        movieSerieLastMomentModel.save();
+                    }
                     progressDialog.dismiss();
+
+                    videoView.seekTo(movieSerieLastMomentModel.time);
                     videoView.start();
-                    videoView.seekTo(movieTime);
+                    myTimer = new Timer();
+                    myTimer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            movieSerieLastMomentModel.time=videoView.getCurrentPosition();
+                            movieSerieLastMomentModel.save();
+                        }
+
+                    }, 0, 1000);
                     videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
                         @Override
                         public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
                             movieTime = mediaPlayer.getCurrentPosition();
+
                             PlayVideo();
 
                             return true;
@@ -501,6 +516,8 @@ public class MoviePageActivity extends Activity {
                 YoYo.with(Techniques.SlideOutRight).withListener(new Animator.AnimatorListener() {
                     @Override
                     public void onAnimationStart(Animator animation) {
+                        myTimer.cancel();
+                        myTimer.purge();
                         finish();
                     }
 
@@ -524,6 +541,8 @@ public class MoviePageActivity extends Activity {
             YoYo.with(Techniques.SlideOutRight).withListener(new Animator.AnimatorListener() {
                 @Override
                 public void onAnimationStart(Animator animation) {
+                    myTimer.cancel();
+                    myTimer.purge();
                     finish();
                 }
 

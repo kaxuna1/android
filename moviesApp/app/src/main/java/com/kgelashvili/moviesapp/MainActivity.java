@@ -33,6 +33,7 @@ import com.kgelashvili.moviesapp.Classes.dbHelper;
 import com.kgelashvili.moviesapp.broadcastreceivers.CheckEpisodesBroadcastReceiver;
 import com.kgelashvili.moviesapp.fragments.FavoritesPageFragment;
 import com.kgelashvili.moviesapp.fragments.MainPageFragment;
+import com.kgelashvili.moviesapp.fragments.MovieColectionsFragment;
 import com.kgelashvili.moviesapp.fragments.MoviesGridFragment;
 import com.kgelashvili.moviesapp.fragments.MoviesPageFragment;
 import com.kgelashvili.moviesapp.fragments.SeriesPageFragment;
@@ -191,7 +192,7 @@ public class MainActivity extends AppCompatActivity{
 
     public class MyPagerAdapter extends FragmentPagerAdapter {
 
-        private final String[] TITLES = {"მთავარი", "ფილმები","სერიალები", "ვაპირებ ყურებას","ფილმების კედელი"};
+        private final String[] TITLES = {"მთავარი","კოლექციები", "ფილმები","სერიალები", "ვაპირებ ყურებას","ფილმების კედელი"};
 
         public MyPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -211,10 +212,11 @@ public class MainActivity extends AppCompatActivity{
         public Fragment getItem(int position) {
             switch (position){
                 case 0:return MainPageFragment.newInstance(position, findViewById(R.id.fragmentMainLinar));
-                case 1:return MoviesPageFragment.newInstance(position, findViewById(R.id.fragmentMainLinar),dbHelper2);
-                case 2:return SeriesPageFragment.newInstance(position, findViewById(R.id.fragmentMainLinar));
-                case 3:return FavoritesPageFragment.newInstance(position, findViewById(R.id.fragmentMainLinar),dbHelper2);
-                case 4:return MoviesGridFragment.newInstance(position, findViewById(R.id.fragmentMainLinar), dbHelper2);
+                case 1:return MovieColectionsFragment.newInstance(position, findViewById(R.id.fragmentMainLinar), dbHelper2);
+                case 2:return MoviesPageFragment.newInstance(position, findViewById(R.id.fragmentMainLinar),dbHelper2);
+                case 3:return SeriesPageFragment.newInstance(position, findViewById(R.id.fragmentMainLinar));
+                case 4:return FavoritesPageFragment.newInstance(position, findViewById(R.id.fragmentMainLinar),dbHelper2);
+                case 5:return MoviesGridFragment.newInstance(position, findViewById(R.id.fragmentMainLinar), dbHelper2);
                 default:return MainPageFragment.newInstance(position,findViewById(R.id.fragmentMainLinar));
             }
         }

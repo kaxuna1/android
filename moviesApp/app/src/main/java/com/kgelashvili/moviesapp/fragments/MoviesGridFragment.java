@@ -124,6 +124,7 @@ public class MoviesGridFragment extends Fragment{
 
         return rootView;
     }
+
     private List<DemoItem> getMoreItems(int qty) {
         List<DemoItem> items = new ArrayList<>();
 
@@ -141,9 +142,11 @@ public class MoviesGridFragment extends Fragment{
 
         return items;
     }
+
     private AsymmetricGridViewAdapter<?> getNewAdapter() {
         return new AsymmetricGridViewAdapter<>(getActivity(), listView, adapter);
     }
+
     class getMovies extends AsyncTask<String, ArrayList<Movie>, ArrayList<Movie>> {
 
         @Override

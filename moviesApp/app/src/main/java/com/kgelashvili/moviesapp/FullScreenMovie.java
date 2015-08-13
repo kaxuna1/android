@@ -1,5 +1,6 @@
 package com.kgelashvili.moviesapp;
 
+import com.kgelashvili.moviesapp.model.MovieSerieLastMomentModel;
 import com.kgelashvili.moviesapp.util.SystemUiHider;
 
 import android.annotation.TargetApi;
@@ -16,6 +17,10 @@ import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
 import android.widget.MediaController;
 import android.widget.VideoView;
+
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -55,7 +60,9 @@ public class FullScreenMovie extends Activity {
     VideoView videoView;
     String videourl="";
     int movieTime=0;
-
+    String movieId="";
+    private static Timer myTimer;
+    MovieSerieLastMomentModel movieSerieLastMomentModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -129,6 +136,7 @@ public class FullScreenMovie extends Activity {
         videoView=((VideoView)findViewById(R.id.fullScreenMovieView));
         videourl=extras.getString("link");
         movieTime=extras.getInt("time");
+        movieId=extras.getString("movieId");
         PlayVideo();
 
     }
@@ -161,9 +169,27 @@ public class FullScreenMovie extends Activity {
                 public void onPrepared(MediaPlayer mp)
                 {
 
+
+                    List<MovieSerieLastMomentModel> movieSerieLastMomentModels=MovieSerieLastMomentModel.find(MovieSerieLastMomentModel.class, "movie_id = '"+movieId+"'");
+                    if(movieSerieLastMomentModels.size()>0){
+                        movieSerieLastMomentModel=movieSerieLastMomentModels.get(0);
+                    }else{
+                        movieSerieLastMomentModel=new MovieSerieLastMomentModel(movieId);
+                        movieSerieLastMomentModel.time=0;
+                        movieSerieLastMomentModel.save();
+                    }
+                    videoView.seekTo(movieSerieLastMomentModel.time);
                     videoView.start();
-                    videoView.seekTo(movieTime);
                     videoView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+                    myTimer = new Timer();
+                    myTimer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            movieSerieLastMomentModel.time = videoView.getCurrentPosition();
+                            movieSerieLastMomentModel.save();
+                        }
+
+                    }, 0, 1000);
                     videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
                         @Override
                         public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
@@ -189,7 +215,8 @@ public class FullScreenMovie extends Activity {
 
     public void onBackPressed(){
 
-
+        myTimer.cancel();
+        myTimer.purge();
         setResult(videoView.getCurrentPosition());
         finish();
     }

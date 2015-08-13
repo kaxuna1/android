@@ -62,6 +62,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.kgelashvili.moviesapp.SeriesActiviry" />
         </activity>
+        <activity android:name="io.vov.vitamio.activity.InitActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|keyboard|keyboardHidden"
+            android:launchMode="singleTop"
+            android:theme="@android:style/Theme.NoTitleBar"
+            android:windowSoftInputMode="stateAlwaysHidden"/>
 
         <receiver android:name=".broadcastreceivers.MyBroadcastReceiver" >
             <intent-filter>
@@ -88,7 +93,7 @@
             android:value="adjaranet.db" />
         <meta-data
             android:name="VERSION"
-            android:value="4" />
+            android:value="7" />
         <meta-data
             android:name="QUERY_LOG"
             android:value="true" />

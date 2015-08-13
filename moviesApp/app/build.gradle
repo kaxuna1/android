@@ -43,6 +43,7 @@ dependencies {
     //Optional for drag and drop
     compile 'com.github.gabrielemariotti.cards:cardslib-extra-dragdrop:2.1.0'
     //Optional for twoway  (coming soon)
+
     //compile 'com.github.gabrielemariotti.cards:cardslib-extra-twoway:2.1.0'
     compile files('libs/jsoup-1.8.2.jar')
     compile 'uk.co.chrisjenx:calligraphy:2.1.0'
@@ -59,4 +60,5 @@ dependencies {
     compile 'com.github.pedrovgs:draggablepanel:1.8'
     compile 'com.felipecsl.asymmetricgridview:library:2.0.1'
     compile 'com.koushikdutta.ion:ion:2.+'
+    compile 'me.neavo:vitamio:4.2.2'
 }

@@ -25,6 +25,7 @@
                     android:layout_height="wrap_content"></TabWidget>
             </HorizontalScrollView>
 
+
             <FrameLayout
                 android:id="@android:id/tabcontent"
                 android:layout_width="match_parent"
@@ -60,8 +61,6 @@
                             android:layout_width="wrap_content"
                             android:gravity="center"
                             android:layout_height="200dp">
-
-
                             <VideoView
                                 android:id="@+id/myvideoview"
                                 android:layout_width="fill_parent"
