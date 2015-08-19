@@ -62,11 +62,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.kgelashvili.moviesapp.SeriesActiviry" />
         </activity>
-        <activity android:name="io.vov.vitamio.activity.InitActivity"
+        <activity
+            android:name="io.vov.vitamio.activity.InitActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|keyboard|keyboardHidden"
             android:launchMode="singleTop"
             android:theme="@android:style/Theme.NoTitleBar"
-            android:windowSoftInputMode="stateAlwaysHidden"/>
+            android:windowSoftInputMode="stateAlwaysHidden" />
 
         <receiver android:name=".broadcastreceivers.MyBroadcastReceiver" >
             <intent-filter>
@@ -120,6 +121,30 @@
         <activity
             android:name=".HistoryPageActivity"
             android:label="@string/title_activity_history_page"
+            android:parentActivityName=".MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.kgelashvili.moviesapp.MainActivity" />
+        </activity>
+        <activity
+            android:name=".CollectionMoviesActivity"
+            android:label="@string/title_activity_collection_movies"
+            android:parentActivityName=".MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.kgelashvili.moviesapp.MainActivity" />
+        </activity>
+        <activity
+            android:name=".WatchLaterActivity"
+            android:label="@string/title_activity_watch_later"
+            android:parentActivityName=".MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.kgelashvili.moviesapp.MainActivity" />
+        </activity>
+        <activity
+            android:name=".ActorMoviesActivity"
+            android:label="@string/title_activity_actor_movies"
             android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

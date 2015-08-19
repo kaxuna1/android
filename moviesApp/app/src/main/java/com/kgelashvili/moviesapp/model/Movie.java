@@ -21,6 +21,7 @@ public class Movie extends SugarRecord<Movie> implements Serializable {
     public String description;
     public String duration;
     public String lang;
+    public int type;
 
     public Movie(){
     }

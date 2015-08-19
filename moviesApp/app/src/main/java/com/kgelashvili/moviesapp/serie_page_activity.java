@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,6 +25,7 @@ import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
@@ -39,6 +41,8 @@ import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.kgelashvili.moviesapp.Classes.FloatingActionButton;
 import com.kgelashvili.moviesapp.Classes.MovieServices;
+import com.kgelashvili.moviesapp.Classes.ScrollViewExt;
+import com.kgelashvili.moviesapp.Classes.ScrollViewListener;
 import com.kgelashvili.moviesapp.cards.CustomThumbCard;
 import com.kgelashvili.moviesapp.model.Actor;
 import com.kgelashvili.moviesapp.model.Episode;
@@ -70,13 +74,14 @@ import it.gmariotti.cardslib.library.view.CardViewNative;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class serie_page_activity extends Activity {
+public class serie_page_activity extends AppCompatActivity {
     private static ProgressDialog progressDialog;
     String id;
     String qual;
     String lang;
     ArrayList<Season> seasons;
     int currentSeason=1;
+    int currentEpisode=0;
     String currentLangs="";
     String currentLang="";
     ArrayList<Episode> currentEpisodes=new ArrayList<Episode>();
@@ -91,6 +96,7 @@ public class serie_page_activity extends Activity {
     ListView episodesListView;
     LinearLayout relatedLayout;
     MovieSerieLastMomentModel movieSerieLastMomentModel;
+    ImageButton playButton=null;
 
 
     @Override
@@ -107,7 +113,526 @@ public class serie_page_activity extends Activity {
                         .build()
         );
         setContentView(R.layout.activity_serie_page_activity);
+        playButton=(ImageButton)findViewById(R.id.play_button);
+        playButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(serie_page_activity.this, "მიმდინარეობს ფილმის ჩატვირთვა", Toast.LENGTH_LONG).show();
+            }
+        });
 
+
+        startPlayer();
+
+
+
+
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        movieTime=resultCode;
+        super.onActivityResult(requestCode, resultCode, data);
+
+    }
+
+    private void PlayVideo() {
+        try
+        {
+            getWindow().setFormat(PixelFormat.TRANSLUCENT);
+
+
+
+            final Uri video = Uri.parse(videourl);
+            videoView.setVideoURI(video);
+            videoView.requestFocus();
+            videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener()
+            {
+
+                public void onPrepared(MediaPlayer mp)
+                {
+                    videoView.start();
+                    progressDialog.dismiss();
+                    videoView.seekTo(movieTime);
+                    videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                        @Override
+                        public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
+                            movieTime = mediaPlayer.getCurrentPosition();
+
+                            PlayVideo();
+                            return true;
+                        }
+                    });
+
+                    ScrollViewExt scrollViewExt=(ScrollViewExt)findViewById(R.id.scrollView2);
+
+                    final MediaController mediaController = new MediaController(serie_page_activity.this,true);
+
+                    scrollViewExt.setScrollViewListener(new ScrollViewListener() {
+                        @Override
+                        public void onScrollChanged(ScrollViewExt scrollView, int x, int y, int oldx, int oldy) {
+                            mediaController.hide();
+                        }
+                    });
+
+                    mediaController.setPrevNextListeners(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            videoView.seekTo(videoView.getCurrentPosition()+5000);
+                        }
+                    }, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            videoView.seekTo(videoView.getCurrentPosition()-5000);
+                        }
+                    });
+                    mediaController.setAnchorView(videoView);
+
+                    videoView.setMediaController(mediaController);
+                }
+            });
+
+        }
+        catch(Exception e)
+        {
+            System.out.println("Video Play Error :" + e.toString());
+            //finish();
+        }
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_serie_page_activity, menu);
+        return true;
+    }
+
+    private class GetSeriesDataJSON extends AsyncTask<String,SeriesDataModel, SeriesDataModel> {
+
+
+        @Override
+        protected SeriesDataModel doInBackground(String... params) {
+            Document doc = null;
+            SeriesDataModel seriesDataModel=new SeriesDataModel();
+            seriesDataModel.jsonObject = new MovieServices().getSerieDataJson(id);
+            try {
+                doc = Jsoup.connect("http://adjaranet.com/Movie/main?id="+id+"&serie=1&js=1").get();
+                Elements newsHeadlines = doc.select("#episodesDiv");
+                seriesDataModel.elements=newsHeadlines;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            publishProgress(seriesDataModel);
+
+
+            return null;
+        }
+        @Override
+        protected void onProgressUpdate(SeriesDataModel... values) {
+            super.onProgressUpdate(values);
+            setSeriesDataJSON(values[0]);
+
+        }
+    }
+
+    private void setSeriesDataJSON(SeriesDataModel value) {
+        JSONObject jsonValue=value.jsonObject;
+        Elements elementValue=value.elements;
+        int i=1;
+        Iterator<?> keys = jsonValue.keys();
+        /*while( keys.hasNext() ) {
+            String key = (String)keys.next();
+            if(isNumeric(key)){
+                Season season =new Season("Season "+key);
+                try {
+                    JSONObject seasonEpisodesJSON=jsonValue.getJSONObject(key);
+                    Iterator<?> keysEpisodes = seasonEpisodesJSON.keys();
+                    while (keysEpisodes.hasNext()){
+                        String keyEpisode =(String)keysEpisodes.next();
+                        JSONObject episodeJSONObject=seasonEpisodesJSON.getJSONObject(keyEpisode);
+                        Episode episode=new Episode(episodeJSONObject.getString(""))
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }*/
+
+
+
+        while (elementValue.select("#sDiv"+i).hasAttr("class")){
+
+            int f=0;
+            Season season =new Season("Season "+i);
+
+            int episodes=elementValue.select("#sDiv"+i).select("span").size();
+            while (f<episodes){
+                Episode episode=new Episode(elementValue.select("#sDiv"+i).select("span").get(f).attr("data-href"),
+                        elementValue.select("#sDiv"+i).select("span").get(f).attr("data-lang"),"სერია  "+(f+1));
+                try {
+                    JSONObject episodeJSON=jsonValue.getJSONObject(""+i).getJSONObject(""+(f+1));
+                    episode.setName(f+". "+episodeJSON.getString("name"));
+                    episode.setQual(episodeJSON.getString("quality"));
+                    episode.setLang(episodeJSON.getString("lang"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+                season.addEpisode(episode);
+                f++;
+            }
+            seasons.add(season);
+            i++;
+        }
+        serie.lastSes=seasons.size();
+        serie.lastEp=seasons.get(seasons.size()-1).getEpisodes().size();
+
+        final String[] seasonNames=new String[seasons.size()];
+        for(int k=0;k<seasons.size();k++){
+            seasonNames[k]=seasons.get(k).getName();
+        }
+        adapter.clear();
+        for(int e=0;e<seasons.get(movieSerieLastMomentModel.getSeason()).getEpisodes().size();e++){
+            adapter.add(seasons.get(0).getEpisode(e));
+        }
+
+
+        //playLastEpisode
+
+        currentLang=currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getLang().split(",")[0];
+        videourl=currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getLink().replace("{L}",currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getLang().split(",")[0]);
+        qual = currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getQual().split(",")[0];
+        videourl.replaceAll("_\\d+\\.","_"+qual+".");
+        movieSerieLastMomentModel.setSerie(movieSerieLastMomentModel.getSerie());
+        progressDialog = ProgressDialog.show(serie_page_activity.this, "", "მიმდინარეობს ვიდეოს ჩატვირთა", true);
+        progressDialog.setCancelable(true);
+        //getActionBar().setTitle(extras.getString("title") + " " + currentEpisodes.get(position).getName());
+        ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.langBtnSerie)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(serie_page_activity.this);
+                builder.setTitle("აირჩიეთ ენა")
+                        .setItems(currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getLang().split(","), new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                movieTime = videoView.getCurrentPosition();
+
+                                lang = currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getLang().split(",")[which];
+                                videourl=currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getLink().replace("{L}",lang);
+                                if(qual==null){
+                                    qual = currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getQual().split(",")[0];
+                                }
+                                videourl.replaceAll("_\\d+\\.","_"+qual+".");
+                                Uri video = Uri.parse(videourl);
+                                videoView.setVideoURI(video);
+                                videoView.requestFocus();
+                                videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+
+                                    public void onPrepared(MediaPlayer mp) {
+                                        progressDialog.dismiss();
+                                        videoView.start();
+                                        videoView.seekTo(movieTime);
+                                    }
+                                });
+
+
+
+                            }
+                        });
+                builder.create();
+                builder.show();
+            }
+        });
+        ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.qualBtn)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(serie_page_activity.this);
+                builder.setTitle("აირჩიეთ ხარისხი")
+                        .setItems(currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getQual().split(","), new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                movieTime = videoView.getCurrentPosition();
+                                //videourl=currentEpisodes.get(position).getLink().replace("{L}", lang);
+
+                                qual = currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getQual().split(",")[which];
+                                videourl.replaceAll("_\\d+\\.","_"+qual+".");
+
+                                Uri video = Uri.parse(videourl);
+                                videoView.setVideoURI(video);
+                                videoView.requestFocus();
+                                videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+
+                                    public void onPrepared(MediaPlayer mp) {
+                                        progressDialog.dismiss();
+                                        videoView.start();
+                                        videoView.seekTo(movieTime);
+                                    }
+                                });
+
+
+
+                            }
+                        });
+                builder.create();
+                builder.show();
+            }
+        });
+
+        playButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                playButton.setVisibility(View.GONE);
+                PlayVideo();
+            }
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+        //setListViewHeightBasedOnChildren(episodesListView);
+
+        ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.seasonChangeBtn)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(serie_page_activity.this);
+                builder.setTitle("აირჩიეთ სეზონი")
+                        .setItems(seasonNames, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                adapter.clear();
+                                for(int e=0;e<seasons.get(which).getEpisodes().size();e++){
+                                    adapter.add(seasons.get(which).getEpisode(e));
+                                }
+                                //setListViewHeightBasedOnChildren(episodesListView);
+                                currentSeason=(which);
+                                movieSerieLastMomentModel.setSeason(currentSeason);
+                                movieSerieLastMomentModel.setSerie(0);
+                                movieSerieLastMomentModel.save();
+
+                            }
+                        });
+                builder.create();
+                builder.show();
+            }
+        });
+
+
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_download) {
+
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private class EpisodesListAdapter extends ArrayAdapter<Episode> {
+        public EpisodesListAdapter() {
+            super(serie_page_activity.this, R.layout.itemview, currentEpisodes);
+        }
+
+        @Override
+        public View getView(int position, View view, ViewGroup viewGroup) {
+            if (view == null)
+                view = getLayoutInflater().inflate(R.layout.episodeslistitem, viewGroup, false);
+            final Episode currentEpisode = currentEpisodes.get(position);
+            ((TextView)view.findViewById(R.id.episodeTitle)).setText(currentEpisode.getName());
+            return view;
+        }
+    }
+
+    public void onBackPressed() {
+        if(tabHost.getCurrentTab()==1){
+            if(webView.canGoBack()){
+                webView.goBack();
+            }else{
+                YoYo.with(Techniques.SlideOutRight).withListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+                        finish();
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                }).duration(500).playOn(findViewById(R.id.mainfragmentframe));
+            }
+        }else{
+            YoYo.with(Techniques.SlideOutRight).withListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    finish();
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {
+
+                }
+            }).duration(500).playOn(findViewById(R.id.mainfragmentframe));
+        }
+
+
+    }
+
+
+    class getSerieActorsAsync extends AsyncTask<String,ArrayList<Actor>,ArrayList<Actor>>{
+
+        @Override
+        protected ArrayList<Actor> doInBackground(String... strings) {
+            ArrayList<Actor> actors;
+            actors=new MovieServices().getSerieActors(strings[0]);
+            publishProgress(actors);
+            return actors;
+        }
+        @Override
+        protected void onProgressUpdate(ArrayList<Actor>... values) {
+            super.onProgressUpdate(values);
+
+            for (int i = 0; i < values[0].size(); i++) {
+                addActorToCast(values[0].get(i));
+            }
+
+        }
+    }
+
+    private void addActorToCast(Actor actor) {
+
+        LinearLayout linearLayout = castLayout;
+        LayoutInflater inflater = LayoutInflater.from(this);
+        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.actorontop, null, false);
+
+
+
+
+        MaterialLargeImageCard card =
+                MaterialLargeImageCard.with(this)
+                        //.setTextOverImage(actor.actorName)
+                        .useDrawableUrl("http://static.adjaranet.com/cast/"+actor.actorId+".jpg")
+                                //.setupSupplementalActions(R.layout.carddemo_native_material_supplemental_actions_large_icon, actions)
+                        .build();
+
+
+        card.setOnClickListener(new Card.OnCardClickListener() {
+            @Override
+            public void onClick(Card card, View view) {
+
+            }
+        });
+        CardViewNative cardView = (CardViewNative) layout.findViewById(R.id.actorCard);
+        ((TextView)layout.findViewById(R.id.actorCardName)).setText(actor.actorName);
+        cardView.setCard(card);
+
+        linearLayout.addView(layout);
+    }
+
+
+    class getMovieRelated extends AsyncTask<String, ArrayList<Movie>, ArrayList<Movie>> {
+
+        @Override
+        protected ArrayList<Movie> doInBackground(String... strings) {
+
+            MovieServices movieServices = new MovieServices();
+            ArrayList<Movie> movies = movieServices.getRelateMovies(strings[0]);
+            publishProgress(movies);
+
+            return movies;
+        }
+
+        @Override
+        protected void onProgressUpdate(ArrayList<Movie>... values) {
+            super.onProgressUpdate(values);
+            for (int i = 0; i < values[0].size(); i++) {
+                addMovieToRelatedData(values[0].get(i));
+            }
+        }
+
+    }
+
+    private void addMovieToRelatedData(final Movie movie) {
+        LinearLayout linearLayout = relatedLayout;
+        LayoutInflater inflater = LayoutInflater.from(this);
+        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.actorontop, null, false);
+        final Serie serie=new Serie(movie.getMovieId(),movie.getTitle_en(),movie.getLink(),movie.getPoster(),movie.getImdb(),movie.getImdb_id(),
+                movie.getRelease_date(),movie.getDescription(),movie.getDuration(),movie.getLang());
+
+
+
+        MaterialLargeImageCard card =
+                MaterialLargeImageCard.with(this)
+                        //.setTextOverImage(actor.actorName)
+                        .useDrawableUrl(movie.getPoster())
+                                //.setupSupplementalActions(R.layout.carddemo_native_material_supplemental_actions_large_icon, actions)
+                        .build();
+
+
+        card.setOnClickListener(new Card.OnCardClickListener() {
+            @Override
+            public void onClick(Card card, View view) {
+
+
+                Intent i = new Intent(serie_page_activity.this, serie_page_activity.class);
+                i.putExtra("movieId", serie.getMovieId());
+                i.putExtra("description", serie.getDescription());
+                i.putExtra("title", serie.getTitle_en());
+                i.putExtra("date", serie.getRelease_date());
+                i.putExtra("duration", serie.getDuration());
+                i.putExtra("rating", serie.getImdb());
+                i.putExtra("imdb", serie.getImdb_id());
+                i.putExtra("lang", serie.getLang());
+                i.putExtra("Serie",serie);
+                i.putExtra("time", 0);
+                i.putExtra("Serie",serie);
+                startActivity(i);
+            }
+        });
+        CardViewNative cardView = (CardViewNative) layout.findViewById(R.id.actorCard);
+        ((TextView)layout.findViewById(R.id.actorCardName)).setText(movie.getTitle_en());
+        cardView.setCard(card);
+
+        linearLayout.addView(layout);
+
+    }
+
+    private void startPlayer(){
         final Bundle extras = getIntent().getExtras();
         tabHost = (TabHost)findViewById(R.id.tabHost);
         tabHost.setup();
@@ -127,7 +652,7 @@ public class serie_page_activity extends Activity {
         seasons=new ArrayList<Season>();
 
         id=extras.getString("movieId");
-       // getActionBar().setTitle(extras.getString("title"));
+        // getActionBar().setTitle(extras.getString("title"));
 
 
         ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.downloadBtn)).setOnClickListener(new View.OnClickListener() {
@@ -336,513 +861,34 @@ public class serie_page_activity extends Activity {
         }
 
 
-
-
-
-    }
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        movieTime=resultCode;
-        super.onActivityResult(requestCode, resultCode, data);
-
     }
 
-    private void PlayVideo()
-    {
-        try
-        {
-            getWindow().setFormat(PixelFormat.TRANSLUCENT);
-
-
-
-            final Uri video = Uri.parse(videourl);
-            videoView.setVideoURI(video);
-            videoView.requestFocus();
-            videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener()
-            {
-
-                public void onPrepared(MediaPlayer mp)
-                {
-                    videoView.start();
-                    progressDialog.dismiss();
-                    videoView.seekTo(movieTime);
-                    videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-                        @Override
-                        public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
-                            movieTime = mediaPlayer.getCurrentPosition();
-
-                            PlayVideo();
-                            return true;
-                        }
-                    });
-                    MediaController mediaController = new MediaController(serie_page_activity.this);
-                    mediaController.setAnchorView(videoView);
-                    videoView.setMediaController(mediaController);
-                }
-            });
-
-        }
-        catch(Exception e)
-        {
-            System.out.println("Video Play Error :" + e.toString());
-            //finish();
-        }
-
+    public void stopVideoPlaying(){
+        videoView.pause();
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_serie_page_activity, menu);
-        return true;
+    protected void onPause(){
+        super.onPause();
+        stopVideoPlaying();
     }
-
-    private class GetSeriesDataJSON extends AsyncTask<String,SeriesDataModel, SeriesDataModel> {
-
-
-        @Override
-        protected SeriesDataModel doInBackground(String... params) {
-            Document doc = null;
-            SeriesDataModel seriesDataModel=new SeriesDataModel();
-            seriesDataModel.jsonObject = new MovieServices().getSerieDataJson(id);
-            try {
-                doc = Jsoup.connect("http://adjaranet.com/Movie/main?id="+id+"&serie=1&js=1").get();
-                Elements newsHeadlines = doc.select("#episodesDiv");
-                seriesDataModel.elements=newsHeadlines;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            publishProgress(seriesDataModel);
-
-
-            return null;
-        }
-        @Override
-        protected void onProgressUpdate(SeriesDataModel... values) {
-            super.onProgressUpdate(values);
-            setSeriesDataJSON(values[0]);
-
-        }
-    }
-
-    private void setSeriesDataJSON(SeriesDataModel value) {
-        JSONObject jsonValue=value.jsonObject;
-        Elements elementValue=value.elements;
-        int i=1;
-        Iterator<?> keys = jsonValue.keys();
-        /*while( keys.hasNext() ) {
-            String key = (String)keys.next();
-            if(isNumeric(key)){
-                Season season =new Season("Season "+key);
-                try {
-                    JSONObject seasonEpisodesJSON=jsonValue.getJSONObject(key);
-                    Iterator<?> keysEpisodes = seasonEpisodesJSON.keys();
-                    while (keysEpisodes.hasNext()){
-                        String keyEpisode =(String)keysEpisodes.next();
-                        JSONObject episodeJSONObject=seasonEpisodesJSON.getJSONObject(keyEpisode);
-                        Episode episode=new Episode(episodeJSONObject.getString(""))
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        }*/
-
-
-
-        while (elementValue.select("#sDiv"+i).hasAttr("class")){
-
-            int f=0;
-            Season season =new Season("Season "+i);
-
-            int episodes=elementValue.select("#sDiv"+i).select("span").size();
-            while (f<episodes){
-                Episode episode=new Episode(elementValue.select("#sDiv"+i).select("span").get(f).attr("data-href"),
-                        elementValue.select("#sDiv"+i).select("span").get(f).attr("data-lang"),"სერია  "+(f+1));
-                try {
-                    JSONObject episodeJSON=jsonValue.getJSONObject(""+i).getJSONObject(""+(f+1));
-                    episode.setName(f+". "+episodeJSON.getString("name"));
-                    episode.setQual(episodeJSON.getString("quality"));
-                    episode.setLang(episodeJSON.getString("lang"));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-
-                season.addEpisode(episode);
-                f++;
-            }
-            seasons.add(season);
-            i++;
-        }
-        serie.lastSes=seasons.size();
-        serie.lastEp=seasons.get(seasons.size()-1).getEpisodes().size();
-
-        final String[] seasonNames=new String[seasons.size()];
-        for(int k=0;k<seasons.size();k++){
-            seasonNames[k]=seasons.get(k).getName();
-        }
-        adapter.clear();
-        for(int e=0;e<seasons.get(movieSerieLastMomentModel.getSeason()).getEpisodes().size();e++){
-            adapter.add(seasons.get(0).getEpisode(e));
-        }
-
-
-        //playLastEpisode
-
-        currentLang=currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getLang().split(",")[0];
-        videourl=currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getLink().replace("{L}",currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getLang().split(",")[0]);
-        qual = currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getQual().split(",")[0];
-        videourl.replaceAll("_\\d+\\.","_"+qual+".");
-        movieSerieLastMomentModel.setSerie(movieSerieLastMomentModel.getSerie());
-        progressDialog = ProgressDialog.show(serie_page_activity.this, "", "მიმდინარეობს ვიდეოს ჩატვირთა", true);
-        progressDialog.setCancelable(true);
-        //getActionBar().setTitle(extras.getString("title") + " " + currentEpisodes.get(position).getName());
-        ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.langBtnSerie)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(serie_page_activity.this);
-                builder.setTitle("აირჩიეთ ენა")
-                        .setItems(currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getLang().split(","), new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                movieTime = videoView.getCurrentPosition();
-
-                                lang = currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getLang().split(",")[which];
-                                videourl=currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getLink().replace("{L}",lang);
-                                if(qual==null){
-                                    qual = currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getQual().split(",")[0];
-                                }
-                                videourl.replaceAll("_\\d+\\.","_"+qual+".");
-                                Uri video = Uri.parse(videourl);
-                                videoView.setVideoURI(video);
-                                videoView.requestFocus();
-                                videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-
-                                    public void onPrepared(MediaPlayer mp) {
-                                        progressDialog.dismiss();
-                                        videoView.start();
-                                        videoView.seekTo(movieTime);
-                                    }
-                                });
-
-
-
-                            }
-                        });
-                builder.create();
-                builder.show();
-            }
-        });
-        ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.qualBtn)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(serie_page_activity.this);
-                builder.setTitle("აირჩიეთ ხარისხი")
-                        .setItems(currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getQual().split(","), new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                movieTime = videoView.getCurrentPosition();
-                                //videourl=currentEpisodes.get(position).getLink().replace("{L}", lang);
-
-                                qual = currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getQual().split(",")[which];
-                                videourl.replaceAll("_\\d+\\.","_"+qual+".");
-
-                                Uri video = Uri.parse(videourl);
-                                videoView.setVideoURI(video);
-                                videoView.requestFocus();
-                                videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-
-                                    public void onPrepared(MediaPlayer mp) {
-                                        progressDialog.dismiss();
-                                        videoView.start();
-                                        videoView.seekTo(movieTime);
-                                    }
-                                });
-
-
-
-                            }
-                        });
-                builder.create();
-                builder.show();
-            }
-        });
-        PlayVideo();
-
-
-
-
-
-
-
-
-
-
-
-
-        //setListViewHeightBasedOnChildren(episodesListView);
-
-        ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.seasonChangeBtn)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(serie_page_activity.this);
-                builder.setTitle("აირჩიეთ სეზონი")
-                        .setItems(seasonNames, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-
-                                adapter.clear();
-                                for(int e=0;e<seasons.get(which).getEpisodes().size();e++){
-                                    adapter.add(seasons.get(which).getEpisode(e));
-                                }
-                                //setListViewHeightBasedOnChildren(episodesListView);
-                                currentSeason=(which);
-                                movieSerieLastMomentModel.setSeason(currentSeason);
-                                movieSerieLastMomentModel.setSerie(0);
-                                movieSerieLastMomentModel.save();
-
-                            }
-                        });
-                builder.create();
-                builder.show();
-            }
-        });
-
-
-
+    @Override
+    protected void onStop(){
+        super.onStop();
+        stopVideoPlaying();
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_download) {
-
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
+    protected void onDestroy(){
+        super.onDestroy();
+        stopVideoPlaying();
     }
-
-    private class EpisodesListAdapter extends ArrayAdapter<Episode> {
-        public EpisodesListAdapter() {
-            super(serie_page_activity.this, R.layout.itemview, currentEpisodes);
+    @Override
+    protected void onResume(){
+        super.onResume();
+        if(videoView!=null){
+            videoView.resume();
         }
-
-        @Override
-        public View getView(int position, View view, ViewGroup viewGroup) {
-            if (view == null)
-                view = getLayoutInflater().inflate(R.layout.episodeslistitem, viewGroup, false);
-            final Episode currentEpisode = currentEpisodes.get(position);
-            ((TextView)view.findViewById(R.id.episodeTitle)).setText(currentEpisode.getName());
-            return view;
-        }
+        //startVideoPlaying();
     }
-
-    public void onBackPressed() {
-        if(tabHost.getCurrentTab()==1){
-            if(webView.canGoBack()){
-                webView.goBack();
-            }else{
-                YoYo.with(Techniques.SlideOutRight).withListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animation) {
-                        finish();
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animation) {
-
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animation) {
-
-                    }
-                }).duration(500).playOn(findViewById(R.id.mainfragmentframe));
-            }
-        }else{
-            YoYo.with(Techniques.SlideOutRight).withListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator animation) {
-                    finish();
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animation) {
-
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animation) {
-
-                }
-
-                @Override
-                public void onAnimationRepeat(Animator animation) {
-
-                }
-            }).duration(500).playOn(findViewById(R.id.mainfragmentframe));
-        }
-
-
-    }
-
-    public static boolean isNumeric(String str)
-    {
-        try
-        {
-            double d = Double.parseDouble(str);
-        }
-        catch(NumberFormatException nfe)
-        {
-            return false;
-        }
-        return true;
-    }
-
-    class getSerieActorsAsync extends AsyncTask<String,ArrayList<Actor>,ArrayList<Actor>>{
-
-        @Override
-        protected ArrayList<Actor> doInBackground(String... strings) {
-            ArrayList<Actor> actors;
-            actors=new MovieServices().getSerieActors(strings[0]);
-            publishProgress(actors);
-            return actors;
-        }
-        @Override
-        protected void onProgressUpdate(ArrayList<Actor>... values) {
-            super.onProgressUpdate(values);
-
-            for (int i = 0; i < values[0].size(); i++) {
-                addActorToCast(values[0].get(i));
-            }
-
-        }
-    }
-
-    private void addActorToCast(Actor actor) {
-
-        LinearLayout linearLayout = castLayout;
-        LayoutInflater inflater = LayoutInflater.from(this);
-        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.actorontop, null, false);
-
-
-
-
-        MaterialLargeImageCard card =
-                MaterialLargeImageCard.with(this)
-                        //.setTextOverImage(actor.actorName)
-                        .useDrawableUrl("http://static.adjaranet.com/cast/"+actor.actorId+".jpg")
-                                //.setupSupplementalActions(R.layout.carddemo_native_material_supplemental_actions_large_icon, actions)
-                        .build();
-
-
-        card.setOnClickListener(new Card.OnCardClickListener() {
-            @Override
-            public void onClick(Card card, View view) {
-
-            }
-        });
-        CardViewNative cardView = (CardViewNative) layout.findViewById(R.id.actorCard);
-        ((TextView)layout.findViewById(R.id.actorCardName)).setText(actor.actorName);
-        cardView.setCard(card);
-
-        linearLayout.addView(layout);
-    }
-
-    public static void setListViewHeightBasedOnChildren(ListView listView) {
-        ListAdapter listAdapter = listView.getAdapter();
-        if (listAdapter == null) {
-            // pre-condition
-            return;
-        }
-
-        int totalHeight = 0;
-        for (int i = 0; i < listAdapter.getCount(); i++) {
-            View listItem = listAdapter.getView(i, null, listView);
-            listItem.measure(0, 0);
-            totalHeight += listItem.getMeasuredHeight()+10;
-        }
-
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
-        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
-        listView.setLayoutParams(params);
-        listView.requestLayout();
-    }
-
-    class getMovieRelated extends AsyncTask<String, ArrayList<Movie>, ArrayList<Movie>> {
-
-        @Override
-        protected ArrayList<Movie> doInBackground(String... strings) {
-
-            MovieServices movieServices = new MovieServices();
-            ArrayList<Movie> movies = movieServices.getRelateMovies(strings[0]);
-            publishProgress(movies);
-
-            return movies;
-        }
-
-        @Override
-        protected void onProgressUpdate(ArrayList<Movie>... values) {
-            super.onProgressUpdate(values);
-            for (int i = 0; i < values[0].size(); i++) {
-                addMovieToRelatedData(values[0].get(i));
-            }
-        }
-
-    }
-    private void addMovieToRelatedData(final Movie movie) {
-        LinearLayout linearLayout = relatedLayout;
-        LayoutInflater inflater = LayoutInflater.from(this);
-        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.actorontop, null, false);
-        final Serie serie=new Serie(movie.getMovieId(),movie.getTitle_en(),movie.getLink(),movie.getPoster(),movie.getImdb(),movie.getImdb_id(),
-                movie.getRelease_date(),movie.getDescription(),movie.getDuration(),movie.getLang());
-
-
-
-        MaterialLargeImageCard card =
-                MaterialLargeImageCard.with(this)
-                        //.setTextOverImage(actor.actorName)
-                        .useDrawableUrl(movie.getPoster())
-                                //.setupSupplementalActions(R.layout.carddemo_native_material_supplemental_actions_large_icon, actions)
-                        .build();
-
-
-        card.setOnClickListener(new Card.OnCardClickListener() {
-            @Override
-            public void onClick(Card card, View view) {
-
-
-                Intent i = new Intent(serie_page_activity.this, serie_page_activity.class);
-                i.putExtra("movieId", serie.getMovieId());
-                i.putExtra("description", serie.getDescription());
-                i.putExtra("title", serie.getTitle_en());
-                i.putExtra("date", serie.getRelease_date());
-                i.putExtra("duration", serie.getDuration());
-                i.putExtra("rating", serie.getImdb());
-                i.putExtra("imdb", serie.getImdb_id());
-                i.putExtra("lang", serie.getLang());
-                i.putExtra("Serie",serie);
-                i.putExtra("time", 0);
-                i.putExtra("Serie",serie);
-                startActivity(i);
-            }
-        });
-        CardViewNative cardView = (CardViewNative) layout.findViewById(R.id.actorCard);
-        ((TextView)layout.findViewById(R.id.actorCardName)).setText(movie.getTitle_en());
-        cardView.setCard(card);
-
-        linearLayout.addView(layout);
-
-    }
-
 }

@@ -330,6 +330,9 @@
 
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_collection_movies">CollectionMoviesActivity</string>
+    <string name="title_activity_watch_later">WatchLaterActivity</string>
+    <string name="title_activity_actor_movies">ActorMoviesActivity</string>
 
 
 </resources>

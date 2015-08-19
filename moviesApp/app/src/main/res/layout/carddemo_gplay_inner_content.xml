@@ -20,33 +20,16 @@
 
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_marginLeft="3dp"
                 android:layout_height="60dp"
     >
 
-    <RatingBar
-        android:id="@+id/carddemo_gplay_main_inner_ratingBar"
-        style="@style/carddemo_myapps_main_inner_ratingbar"
-        android:numStars="5"
-        android:stepSize="1.0"
-        android:layout_marginLeft="5dp"
-        android:layout_alignParentLeft="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
 
-    <TextView
-        android:id="@+id/carddemo_gplay_main_inner_title"
-        android:layout_width="wrap_content"
-        android:textSize="12sp"
-        android:textColor="@android:color/holo_green_light"
-        android:layout_marginRight="5dp"
-        android:layout_alignParentRight="true"
-        android:layout_height="wrap_content"/>
 
     <TextView
         android:id="@+id/carddemo_gplay_main_inner_subtitle"
-        android:textSize="12sp"
+        android:textSize="14sp"
         android:textColor="#BBB"
         android:layout_marginLeft="5dp"
         android:layout_alignParentBottom="true"

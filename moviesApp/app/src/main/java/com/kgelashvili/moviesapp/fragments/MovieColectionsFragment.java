@@ -1,16 +1,27 @@
 package com.kgelashvili.moviesapp.fragments;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewCompat;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RatingBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.kgelashvili.moviesapp.Classes.CustomThumbNail;
+import com.kgelashvili.moviesapp.Classes.CustomThumbNail2;
 import com.kgelashvili.moviesapp.Classes.MaterialCardArrayAdapter;
 import com.kgelashvili.moviesapp.Classes.MovieServices;
 import com.kgelashvili.moviesapp.Classes.dbHelper;
+import com.kgelashvili.moviesapp.CollectionMoviesActivity;
+import com.kgelashvili.moviesapp.MoviePageActivity;
 import com.kgelashvili.moviesapp.R;
 import com.kgelashvili.moviesapp.model.ColectionModel;
 
@@ -21,6 +32,11 @@ import butterknife.InjectView;
 import it.gmariotti.cardslib.library.cards.material.MaterialLargeImageCard;
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardArrayAdapter;
+import it.gmariotti.cardslib.library.internal.CardGridArrayAdapter;
+import it.gmariotti.cardslib.library.internal.CardHeader;
+import it.gmariotti.cardslib.library.internal.CardThumbnail;
+import it.gmariotti.cardslib.library.internal.base.BaseCard;
+import it.gmariotti.cardslib.library.view.CardGridView;
 import it.gmariotti.cardslib.library.view.CardListView;
 
 public class MovieColectionsFragment extends Fragment {
@@ -28,11 +44,11 @@ public class MovieColectionsFragment extends Fragment {
     private int position;
     private static View view;
     ArrayList<Card> cards=new ArrayList<Card>();
-    MaterialCardArrayAdapter adapter2;
+    CardGridArrayAdapter mCardArrayAdapter;
 
 
-    @InjectView(R.id.carddemo_list_cursor2)
-    CardListView mListView;
+    @InjectView(R.id.carddemo_grid_base1)
+    CardGridView mListView;
 
     public static MovieColectionsFragment newInstance(int position,View view,dbHelper dbHelper2) {
         MovieColectionsFragment f = new MovieColectionsFragment();
@@ -53,9 +69,9 @@ public class MovieColectionsFragment extends Fragment {
         ButterKnife.inject(this, rootView);
         ViewCompat.setElevation(rootView, 50);
 
+        mCardArrayAdapter = new CardGridArrayAdapter(getActivity(), cards);
 
-        adapter2=new MaterialCardArrayAdapter(getActivity(),cards);
-        mListView.setAdapter(adapter2);
+        mListView.setAdapter(mCardArrayAdapter);
 
         new Thread(new Runnable() {
             @Override
@@ -92,15 +108,98 @@ public class MovieColectionsFragment extends Fragment {
     }
 
     public void addColectionToLoadidData(final ColectionModel colectionModel) {
+        GplayGridCard card = new GplayGridCard(getActivity());
+        card.headerTitle = colectionModel.getName();
+        card.secondaryTitle = colectionModel.getCnt()+" ფილმი";
+        CustomThumbNail2 thumbNail2=new CustomThumbNail2(getActivity());
+        //thumbNail2.setUrlResource("http://static.adjaranet.com/collections/thumb/" + colectionModel.getId() + "_big.jpg");
+        //card.addCardThumbnail(thumbNail2);
+        card.thumbUrl="http://static.adjaranet.com/collections/thumb/" + colectionModel.getId() + "_big.jpg";
+        card.setOnClickListener(new Card.OnCardClickListener() {
+            @Override
+            public void onClick(Card card, View view) {
+                Intent i = new Intent(getActivity(), CollectionMoviesActivity.class);
+                i.putExtra("id",colectionModel.getId());
 
-        MaterialLargeImageCard card =
-                MaterialLargeImageCard.with(getActivity())
-                        .setTextOverImage(colectionModel.getName())
-                        .useDrawableUrl("http://static.adjaranet.com/collections/thumb/" + colectionModel.getId() + "_big.jpg")
-                        .build();
-        adapter2.add(card);
+                startActivityForResult(i, 1);
+
+            }
+        });
+        card.init();
+        mCardArrayAdapter.add(card);
 
 
+
+    }
+
+    public class GplayGridCard extends Card {
+
+        protected TextView mTitle;
+        protected TextView mSecondaryTitle;
+        protected RatingBar mRatingBar;
+        protected int resourceIdThumbnail = -1;
+        protected String thumbUrl;
+        protected int count;
+
+        protected String headerTitle;
+        protected String secondaryTitle;
+
+        public GplayGridCard(Context context) {
+            super(context, R.layout.carddemo_gplay_inner_content);
+        }
+
+        public GplayGridCard(Context context, int innerLayout) {
+            super(context, innerLayout);
+        }
+
+        private void init() {
+            //CardHeader header = new CardHeader(getContext());
+            //header.setButtonOverflowVisible(true);
+            //header.setTitle(headerTitle.length()>);
+
+            //addCardHeader(header);
+
+            GplayGridThumb thumbnail = new GplayGridThumb(getContext());
+
+            thumbnail.setUrlResource(thumbUrl);
+            addCardThumbnail(thumbnail);
+
+        }
+
+        @Override
+        public void setupInnerViewElements(ViewGroup parent, View view) {
+
+
+            TextView subtitle = (TextView) view.findViewById(R.id.carddemo_gplay_main_inner_subtitle);
+            subtitle.setText(headerTitle);
+
+        }
+
+        class GplayGridThumb extends CardThumbnail {
+
+            public GplayGridThumb(Context context) {
+                super(context);
+            }
+            @Override
+            public void setupInnerViewElements(ViewGroup parent, View viewImage) {
+                if (viewImage != null) {
+
+                    if (parent!=null && parent.getResources()!=null){
+                        DisplayMetrics metrics=parent.getResources().getDisplayMetrics();
+
+                        int base = 125;
+
+                        if (metrics!=null){
+                            viewImage.getLayoutParams().width = (int)(base*metrics.density*1.4);
+                            viewImage.getLayoutParams().height = (int)(base*metrics.density);
+                        }else{
+                            viewImage.getLayoutParams().width = 250;
+                            viewImage.getLayoutParams().height = 350;
+                        }
+                    }
+                }
+            }
+        }
 
     }
 

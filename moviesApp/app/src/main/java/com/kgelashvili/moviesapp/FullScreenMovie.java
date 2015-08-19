@@ -215,8 +215,10 @@ public class FullScreenMovie extends Activity {
 
     public void onBackPressed(){
 
-        myTimer.cancel();
-        myTimer.purge();
+        if(myTimer!=null){
+            myTimer.cancel();
+            myTimer.purge();
+        }
         setResult(videoView.getCurrentPosition());
         finish();
     }

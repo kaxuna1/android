@@ -11,6 +11,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,6 +20,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
@@ -32,6 +34,8 @@ import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.kgelashvili.moviesapp.Classes.FloatingActionButton;
 import com.kgelashvili.moviesapp.Classes.MovieServices;
+import com.kgelashvili.moviesapp.Classes.ScrollViewExt;
+import com.kgelashvili.moviesapp.Classes.ScrollViewListener;
 import com.kgelashvili.moviesapp.model.Actor;
 import com.kgelashvili.moviesapp.model.HistoryModel;
 import com.kgelashvili.moviesapp.model.Movie;
@@ -52,10 +56,9 @@ import it.gmariotti.cardslib.library.view.CardViewNative;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class MoviePageActivity extends Activity {
+public class MoviePageActivity extends AppCompatActivity {
 
     //Uri video = Uri.parse("http://212.72.157.137/fast2/storage/10246/10246_Georgian_300.mp4");
-    private static ProgressDialog progressDialog;
     String movieId=null;
     String quality="";
     String currentQuality=null;
@@ -63,11 +66,13 @@ public class MoviePageActivity extends Activity {
     String lang=null;
     VideoView videoView;
     String videourl = "";
+    String videoPath= "";
     int movieTime = 0;
     private WebView webView;
     LinearLayout castLayout;
     LinearLayout relatedLayout;
     TabHost tabHost=null;
+    ImageButton playButton=null;
     Movie movie=null;
     private static Timer myTimer;
     MovieSerieLastMomentModel movieSerieLastMomentModel;
@@ -86,188 +91,19 @@ public class MoviePageActivity extends Activity {
                         .build()
         );
         setContentView(R.layout.moviepagelayout);
-        final Bundle extras = getIntent().getExtras();
 
-        tabHost = (TabHost)findViewById(R.id.tabHost);
-        tabHost.setup();
-        TabHost.TabSpec tabSpec=tabHost.newTabSpec("movie");
-        tabSpec.setContent(R.id.tab1);
-        tabSpec.setIndicator(extras.getString("title"));
-        tabHost.addTab(tabSpec);
-
-        tabSpec=tabHost.newTabSpec("movie");
-        tabSpec.setContent(R.id.tab3);
-        tabSpec.setIndicator("IMDB");
-        tabHost.addTab(tabSpec);
-        movie= (Movie) getIntent().getSerializableExtra("Movie");
-        langs=extras.getString("lang");
-
-        castLayout=(LinearLayout)findViewById(R.id.actorsLayout);
-        relatedLayout=(LinearLayout)findViewById(R.id.relatedMoviesLayout);
-
-        ((TextView)findViewById(R.id.durationTxt)).setText(extras.getString("duration") + "-სთ");
-
-        final String value = extras.getString("movieId");
-        movieId=extras.getString("movieId");
-
-
-        ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.fullScreenButton)).setOnClickListener(new View.OnClickListener() {
+        playButton=(ImageButton)findViewById(R.id.play_button);
+        playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(MoviePageActivity.this, FullScreenMovie.class);
-                i.putExtra("movieId", extras.getString("movieId"));
-                i.putExtra("description", extras.getString("description"));
-                i.putExtra("title", extras.getString("title"));
-                i.putExtra("date", extras.getString("date"));
-                i.putExtra("duration", extras.getString("duration"));
-                i.putExtra("rating", extras.getString("rating"));
-                i.putExtra("imdb", extras.getString("imdb"));
-                i.putExtra("time", videoView.getCurrentPosition());
-                i.putExtra("link", videourl);
-
-                myTimer.cancel();
-                myTimer.purge();
-
-
-                startActivityForResult(i, 0);
-            }
-        });
-        ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.watchLaterBtn)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                List<Movie> movieList = Movie.find(Movie.class, "movie_id = '" + movie.getMovieId() + "'");
-
-                if (movieList.size() == 0) {
-                    movie.save();
-                    Toast.makeText(MoviePageActivity.this, "დაემატა ვაპირებ ყრებას სიაში", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(MoviePageActivity.this, "უკვე არსებობს ვაპირებ ყრებას სიაში", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-        ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.downloadButtonSerie)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String url = videourl;
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(url));
-                startActivity(i);
-            }
-        });
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                new getMovieActorsAsync().doInBackground(extras.getString("movieId"));
-                new getMovieRelated().doInBackground(extras.getString("movieId"));
-            }
-        }).start();
-        ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.langBtnSerie)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(MoviePageActivity.this);
-                builder.setTitle("აირჩიეთ ენა")
-                        .setItems(langs.split(","), new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                movieTime = videoView.getCurrentPosition();
-                                myTimer.cancel();
-                                myTimer.purge();
-                                movieSerieLastMomentModel.setTime(videoView.getCurrentPosition());
-                                movieSerieLastMomentModel.save();
-                                if (currentQuality == null) {
-                                    currentQuality = quality.split(",")[0];
-                                }
-                                lang = langs.split(",")[which];
-                                videourl = "http://adjaranet.com/download.php?mid=" + value + "&file=" + value + "_" +
-                                        lang + "_" + currentQuality;
-                                PlayVideo();
-
-                            }
-                        });
-                builder.create();
-                builder.show();
-            }
-        });
-        ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.qualBtn)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(MoviePageActivity.this);
-                builder.setTitle("აირჩიეთ ხარისხი")
-                        .setItems(quality.split(","), new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                movieTime = videoView.getCurrentPosition();
-                                //videourl=currentEpisodes.get(position).getLink().replace("{L}", lang);
-                                myTimer.cancel();
-                                myTimer.purge();
-                                movieSerieLastMomentModel.setTime(videoView.getCurrentPosition());
-                                movieSerieLastMomentModel.save();
-
-                                currentQuality = quality.split(",")[which];
-
-                                videourl = "http://adjaranet.com/download.php?mid=" + value + "&file=" + value + "_" +
-                                        lang + "_" + currentQuality;
-                                PlayVideo();
-
-
-                            }
-                        });
-                builder.create();
-                builder.show();
+                Toast.makeText(MoviePageActivity.this, "მიმდინარეობს ფილმის ჩატვირთვა", Toast.LENGTH_LONG).show();
             }
         });
 
-
-        TextView date = (TextView) findViewById(R.id.movieDate);
-        date.setText("(" + extras.getString("date") + ")");
-        ((TextView) findViewById(R.id.imdbRating)).setText(extras.getString("rating"));
-        ((ImageView) findViewById(R.id.imdbImg)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.imdb.com/title/" + extras.getString("imdb")));
-                startActivity(browserIntent);
-            }
-        });
-        ((TextView) findViewById(R.id.descriptionTxt)).setText(extras.getString("description"));
-
-        setTitle(extras.getString("title"));
-        movieTime = extras.getInt("time");
-
-
-        videoView = (VideoView) findViewById(R.id.myvideoview);
-        progressDialog = ProgressDialog.show(MoviePageActivity.this, "", "მიმდინარეობს ვიდეოს ჩატვირთა", true);
-        progressDialog.setCancelable(false);
-
-
-        YoYo.with(Techniques.SlideInRight).duration(500)
-                .withListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animation) {
-
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-
-                        webView = (WebView) findViewById(R.id.webView1);
-                        webView.getSettings().setJavaScriptEnabled(true);
-                        webView.setWebViewClient(new WebViewClient());
-                        webView.loadUrl("http://www.imdb.com/title/" + extras.getString("imdb"));
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animation) {
-
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animation) {
-
-                    }
-                }).playOn(findViewById(R.id.moviePageRelative));
-
-
-
-
+        startVideoPlaying();
     }
+
+
 
 
     @Override
@@ -298,7 +134,6 @@ public class MoviePageActivity extends Activity {
                         movieSerieLastMomentModel.time=0;
                         movieSerieLastMomentModel.save();
                     }
-                    progressDialog.dismiss();
 
                     videoView.seekTo(movieSerieLastMomentModel.time);
                     videoView.start();
@@ -306,7 +141,7 @@ public class MoviePageActivity extends Activity {
                     myTimer.schedule(new TimerTask() {
                         @Override
                         public void run() {
-                            movieSerieLastMomentModel.time=videoView.getCurrentPosition();
+                            movieSerieLastMomentModel.time = videoView.getCurrentPosition();
                             movieSerieLastMomentModel.save();
                         }
 
@@ -321,7 +156,16 @@ public class MoviePageActivity extends Activity {
                             return true;
                         }
                     });
-                    MediaController mediaController = new MediaController(MoviePageActivity.this);
+                    ScrollViewExt scrollViewExt=(ScrollViewExt)findViewById(R.id.scrollView2);
+
+                    final MediaController mediaController = new MediaController(MoviePageActivity.this,true);
+
+                    scrollViewExt.setScrollViewListener(new ScrollViewListener() {
+                        @Override
+                        public void onScrollChanged(ScrollViewExt scrollView, int x, int y, int oldx, int oldy) {
+                            mediaController.hide();
+                        }
+                    });
                     mediaController.setAnchorView(videoView);
                     videoView.setMediaController(mediaController);
 
@@ -330,7 +174,6 @@ public class MoviePageActivity extends Activity {
             });
 
         } catch (Exception e) {
-            progressDialog.dismiss();
             finish();
         }
 
@@ -367,6 +210,8 @@ public class MoviePageActivity extends Activity {
             actors=new MovieServices().getMovieActors(strings[0]);
             quality=new MovieServices().getMovieQuality(strings[0]);
             langs=new MovieServices().getMovieLangs(strings[0]);
+            videoPath=new MovieServices().getMoviePath(strings[0]);
+
             movie.setLang(langs);
 
             HistoryModel historyModel=new HistoryModel(movie.getMovieId(),movie.getTitle_en(),movie.getLink(),
@@ -394,9 +239,16 @@ public class MoviePageActivity extends Activity {
         protected void onProgressUpdate(ArrayList<Actor>... values) {
             super.onProgressUpdate(values);
 
-            videourl = "http://adjaranet.com/download.php?mid="
-                    + movieId + "&file=" + movieId + "_" + (langs.split(",")[0]) + "_"+quality.split(",")[0];
-            PlayVideo();
+            lang=langs.split(",")[0];
+            videourl = videoPath + movieId + "_" + lang + "_"+quality.split(",")[0]+".mp4";
+            //PlayVideo();
+            playButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    playButton.setVisibility(View.GONE);
+                    PlayVideo();
+                }
+            });
             for (int i = 0; i < values[0].size(); i++) {
                 addActorToCast(values[0].get(i));
             }
@@ -469,7 +321,7 @@ public class MoviePageActivity extends Activity {
 
     }
 
-    private void addActorToCast(Actor actor) {
+    private void addActorToCast(final Actor actor) {
 
         LinearLayout linearLayout = castLayout;
         LayoutInflater inflater = LayoutInflater.from(this);
@@ -489,7 +341,10 @@ public class MoviePageActivity extends Activity {
         card.setOnClickListener(new Card.OnCardClickListener() {
             @Override
             public void onClick(Card card, View view) {
+                Intent i = new Intent(MoviePageActivity.this, ActorMoviesActivity.class);
+                i.putExtra("id",actor.actorId);
 
+                startActivityForResult(i, 1);
             }
         });
         CardViewNative cardView = (CardViewNative) layout.findViewById(R.id.actorCard);
@@ -516,8 +371,10 @@ public class MoviePageActivity extends Activity {
                 YoYo.with(Techniques.SlideOutRight).withListener(new Animator.AnimatorListener() {
                     @Override
                     public void onAnimationStart(Animator animation) {
-                        myTimer.cancel();
-                        myTimer.purge();
+                        if(myTimer!=null){
+                            myTimer.cancel();
+                            myTimer.purge();
+                        }
                         finish();
                     }
 
@@ -541,8 +398,10 @@ public class MoviePageActivity extends Activity {
             YoYo.with(Techniques.SlideOutRight).withListener(new Animator.AnimatorListener() {
                 @Override
                 public void onAnimationStart(Animator animation) {
-                    myTimer.cancel();
-                    myTimer.purge();
+                    if(myTimer!=null){
+                        myTimer.cancel();
+                        myTimer.purge();
+                    }
                     finish();
                 }
 
@@ -577,6 +436,218 @@ public class MoviePageActivity extends Activity {
 
             return result;
         }
+    }
+
+    public void startVideoPlaying(){
+        final Bundle extras = getIntent().getExtras();
+
+        tabHost = (TabHost)findViewById(R.id.tabHost);
+        tabHost.setup();
+        TabHost.TabSpec tabSpec=tabHost.newTabSpec("movie");
+        tabSpec.setContent(R.id.tab1);
+        tabSpec.setIndicator(extras.getString("title"));
+        tabHost.addTab(tabSpec);
+
+        tabSpec=tabHost.newTabSpec("movie");
+        tabSpec.setContent(R.id.tab3);
+        tabSpec.setIndicator("IMDB");
+        tabHost.addTab(tabSpec);
+        movie= (Movie) getIntent().getSerializableExtra("Movie");
+        langs=extras.getString("lang");
+
+        castLayout=(LinearLayout)findViewById(R.id.actorsLayout);
+        relatedLayout=(LinearLayout)findViewById(R.id.relatedMoviesLayout);
+
+        ((TextView)findViewById(R.id.durationTxt)).setText(extras.getString("duration") + "-სთ");
+
+        final String value = extras.getString("movieId");
+        movieId=extras.getString("movieId");
+
+
+        ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.fullScreenButton)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MoviePageActivity.this, FullScreenMovie.class);
+                i.putExtra("movieId", extras.getString("movieId"));
+                i.putExtra("description", extras.getString("description"));
+                i.putExtra("title", extras.getString("title"));
+                i.putExtra("date", extras.getString("date"));
+                i.putExtra("duration", extras.getString("duration"));
+                i.putExtra("rating", extras.getString("rating"));
+                i.putExtra("imdb", extras.getString("imdb"));
+                i.putExtra("time", videoView.getCurrentPosition());
+                i.putExtra("link", videourl);
+
+                myTimer.cancel();
+                myTimer.purge();
+
+
+                startActivityForResult(i, 0);
+            }
+        });
+        ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.watchLaterBtn)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                List<Movie> movieList = Movie.find(Movie.class, "movie_id = '" + movie.getMovieId() + "'");
+
+                if (movieList.size() == 0) {
+                    movie.save();
+                    Toast.makeText(MoviePageActivity.this, "დაემატა სიაში", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(MoviePageActivity.this, "უკვე დამატებულია სიაში", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+        ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.downloadButtonSerie)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String url = videourl;
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
+            }
+        });
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                new getMovieActorsAsync().doInBackground(extras.getString("movieId"));
+                new getMovieRelated().doInBackground(extras.getString("movieId"));
+            }
+        }).start();
+        ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.langBtnSerie)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MoviePageActivity.this);
+                builder.setTitle("აირჩიეთ ენა")
+                        .setItems(langs.split(","), new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                movieTime = videoView.getCurrentPosition();
+                                myTimer.cancel();
+                                myTimer.purge();
+                                movieSerieLastMomentModel.setTime(videoView.getCurrentPosition());
+                                movieSerieLastMomentModel.save();
+                                if (currentQuality == null) {
+                                    currentQuality = quality.split(",")[0];
+                                }
+                                lang = langs.split(",")[which];
+                                videourl = videoPath + value + "_" +
+                                        lang + "_" + currentQuality+".mp4";
+                                PlayVideo();
+
+                            }
+                        });
+                builder.create();
+                builder.show();
+            }
+        });
+        ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.qualBtn)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MoviePageActivity.this);
+                builder.setTitle("აირჩიეთ ხარისხი")
+                        .setItems(quality.split(","), new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                movieTime = videoView.getCurrentPosition();
+                                //videourl=currentEpisodes.get(position).getLink().replace("{L}", lang);
+                                myTimer.cancel();
+                                myTimer.purge();
+                                movieSerieLastMomentModel.setTime(videoView.getCurrentPosition());
+                                movieSerieLastMomentModel.save();
+
+                                currentQuality = quality.split(",")[which];
+
+                                videourl = videoPath + value + "_" +
+                                        lang + "_" + currentQuality+".mp4";
+                                PlayVideo();
+
+
+                            }
+                        });
+                builder.create();
+                builder.show();
+            }
+        });
+
+
+        TextView date = (TextView) findViewById(R.id.movieDate);
+        date.setText(extras.getString("date"));
+        ((TextView) findViewById(R.id.imdbRating)).setText(extras.getString("rating"));
+        ((ImageView) findViewById(R.id.imdbImg)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.imdb.com/title/" + extras.getString("imdb")));
+                startActivity(browserIntent);
+            }
+        });
+        ((TextView) findViewById(R.id.descriptionTxt)).setText(extras.getString("description"));
+
+        setTitle(extras.getString("title"));
+        movieTime = extras.getInt("time");
+
+
+        videoView = (VideoView) findViewById(R.id.myvideoview);
+
+
+
+        YoYo.with(Techniques.SlideInRight).duration(500)
+                .withListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+
+                        webView = (WebView) findViewById(R.id.webView1);
+                        webView.getSettings().setJavaScriptEnabled(true);
+                        webView.setWebViewClient(new WebViewClient());
+                        webView.loadUrl("http://www.imdb.com/title/" + extras.getString("imdb"));
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                }).playOn(findViewById(R.id.moviePageRelative));
+    }
+
+    public void stopVideoPlaying(){
+        videoView.pause();
+        if(myTimer!=null){
+            myTimer.cancel();
+            myTimer.purge();
+        }
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        stopVideoPlaying();
+    }
+    @Override
+    protected void onStop(){
+        super.onStop();
+        stopVideoPlaying();
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        stopVideoPlaying();
+    }
+    @Override
+    protected void onResume(){
+        super.onResume();
+        if(videoView!=null){
+            videoView.resume();
+        }
+        //startVideoPlaying();
     }
 
 }

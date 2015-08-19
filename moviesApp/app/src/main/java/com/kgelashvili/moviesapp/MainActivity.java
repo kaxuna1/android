@@ -38,6 +38,17 @@ import com.kgelashvili.moviesapp.fragments.MoviesGridFragment;
 import com.kgelashvili.moviesapp.fragments.MoviesPageFragment;
 import com.kgelashvili.moviesapp.fragments.SeriesPageFragment;
 import com.kgelashvili.moviesapp.utils.SimpleSectionedListAdapter;
+import com.mikepenz.iconics.typeface.FontAwesome;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.accountswitcher.AccountHeader;
+import com.mikepenz.materialdrawer.accountswitcher.AccountHeaderBuilder;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 
 import java.util.ArrayList;
@@ -63,7 +74,6 @@ public class MainActivity extends AppCompatActivity{
     dbHelper dbHelper2=new dbHelper(MainActivity.this);
     private ListView mDrawerList;
     private DrawerLayout mDrawer;
-    private CustomActionBarDrawerToggle mDrawerToggle;
     int mCurrentTitle=R.string.app_name;
 
     SimpleSectionedListAdapter mSectionedAdapter;
@@ -142,9 +152,78 @@ public class MainActivity extends AppCompatActivity{
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout2);
         mDrawer.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 
-        _initMenu();
+        //_initMenu();
+        AccountHeader headerResult = new AccountHeaderBuilder()
+                .withActivity(this)
+                .withHeaderBackground(R.drawable.header2)
+                .addProfiles(
+                        //new ProfileDrawerItem().withName("Adjaranet").withEmail("").withIcon(getResources().getDrawable(R.mipmap.ic_launcher))
+                )
+                .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
+                    @Override
+                    public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
+                        return false;
+                    }
+                })
+                .build();
 
 
+        android.support.v7.widget.Toolbar toolbar=(android.support.v7.widget.Toolbar)findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        Drawer result = new DrawerBuilder()
+                .withActivity(this)
+                .withToolbar(toolbar)
+                .withActionBarDrawerToggle(true)
+                .withActionBarDrawerToggleAnimated(true)
+                .withTranslucentStatusBar(false)
+                .withAccountHeader(headerResult)
+                .addDrawerItems(
+                        new PrimaryDrawerItem().withName("ქართულად გახმოვანებული").withBadge("Ge"),
+                        new PrimaryDrawerItem().withName("გამოწერილი სიახლეები").withIcon(FontAwesome.Icon.faw_newspaper_o),
+                        new PrimaryDrawerItem().withName("ვაპირებ ყურებას").withIcon(FontAwesome.Icon.faw_thumbs_o_up),
+                        new PrimaryDrawerItem().withName("ისტორია").withIcon(FontAwesome.Icon.faw_history),
+                        new PrimaryDrawerItem().withName("პარამეტრები").withIcon(FontAwesome.Icon.faw_gears)
+                )
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
+                        // do something with the clicked item :D
+                        Intent i;
+                        switch (position) {
+                            case 4:
+
+                                i = new Intent(MainActivity.this, settingsActivity.class);
+                                startActivity(i);
+                                break;
+                            case 3:
+
+                                i = new Intent(MainActivity.this, HistoryPageActivity.class);
+                                startActivity(i);
+                                break;
+                            case 2:
+
+                                i = new Intent(MainActivity.this, WatchLaterActivity.class);
+                                startActivity(i);
+                                break;
+                            case 1:
+
+                                i = new Intent(MainActivity.this, NewsCollectionActivity.class);
+                                startActivity(i);
+                                break;
+                            case 0:
+
+                                i = new Intent(MainActivity.this, GeoMoviesCollecitonActivity.class);
+                                startActivity(i);
+                                break;
+
+                        }
+
+
+                        return false;
+                    }
+                })
+                .build();
+        toolbar.setTitle("Adjaranet");
     }
     private void changeColor(int newColor) {
         tabs.setBackgroundColor(newColor);
@@ -167,32 +246,12 @@ public class MainActivity extends AppCompatActivity{
         oldBackground = ld;
         currentColor = newColor;
     }
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_settings, menu);
-        return true;
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
 
     public class MyPagerAdapter extends FragmentPagerAdapter {
 
-        private final String[] TITLES = {"მთავარი","კოლექციები", "ფილმები","სერიალები", "ვაპირებ ყურებას","ფილმების კედელი"};
+        private final String[] TITLES = {"მთავარი","კოლექციები", "ფილმები","სერიალები"};
 
         public MyPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -215,8 +274,6 @@ public class MainActivity extends AppCompatActivity{
                 case 1:return MovieColectionsFragment.newInstance(position, findViewById(R.id.fragmentMainLinar), dbHelper2);
                 case 2:return MoviesPageFragment.newInstance(position, findViewById(R.id.fragmentMainLinar),dbHelper2);
                 case 3:return SeriesPageFragment.newInstance(position, findViewById(R.id.fragmentMainLinar));
-                case 4:return FavoritesPageFragment.newInstance(position, findViewById(R.id.fragmentMainLinar),dbHelper2);
-                case 5:return MoviesGridFragment.newInstance(position, findViewById(R.id.fragmentMainLinar), dbHelper2);
                 default:return MainPageFragment.newInstance(position,findViewById(R.id.fragmentMainLinar));
             }
         }
@@ -227,92 +284,6 @@ public class MainActivity extends AppCompatActivity{
         super.onActivityResult(requestCode, resultCode, data);
         YoYo.with(Techniques.ZoomInLeft).playOn(findViewById(R.id.fragmentMainLinar));
     }
-    public static final String[] options = {
-            "ქართულად გახმოვანებული",
-            "გამოწერილი სიახლეები",
-            "ისტორია",
-            "პარამეტრები"
-    };
-    private class CustomActionBarDrawerToggle extends ActionBarDrawerToggle {
 
-        public CustomActionBarDrawerToggle(Activity mActivity, DrawerLayout mDrawerLayout) {
-
-            super(
-                    mActivity,
-                    mDrawerLayout,
-                    com.kgelashvili.moviesapp.R.drawable.ic_navigation_drawer,
-                    com.kgelashvili.moviesapp.R.string.app_name,
-                    mCurrentTitle);
-        }
-
-        @Override
-        public void onDrawerClosed(View view) {
-            //getActionBar().setTitle("კინოები");
-            invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-        }
-
-        @Override
-        public void onDrawerOpened(View drawerView) {
-            //getActionBar().setTitle("მენიუ");
-            invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-        }
-    }
-    private void _initMenu() {
-
-        mDrawerList = (ListView) findViewById(R.id.drawer2);
-
-        if (mDrawerList != null) {
-            ArrayAdapter<String> mAdapter = new ArrayAdapter<String>(this,
-                    R.layout.demo_activity_menuitem, options);
-
-            List<SimpleSectionedListAdapter.Section> sections =
-                    new ArrayList<SimpleSectionedListAdapter.Section>();
-
-
-            SimpleSectionedListAdapter.Section[] dummy = new SimpleSectionedListAdapter.Section[sections.size()];
-            mSectionedAdapter = new SimpleSectionedListAdapter(this, R.layout.demo_activity_menusection, mAdapter);
-            mSectionedAdapter.setSections(sections.toArray(dummy));
-
-            mDrawerList.setAdapter(mSectionedAdapter);
-            mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
-        }
-
-    }
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
-
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position,
-                                long id) {
-
-            // Highlight the selected item, update the title, and close the drawer
-            // update selected item and title, then close the drawer
-            position = mSectionedAdapter.sectionedPositionToPosition(position);
-            mDrawer.closeDrawer(mDrawerList);
-            Intent i;
-            switch (position) {
-                case 3:
-
-                    i = new Intent(MainActivity.this, settingsActivity.class);
-                    startActivity(i);
-                    break;
-                case 2:
-
-                    i = new Intent(MainActivity.this, HistoryPageActivity.class);
-                    startActivity(i);
-                    break;
-                case 1:
-
-                    i = new Intent(MainActivity.this, NewsCollectionActivity.class);
-                    startActivity(i);
-                    break;
-                case 0:
-
-                    i = new Intent(MainActivity.this, GeoMoviesCollecitonActivity.class);
-                    startActivity(i);
-                    break;
-
-            }
-        }
-    }
 
 }

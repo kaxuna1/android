@@ -29,4 +29,12 @@ public class ColectionModel {
     public void setId(String id) {
         this.id = id;
     }
+
+    public String getCnt() {
+        return cnt;
+    }
+
+    public void setCnt(String cnt) {
+        this.cnt = cnt;
+    }
 }

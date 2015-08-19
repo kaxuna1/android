@@ -1,75 +1,60 @@
-package com.kgelashvili.moviesapp.fragments;
+package com.kgelashvili.moviesapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewCompat;
-import android.util.Log;
-import android.view.LayoutInflater;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.kgelashvili.moviesapp.Classes.CustomHeaderMainMovieItem;
 import com.kgelashvili.moviesapp.Classes.CustomThumbNail;
-import com.kgelashvili.moviesapp.Classes.dbHelper;
-import com.kgelashvili.moviesapp.MoviePageActivity;
-import com.kgelashvili.moviesapp.R;
 import com.kgelashvili.moviesapp.model.Movie;
 import com.kgelashvili.moviesapp.model.Serie;
-import com.kgelashvili.moviesapp.serie_page_activity;
 import com.nineoldandroids.animation.Animator;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.ButterKnife;
-import butterknife.InjectView;
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardArrayAdapter;
 import it.gmariotti.cardslib.library.internal.CardExpand;
 import it.gmariotti.cardslib.library.internal.CardHeader;
-import it.gmariotti.cardslib.library.internal.CardThumbnail;
 import it.gmariotti.cardslib.library.view.CardListView;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-/**
- * Created by KGelashvili on 7/27/2015.
- */
-public class FavoritesPageFragment extends Fragment {
-    private static final String ARG_POSITION = "position";
-    private int position;
-    private static View view;
-    private static dbHelper dbHelper2;
+
+public class WatchLaterActivity extends AppCompatActivity {
+
+    CardListView mListView;
     CardArrayAdapter adapter3;
     ArrayList<Card> cardsFav=new ArrayList<Card>();
     getMoviesFav getMoviesFav=new getMoviesFav();
-    @InjectView(R.id.favoritesList)
-    CardListView mListView;
-    public static FavoritesPageFragment newInstance(int position,View view,dbHelper dbHelper2) {
-        FavoritesPageFragment f = new FavoritesPageFragment();
-        Bundle b = new Bundle();
-        FavoritesPageFragment.view=view;
-        FavoritesPageFragment.dbHelper2=dbHelper2;
-        b.putInt(ARG_POSITION, position);
-        f.setArguments(b);
-        FavoritesPageFragment.view=view;
-        return f;
-    }
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        position = getArguments().getInt(ARG_POSITION);
-    }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.favoritesfragment, container, false);
-        ButterKnife.inject(this, rootView);
-        ViewCompat.setElevation(rootView, 50);
-        adapter3=new CardArrayAdapter(getActivity(), cardsFav);
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                        .setDefaultFontPath("fonts/bpg_square_mtavruli_2009.ttf")
+                        .setFontAttrId(R.attr.fontPath)
+                        .build()
+        );
+        setContentView(R.layout.activity_watch_later);
+        mListView=(CardListView)findViewById(R.id.carddemo_list_cursor2);
+        adapter3=new CardArrayAdapter(this, cardsFav);
         mListView.setAdapter(adapter3);
         new Thread(new Runnable() {
             @Override
@@ -78,9 +63,29 @@ public class FavoritesPageFragment extends Fragment {
                 getMoviesFav.doInBackground("");
             }
         }).run();
-        return rootView;
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_news_collection, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 
     class getMoviesFav extends AsyncTask<String,ArrayList<Card>,ArrayList<Card>> {
 
@@ -96,10 +101,10 @@ public class FavoritesPageFragment extends Fragment {
         List<Movie> moviesFavs=Movie.listAll(Movie.class);
         for(int i=0;i<moviesFavs.size();i++){
             final Movie movie=moviesFavs.get(i);
-            Card card = new Card(getActivity());
+            Card card = new Card(WatchLaterActivity.this);
 
             //Create a CardHeader
-            CustomHeaderMainMovieItem header = new CustomHeaderMainMovieItem(getActivity(),
+            CustomHeaderMainMovieItem header = new CustomHeaderMainMovieItem(WatchLaterActivity.this,
                     movie.getTitle_en(),movie.getRelease_date(),movie.getDescription().length()>50?movie.getDescription().substring(0,49):movie.getDescription());
 
             //Set the header title
@@ -113,7 +118,7 @@ public class FavoritesPageFragment extends Fragment {
             header.setOtherButtonClickListener(new CardHeader.OnClickCardHeaderOtherButtonListener() {
                 @Override
                 public void onButtonItemClick(Card card, View view) {
-                    Toast.makeText(getActivity(), "წაიშალა ვაპირებ ყურებას სიიდან", Toast.LENGTH_LONG).show();
+                    Toast.makeText(WatchLaterActivity.this, "წაიშალა ვაპირებ ყურებას სიიდან", Toast.LENGTH_LONG).show();
                     movie.delete();
                     adapter3.remove(card);
                     adapter3.notifyDataSetChanged();
@@ -123,7 +128,7 @@ public class FavoritesPageFragment extends Fragment {
             //Use this code to set your drawable
             header.setOtherButtonDrawable(R.drawable.card_menu_button_other_dismiss);
 
-            CardExpand expand = new CardExpand(getActivity());
+            CardExpand expand = new CardExpand(WatchLaterActivity.this);
 
             card.addCardExpand(expand);
 
@@ -132,7 +137,7 @@ public class FavoritesPageFragment extends Fragment {
             //Create thumbnail
             //CustomThumbCard thumb = new CustomThumbCard(MainActivity.this);
 
-            CustomThumbNail thumbnail=new CustomThumbNail(getActivity());
+            CustomThumbNail thumbnail=new CustomThumbNail(WatchLaterActivity.this);
 
             thumbnail.setUrlResource(movie.getPoster());
 
@@ -166,7 +171,7 @@ public class FavoritesPageFragment extends Fragment {
                         public void onAnimationEnd(Animator animation) {
                             Movie selectedMovie = movie;
 
-                            Intent i = new Intent(getActivity(), MoviePageActivity.class);
+                            Intent i = new Intent(WatchLaterActivity.this, MoviePageActivity.class);
                             i.putExtra("movieId", selectedMovie.getMovieId());
                             i.putExtra("description", selectedMovie.getDescription());
                             i.putExtra("title", selectedMovie.getTitle_en());
@@ -189,7 +194,7 @@ public class FavoritesPageFragment extends Fragment {
                         public void onAnimationRepeat(Animator animation) {
 
                         }
-                    }).playOn(FavoritesPageFragment.view);
+                    }).playOn(findViewById(R.id.watchLaterMain));
 
                 }
             });
@@ -199,4 +204,9 @@ public class FavoritesPageFragment extends Fragment {
 
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        YoYo.with(Techniques.ZoomInLeft).playOn(findViewById(R.id.watchLaterMain));
+    }
 }

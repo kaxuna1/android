@@ -61,4 +61,7 @@ dependencies {
     compile 'com.felipecsl.asymmetricgridview:library:2.0.1'
     compile 'com.koushikdutta.ion:ion:2.+'
     compile 'me.neavo:vitamio:4.2.2'
+    compile('com.mikepenz:materialdrawer:3.1.2@aar') {
+        transitive = true
+    }
 }

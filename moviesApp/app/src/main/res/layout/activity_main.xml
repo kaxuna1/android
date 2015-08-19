@@ -13,23 +13,13 @@
         android:fitsSystemWindows="true"
         android:orientation="vertical"
         tools:ignore="MissingPrefix">
-
-        <RelativeLayout
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="10dp"
-            android:layout_weight="0.05"
-            android:background="@color/primary">
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/primary"
+            android:elevation="4dp"/>
 
-            <ImageView
-                android:id="@+id/imageView3"
-                android:layout_width="130dp"
-                android:layout_height="match_parent"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:paddingLeft="10dp"
-                android:src="@drawable/logoo" />
-        </RelativeLayout>
 
         <com.astuetz.PagerSlidingTabStrip
             android:id="@+id/tabs"
@@ -46,14 +36,5 @@
 
 
     </LinearLayout>
-    <ListView
-        android:id="@+id/drawer2"
-        android:layout_width="@dimen/drawer_width"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:background="#F3F3F4"
-        android:choiceMode="singleChoice"
-        android:divider="@android:color/darker_gray"
-        android:dividerHeight="1dp"/>
 
 </android.support.v4.widget.DrawerLayout>

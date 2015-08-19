@@ -61,7 +61,7 @@ public class MovieServices {
     public ArrayList<Serie> getMainSeries(String offset,String language,String startYear,String endYear,String keyWord,String janrebi){
         ArrayList<Serie> Series=new ArrayList<Serie>();
         //offset=0,language=false,startYear=1900,endYear=2015
-        String url = "http://adjaranet.com/Search/SearchResults?ajax=1"+janrebi+"&display=15&startYear="+startYear+"&endYear="+endYear +
+        String url = "http://adjaranet.com/Search/SearchResults?ajax=1&"+janrebi+"display=15&startYear="+startYear+"&endYear="+endYear +
                 "&offset="+offset+"&isnew=0&keyword="+keyWord+"&needtags=0&orderBy=date&order%5Border%5D=data&order%5Bdata%5D=published&language="+language +
                 "&country=false&game=0&videos=0&xvideos=0&xphotos=0&trailers=0&episode=1&tvshow=0&flashgames=0";
         NetworkDAO networkDAO=new NetworkDAO();
@@ -467,5 +467,96 @@ public class MovieServices {
 
         return Colections;
 
+    }
+
+    public ArrayList<Movie> getCollectionMovies(String id){
+        ArrayList<Movie> Movies=new ArrayList<Movie>();
+        String url = "http://adjaranet.com/req/jsondata/req.php?reqId=getCollections&id="+id;
+        NetworkDAO networkDAO=new NetworkDAO();
+        try {
+            String rawMoviesData=networkDAO.request(url);
+            JSONArray movies=new JSONArray(rawMoviesData);
+            //JSONArray movies=jsonObject.getJSONArray("data");
+            for (int i=0;i<movies.length();i++){
+                JSONObject movieJ=movies.getJSONObject(i);
+
+                Movie movie=new Movie(movieJ.getString("id"),
+                        movieJ.getString("title_ge"),
+                        movieJ.getString("link"),
+                        movieJ.getString("poster"),
+                        movieJ.getString("imdb"),
+                        movieJ.getString("imdb_id"),
+                        movieJ.getString("release_date"),
+                        movieJ.getString("description"),
+                        "",
+                        "");
+                movie.type=movieJ.getInt("movie_type");
+                Movies.add(movie);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+
+        return Movies;
+    }
+
+    public String getMoviePath(String movieId) {
+        String path="";
+        String url = "http://adjaranet.com/req/jsondata/req.php?id="+movieId+"&reqId=getLangAndHd";
+        NetworkDAO networkDAO=new NetworkDAO();
+        try {
+            String rawData=networkDAO.request(url);
+
+            JSONObject movieData=new JSONObject(rawData);
+            JSONObject object0=movieData.getJSONObject("0");
+            path=object0.getString("url");
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return path;
+    }
+
+    public ArrayList<Movie> getActorMovies(String id){
+        ArrayList<Movie> Movies=new ArrayList<Movie>();
+        String url = "http://adjaranet.com/req/jsondata/req.php?reqId=getActorMovies&id="+id;
+        NetworkDAO networkDAO=new NetworkDAO();
+        try {
+            String rawMoviesData=networkDAO.request(url);
+            JSONArray movies=new JSONArray(rawMoviesData);
+            //JSONArray movies=jsonObject.getJSONArray("data");
+            for (int i=0;i<movies.length();i++){
+                JSONObject movieJ=movies.getJSONObject(i);
+
+                Movie movie=new Movie(movieJ.getString("id"),
+                        movieJ.getString("title_en"),
+                        movieJ.getString("link"),
+                        movieJ.getString("poster"),
+                        movieJ.getString("imdb"),
+                        movieJ.getString("imdb_id"),
+                        movieJ.getString("release_date"),
+                        movieJ.getString("description"),
+                        "",
+                        "");
+                movie.type=movieJ.getInt("movie_type");
+                Movies.add(movie);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+
+        return Movies;
     }
 }
