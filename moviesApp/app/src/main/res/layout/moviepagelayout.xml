@@ -108,21 +108,22 @@
                                 android:layout_alignLeft="@+id/cardview1"
                                 android:layout_alignStart="@+id/cardview1" />
                             <mehdi.sakout.fancybuttons.FancyButton
-                                android:id="@+id/downloadButtonSerie"
-                                android:layout_width="40dp"
+                                android:id="@+id/qualBtn"
+                                android:layout_width="120dp"
                                 android:layout_height="30dp"
                                 fancy:fb_borderColor="#FFFFFF"
                                 fancy:fb_borderWidth="1dp"
-                                fancy:fb_defaultColor="#7ab800"
-                                fancy:fb_focusColor="#9bd823"
-                                fancy:fb_fontIconResource="&#xf0ed;"                                fancy:fb_iconPosition="left"
+                                fancy:fb_defaultColor="#3b5998"
+                                fancy:fb_focusColor="#5474b8"
+                                fancy:fb_fontIconResource="&#xf008;"
+                                fancy:fb_iconPosition="left"
                                 fancy:fb_radius="30dp"
-                                fancy:fb_text=""
-                                fancy:fb_textColor="#FFFFFF"
                                 fancy:fb_textSize="18px"
-                                android:layout_alignParentTop="true"
-                                android:layout_toRightOf="@+id/qualBtn"
-                                android:layout_toEndOf="@+id/qualBtn"
+                                fancy:fb_text="ხარისხი"
+                                fancy:fb_textColor="#FFFFFF"
+                                android:layout_alignTop="@+id/langBtnSerie"
+                                android:layout_toRightOf="@+id/langBtnSerie"
+                                android:layout_toEndOf="@+id/langBtnSerie"
                                 android:layout_marginLeft="5dp" />
                             <mehdi.sakout.fancybuttons.FancyButton
                                 android:id="@+id/fullScreenButton"
@@ -138,27 +139,31 @@
                                 fancy:fb_textColor="#FFFFFF"
                                 fancy:fb_textSize="18px"
                                 android:layout_alignParentTop="true"
-                                android:layout_toRightOf="@+id/downloadButtonSerie"
-                                android:layout_toEndOf="@+id/downloadButtonSerie"
+                                android:layout_toRightOf="@+id/qualBtn"
+                                android:layout_alignRight="@+id/downloadButtonSerie"
+                                android:layout_alignEnd="@+id/downloadButtonSerie"
                                 android:layout_marginLeft="5dp" />
                             <mehdi.sakout.fancybuttons.FancyButton
-                                android:id="@+id/qualBtn"
-                                android:layout_width="100dp"
+                                android:id="@+id/downloadButtonSerie"
+                                android:layout_width="40dp"
                                 android:layout_height="30dp"
                                 fancy:fb_borderColor="#FFFFFF"
                                 fancy:fb_borderWidth="1dp"
                                 fancy:fb_defaultColor="#7ab800"
                                 fancy:fb_focusColor="#9bd823"
-                                fancy:fb_fontIconResource="&#xf008;"
-                                fancy:fb_iconPosition="left"
+                                fancy:fb_fontIconResource="&#xf0ed;"                                fancy:fb_iconPosition="left"
                                 fancy:fb_radius="30dp"
-                                fancy:fb_text="ხარისხი"
+                                fancy:fb_text=""
                                 fancy:fb_textColor="#FFFFFF"
-                                fancy:fb_textSize="14px"
-                                android:layout_alignTop="@+id/langBtnSerie"
-                                android:layout_toRightOf="@+id/langBtnSerie"
-                                android:layout_toEndOf="@+id/langBtnSerie"
-                                android:layout_marginLeft="5dp" />
+                                fancy:fb_textSize="18px"
+                                android:layout_alignRight="@+id/cardview1"
+                                android:layout_alignEnd="@+id/cardview1"
+                                android:layout_marginRight="21dp"
+                                android:layout_marginEnd="21dp"
+                                android:layout_toRightOf="@+id/qualBtn"
+                                android:layout_toEndOf="@+id/qualBtn"
+                                android:layout_marginLeft="5dp"
+                                android:layout_alignTop="@+id/watchLaterBtn" />
                             <mehdi.sakout.fancybuttons.FancyButton
                                 android:id="@+id/watchLaterBtn"
                                 android:layout_width="200dp"
@@ -176,7 +181,9 @@
                                 android:layout_below="@+id/langBtnSerie"
                                 android:layout_alignLeft="@+id/langBtnSerie"
                                 android:layout_alignStart="@+id/langBtnSerie"
-                                android:layout_marginTop="5dp" />
+                                android:layout_marginTop="5dp"
+                                android:layout_alignRight="@+id/qualBtn"
+                                android:layout_alignEnd="@+id/qualBtn" />
                             <android.support.v7.widget.CardView
                                 android:id="@+id/cardview1"
                                 android:layout_width="match_parent"
@@ -200,14 +207,17 @@
                                     android:layout_height="wrap_content"
                                     android:paddingLeft="10dp"
                                     android:paddingRight="10dp"
+                                    android:paddingTop="10dp"
                                     android:paddingBottom="20dp"
                                     android:text="Small Text"
                                     android:textAppearance="?android:attr/textAppearanceSmall"
-                                    android:layout_below="@+id/durationTxt"
-                                    android:layout_alignLeft="@+id/durationTxt"
-                                    android:layout_alignStart="@+id/durationTxt"
+                                    android:layout_below="@+id/geners"
+                                    android:layout_alignLeft="@+id/geners"
+                                    android:layout_alignStart="@+id/geners"
                                     android:layout_alignParentRight="true"
-                                    android:layout_alignParentEnd="true" />
+                                    android:layout_alignParentEnd="true"
+                                    android:layout_marginTop="5dp"
+                                    android:textStyle="bold" />
 
                                 <TableLayout
 
@@ -271,6 +281,28 @@
                                     android:layout_alignParentTop="true"
                                     android:layout_alignParentRight="true"
                                     android:layout_alignParentEnd="true" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textAppearance="?android:attr/textAppearanceSmall"
+                                    android:text=""
+                                    android:paddingBottom="5dp"
+                                    android:paddingLeft="10dp"
+                                    android:paddingRight="10dp"
+                                    android:id="@+id/directorText"
+                                    android:layout_below="@+id/durationTxt" />
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textAppearance="?android:attr/textAppearanceSmall"
+                                    android:text=""
+                                    android:paddingBottom="5dp"
+                                    android:paddingLeft="10dp"
+                                    android:paddingRight="10dp"
+                                    android:id="@+id/geners"
+                                    android:layout_below="@+id/directorText"
+                            />
                             </RelativeLayout>
                             </android.support.v7.widget.CardView>
 

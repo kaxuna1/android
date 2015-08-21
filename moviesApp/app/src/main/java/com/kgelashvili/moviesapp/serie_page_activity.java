@@ -97,6 +97,10 @@ public class serie_page_activity extends AppCompatActivity {
     LinearLayout relatedLayout;
     MovieSerieLastMomentModel movieSerieLastMomentModel;
     ImageButton playButton=null;
+    TextView director=null;
+    String directorText="";
+    TextView gener=null;
+    String generText="";
 
 
     @Override
@@ -150,6 +154,7 @@ public class serie_page_activity extends AppCompatActivity {
 
                 public void onPrepared(MediaPlayer mp)
                 {
+                    playButton.setVisibility(View.GONE);
                     videoView.start();
                     progressDialog.dismiss();
                     videoView.seekTo(movieTime);
@@ -174,17 +179,6 @@ public class serie_page_activity extends AppCompatActivity {
                         }
                     });
 
-                    mediaController.setPrevNextListeners(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            videoView.seekTo(videoView.getCurrentPosition()+5000);
-                        }
-                    }, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            videoView.seekTo(videoView.getCurrentPosition()-5000);
-                        }
-                    });
                     mediaController.setAnchorView(videoView);
 
                     videoView.setMediaController(mediaController);
@@ -304,10 +298,9 @@ public class serie_page_activity extends AppCompatActivity {
         currentLang=currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getLang().split(",")[0];
         videourl=currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getLink().replace("{L}",currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getLang().split(",")[0]);
         qual = currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getQual().split(",")[0];
-        videourl.replaceAll("_\\d+\\.","_"+qual+".");
+        videourl.replaceAll("_\\d+\\.", "_" + qual + ".");
         movieSerieLastMomentModel.setSerie(movieSerieLastMomentModel.getSerie());
-        progressDialog = ProgressDialog.show(serie_page_activity.this, "", "მიმდინარეობს ვიდეოს ჩატვირთა", true);
-        progressDialog.setCancelable(true);
+
         //getActionBar().setTitle(extras.getString("title") + " " + currentEpisodes.get(position).getName());
         ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.langBtnSerie)).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -382,6 +375,8 @@ public class serie_page_activity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 playButton.setVisibility(View.GONE);
+                progressDialog = ProgressDialog.show(serie_page_activity.this, "", "მიმდინარეობს ვიდეოს ჩატვირთა", true);
+                progressDialog.setCancelable(true);
                 PlayVideo();
             }
         });
@@ -520,13 +515,18 @@ public class serie_page_activity extends AppCompatActivity {
         protected ArrayList<Actor> doInBackground(String... strings) {
             ArrayList<Actor> actors;
             actors=new MovieServices().getSerieActors(strings[0]);
+
+            directorText=new MovieServices().getDirector(strings[0]);
+            generText=new MovieServices().getJanrebi(strings[0]);
+
             publishProgress(actors);
             return actors;
         }
         @Override
         protected void onProgressUpdate(ArrayList<Actor>... values) {
             super.onProgressUpdate(values);
-
+            director.setText(directorText);
+            gener.setText(generText);
             for (int i = 0; i < values[0].size(); i++) {
                 addActorToCast(values[0].get(i));
             }
@@ -534,7 +534,7 @@ public class serie_page_activity extends AppCompatActivity {
         }
     }
 
-    private void addActorToCast(Actor actor) {
+    private void addActorToCast(final Actor actor) {
 
         LinearLayout linearLayout = castLayout;
         LayoutInflater inflater = LayoutInflater.from(this);
@@ -554,6 +554,10 @@ public class serie_page_activity extends AppCompatActivity {
         card.setOnClickListener(new Card.OnCardClickListener() {
             @Override
             public void onClick(Card card, View view) {
+                Intent i = new Intent(serie_page_activity.this, ActorMoviesActivity.class);
+                i.putExtra("id",actor.actorId);
+
+                startActivityForResult(i, 1);
 
             }
         });
@@ -641,6 +645,7 @@ public class serie_page_activity extends AppCompatActivity {
         tabSpec.setIndicator(extras.getString("title"));
         tabHost.addTab(tabSpec);
 
+
         tabSpec=tabHost.newTabSpec("movie");
         tabSpec.setContent(R.id.tab3);
         tabSpec.setIndicator("IMDB");
@@ -648,7 +653,8 @@ public class serie_page_activity extends AppCompatActivity {
 
         relatedLayout=(LinearLayout)findViewById(R.id.relatedMoviesLayout);
         castLayout=(LinearLayout)findViewById(R.id.actorsLayout);
-
+        director=(TextView)findViewById(R.id.directorText);
+        gener=(TextView)findViewById(R.id.geners);
         seasons=new ArrayList<Season>();
 
         id=extras.getString("movieId");

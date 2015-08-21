@@ -51,6 +51,11 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -178,7 +183,7 @@ public class MainActivity extends AppCompatActivity{
                 .withTranslucentStatusBar(false)
                 .withAccountHeader(headerResult)
                 .addDrawerItems(
-                        new PrimaryDrawerItem().withName("ქართულად გახმოვანებული").withBadge("Ge"),
+                        new PrimaryDrawerItem().withName("ქართულად გახმოვანებული"),
                         new PrimaryDrawerItem().withName("გამოწერილი სიახლეები").withIcon(FontAwesome.Icon.faw_newspaper_o),
                         new PrimaryDrawerItem().withName("ვაპირებ ყურებას").withIcon(FontAwesome.Icon.faw_thumbs_o_up),
                         new PrimaryDrawerItem().withName("ისტორია").withIcon(FontAwesome.Icon.faw_history),
@@ -223,8 +228,10 @@ public class MainActivity extends AppCompatActivity{
                     }
                 })
                 .build();
-        toolbar.setTitle("Adjaranet");
+        toolbar.setTitle("adjaranet");
+
     }
+
     private void changeColor(int newColor) {
         tabs.setBackgroundColor(newColor);
         tabs.setTextColor(getResources().getColor(R.color.md_white_1000));

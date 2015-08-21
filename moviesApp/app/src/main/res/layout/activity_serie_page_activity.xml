@@ -82,7 +82,7 @@
 
                     <mehdi.sakout.fancybuttons.FancyButton
                         android:id="@+id/langBtnSerie"
-                        android:layout_width="100dp"
+                        android:layout_width="140dp"
                         android:layout_height="30dp"
                         fancy:fb_borderColor="#FFFFFF"
                         fancy:fb_borderWidth="1dp"
@@ -104,26 +104,27 @@
                         fancy:fb_borderColor="#FFFFFF"
 
                         fancy:fb_borderWidth="1dp"
-                        fancy:fb_defaultColor="#7ab800"
-                        fancy:fb_focusColor="#9bd823"
+                        fancy:fb_defaultColor="#3b5998"
+                        fancy:fb_focusColor="#5474b8"
                         fancy:fb_fontIconResource="&#xf0ed;"
                         fancy:fb_iconPosition="left"
                         fancy:fb_radius="30dp"
                         fancy:fb_text=""
                         fancy:fb_textColor="#FFFFFF"
                         fancy:fb_textSize="18px"
-                        android:layout_alignParentTop="true"
-                        android:layout_toRightOf="@+id/qualBtn"
-                        android:layout_toEndOf="@+id/qualBtn"
-                        android:layout_marginLeft="5dp" />
+                        android:layout_alignTop="@+id/getNewsBtn"
+                        android:layout_toRightOf="@+id/getNewsBtn"
+                        android:layout_marginLeft="5dp"
+                        android:layout_alignRight="@+id/fullScreenButton"
+                        android:layout_alignEnd="@+id/fullScreenButton" />
                     <mehdi.sakout.fancybuttons.FancyButton
                         android:id="@+id/qualBtn"
-                        android:layout_width="100dp"
+                        android:layout_width="140dp"
                         android:layout_height="30dp"
                         fancy:fb_borderColor="#FFFFFF"
                         fancy:fb_borderWidth="1dp"
-                        fancy:fb_defaultColor="#7ab800"
-                        fancy:fb_focusColor="#9bd823"
+                        fancy:fb_defaultColor="#3b5998"
+                        fancy:fb_focusColor="#5474b8"
                         fancy:fb_fontIconResource="&#xf008;"
                         fancy:fb_iconPosition="left"
                         fancy:fb_radius="30dp"
@@ -136,7 +137,7 @@
                         android:layout_marginLeft="5dp" />
                     <mehdi.sakout.fancybuttons.FancyButton
                         android:id="@+id/seasonChangeBtn"
-                        android:layout_width="100dp"
+                        android:layout_width="140dp"
                         android:layout_height="30dp"
                         fancy:fb_ghost="true"
                         fancy:fb_focusColor="#ffa8f192"
@@ -167,12 +168,13 @@
                         fancy:fb_textColor="#FFFFFF"
                         fancy:fb_textSize="18px"
                         android:layout_alignParentTop="true"
-                        android:layout_toRightOf="@+id/downloadBtn"
-                        android:layout_toEndOf="@+id/downloadBtn"
+                        android:layout_toRightOf="@+id/qualBtn"
+                        android:layout_alignRight="@+id/cardvie3"
+                        android:layout_alignEnd="@+id/cardvie3"
                         android:layout_marginLeft="5dp" />
                     <mehdi.sakout.fancybuttons.FancyButton
                         android:id="@+id/getNewsBtn"
-                        android:layout_width="130dp"
+                        android:layout_width="140dp"
                         android:layout_height="30dp"
                         fancy:fb_ghost="true"
                         fancy:fb_focusColor="#ff48a4ff"
@@ -260,11 +262,38 @@
                             android:paddingLeft="10dp"
                             android:paddingRight="10dp"
                             android:paddingBottom="20dp"
-                            android:text="Small Text"
+                            android:text=""
                             android:textAppearance="?android:attr/textAppearanceSmall"
+                            android:layout_below="@+id/geners"
+                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
+                            android:layout_alignParentRight="true"
+                            android:layout_alignParentEnd="true" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingLeft="10dp"
+                            android:paddingRight="10dp"
+                            android:textAppearance="?android:attr/textAppearanceSmall"
+                            android:text=""
+                            android:id="@+id/directorText"
                             android:layout_below="@+id/tableLayout"
                             android:layout_alignParentLeft="true"
-                            android:layout_alignParentStart="true" />
+                            android:layout_alignParentStart="true"
+                            android:layout_marginTop="3dp"
+                            android:layout_marginBottom="3dp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?android:attr/textAppearanceSmall"
+                            android:text=""
+                            android:paddingLeft="10dp"
+                            android:paddingRight="10dp"
+                            android:id="@+id/geners"
+                            android:layout_below="@+id/directorText"
+                            android:layout_alignLeft="@+id/directorText"
+                            android:layout_alignStart="@+id/directorText"/>
 
 
                     </RelativeLayout>

@@ -37,7 +37,7 @@ public class MovieServices {
 
                 Movie movie=new Movie(
                         movieJ.getString("id"),
-                        movieJ.getString("title_en"),
+                        movieJ.getString("title_en")+" - "+movieJ.getString("title_ge"),
                         movieJ.getString("link"),
                         movieJ.getString("poster"),
                         movieJ.getString("imdb"),
@@ -72,7 +72,7 @@ public class MovieServices {
             for (int i=0;i<movies.length();i++){
                 JSONObject movieJ=movies.getJSONObject(i);
                 Serie serie=new Serie(movieJ.getString("id"),
-                        movieJ.getString("title_en"),
+                        movieJ.getString("title_en")+" - "+movieJ.getString("title_ge"),
                         movieJ.getString("link"),
                         movieJ.getString("poster"),
                         movieJ.getString("imdb"),
@@ -104,7 +104,7 @@ public class MovieServices {
             for (int i=0;i<movies.length();i++){
                 JSONObject movieJ=movies.getJSONObject(i);
                 Movie movie=new Movie(movieJ.getString("id"),
-                        movieJ.getString("title_en"),
+                        movieJ.getString("title_en")+" - "+movieJ.getString("title_ge"),
                         movieJ.getString("link"),
                         movieJ.getString("poster"),
                         movieJ.getString("imdb"),
@@ -138,7 +138,7 @@ public class MovieServices {
                 JSONObject movieJ=movies.getJSONObject(i);
 
                 Movie movie=new Movie(movieJ.getString("id"),
-                        movieJ.getString("title_en"),
+                        movieJ.getString("title_en")+" - "+movieJ.getString("title_ge"),
                         movieJ.getString("link"),
                         movieJ.getString("poster"),
                         movieJ.getString("imdb"),
@@ -171,7 +171,7 @@ public class MovieServices {
             for (int i=0;i<movies.length();i++){
                 JSONObject movieJ=movies.getJSONObject(i);
                 Serie movie=new Serie(movieJ.getString("id"),
-                        movieJ.getString("title_en"),
+                        movieJ.getString("title_en")+" - "+movieJ.getString("title_ge"),
                         movieJ.getString("link"),
                         movieJ.getString("poster"),
                         movieJ.getString("imdb"),
@@ -204,7 +204,7 @@ public class MovieServices {
             for (int i=0;i<movies.length();i++){
                 JSONObject movieJ=movies.getJSONObject(i);
                 Serie movie=new Serie(movieJ.getString("id"),
-                        movieJ.getString("title_en"),
+                        movieJ.getString("title_en")+" - "+movieJ.getString("title_ge"),
                         movieJ.getString("link"),
                         movieJ.getString("poster"),
                         movieJ.getString("imdb"),
@@ -239,7 +239,7 @@ public class MovieServices {
                 JSONObject movieJ=movies.getJSONObject(i);
 
                 Movie movie=new Movie(movieJ.getString("id"),
-                        movieJ.getString("title_en"),
+                        movieJ.getString("title_en")+" - "+movieJ.getString("title_ge"),
                         movieJ.getString("link"),
                         movieJ.getString("poster"),
                         movieJ.getString("imdb"),
@@ -382,7 +382,7 @@ public class MovieServices {
             for (int i=0;i<movies.length();i++){
                 JSONObject movieJ=movies.getJSONObject(i);
                 Movie movie=new Movie(movieJ.getString("id"),
-                        movieJ.getString("title_en"),
+                        movieJ.getString("title_en")+" - "+movieJ.getString("title_ge"),
                         movieJ.getString("link"),
                         movieJ.getString("poster"),
                         movieJ.getString("imdb"),
@@ -422,7 +422,7 @@ public class MovieServices {
             for (int i=0;i<movies.length();i++){
                 JSONObject movieJ=movies.getJSONObject(i);
                 MovieAndSerie movieAndSerie=new MovieAndSerie(movieJ.getString("id"),
-                        movieJ.getString("title_en"),
+                        movieJ.getString("title_en")+" - "+movieJ.getString("title_ge"),
                         movieJ.getString("link"),
                         movieJ.getString("poster"),
                         movieJ.getString("imdb"),
@@ -481,7 +481,7 @@ public class MovieServices {
                 JSONObject movieJ=movies.getJSONObject(i);
 
                 Movie movie=new Movie(movieJ.getString("id"),
-                        movieJ.getString("title_ge"),
+                        movieJ.getString("title_ge")+" - "+movieJ.getString("title_ge"),
                         movieJ.getString("link"),
                         movieJ.getString("poster"),
                         movieJ.getString("imdb"),
@@ -537,7 +537,7 @@ public class MovieServices {
                 JSONObject movieJ=movies.getJSONObject(i);
 
                 Movie movie=new Movie(movieJ.getString("id"),
-                        movieJ.getString("title_en"),
+                        movieJ.getString("title_en")+" - "+movieJ.getString("title_ge"),
                         movieJ.getString("link"),
                         movieJ.getString("poster"),
                         movieJ.getString("imdb"),
@@ -558,5 +558,58 @@ public class MovieServices {
 
 
         return Movies;
+    }
+
+    public String getDirector(String id){
+        String director="";
+
+        String url = "http://adjaranet.com/req/jsondata/req.php?id="+id+"&reqId=getInfo";
+        NetworkDAO networkDAO=new NetworkDAO();
+        try {
+            String rawData=networkDAO.request(url);
+            JSONObject movieData=new JSONObject(rawData);
+            JSONObject directorObject=movieData.getJSONObject("director");
+            Iterator<?> keys = directorObject.keys();
+            while( keys.hasNext() ) {
+                String key = (String)keys.next();
+                director=directorObject.getString(key);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+        return director;
+    }
+
+    public String getJanrebi(String id){
+        String janrebi="";
+
+        String url = "http://adjaranet.com/req/jsondata/req.php?id="+id+"&reqId=getInfo";
+        NetworkDAO networkDAO=new NetworkDAO();
+        try {
+            String rawData=networkDAO.request(url);
+            JSONObject movieData=new JSONObject(rawData);
+            JSONObject directorObject=movieData.getJSONObject("genres");
+            Iterator<?> keys = directorObject.keys();
+            while( keys.hasNext() ) {
+                String key = (String)keys.next();
+                int jId=Integer.parseInt(key);
+                if(jId>800){
+                    janrebi+=directorObject.getString(key);
+                    janrebi+=" ";
+                }
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+        return janrebi;
     }
 }

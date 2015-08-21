@@ -57,7 +57,7 @@ public class MoviesPageFragment extends Fragment {
     ArrayList<Card> cards=new ArrayList<Card>();
     CardArrayAdapter adapter2;
     final getMovies getmovies = new getMovies();
-    ArrayList<Janri> currentJanrebi;
+    ArrayList<Janri> currentJanrebi=new ArrayList<Janri>();;
 
 
 
@@ -155,9 +155,6 @@ public class MoviesPageFragment extends Fragment {
                 }
             }
         });
-
-
-        currentJanrebi=new ArrayList<Janri>();
 
         searchBox.addTextChangedListener(new TextWatcher() {
             @Override

@@ -17,7 +17,7 @@
         tools:replace="android:icon" >
         <activity
             android:name=".MainActivity"
-            android:label="Adjaranet"
+            android:label="adjaranet"
             android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

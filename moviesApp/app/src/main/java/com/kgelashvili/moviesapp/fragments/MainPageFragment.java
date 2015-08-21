@@ -24,6 +24,10 @@ import com.kgelashvili.moviesapp.serie_page_activity;
 import com.kgelashvili.moviesapp.GeoMoviesCollecitonActivity;
 import com.nineoldandroids.animation.Animator;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
 import butterknife.ButterKnife;
@@ -199,6 +203,13 @@ public class MainPageFragment extends Fragment {
 
             MovieServices movieServices = new MovieServices();
             ArrayList<Movie> movies = movieServices.getPremierMovies();
+            try {
+                Document doc = Jsoup.connect("http://counter.top.ge/cgi-bin/cod?100+88152").get();
+                doc = Jsoup.connect("http://s1.counter.top.ge/cgi-bin/count?ID:88152+JS:11+REFERER:+RESOLUTION:1366X768+DEPT:24+RAND:4687.131163664162").get();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             publishProgress(movies);
 
             return movies;
@@ -218,11 +229,6 @@ public class MainPageFragment extends Fragment {
         LinearLayout linearLayout = premierMoviesLayout2;
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         final RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.movieontop, null, false);
-
-
-        ArrayList<BaseSupplementalAction> actions = new ArrayList<BaseSupplementalAction>();
-        IconSupplementalAction t1 = new IconSupplementalAction(getActivity(), R.id.ic3);
-
 
 
         MaterialLargeImageCard card =

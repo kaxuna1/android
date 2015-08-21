@@ -66,6 +66,7 @@ public class MoviePageActivity extends AppCompatActivity {
     String lang=null;
     VideoView videoView;
     String videourl = "";
+
     String videoPath= "";
     int movieTime = 0;
     private WebView webView;
@@ -73,6 +74,10 @@ public class MoviePageActivity extends AppCompatActivity {
     LinearLayout relatedLayout;
     TabHost tabHost=null;
     ImageButton playButton=null;
+    TextView director=null;
+    String directorText="";
+    TextView gener=null;
+    String generText="";
     Movie movie=null;
     private static Timer myTimer;
     MovieSerieLastMomentModel movieSerieLastMomentModel;
@@ -84,6 +89,7 @@ public class MoviePageActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
 
+
         super.onCreate(savedInstanceState);
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
                         .setDefaultFontPath("fonts/bpg_square_mtavruli_2009.ttf")
@@ -91,6 +97,15 @@ public class MoviePageActivity extends AppCompatActivity {
                         .build()
         );
         setContentView(R.layout.moviepagelayout);
+        movie= (Movie) getIntent().getSerializableExtra("Movie");
+        List<MovieSerieLastMomentModel> movieSerieLastMomentModels=MovieSerieLastMomentModel.find(MovieSerieLastMomentModel.class, "movie_id = '"+movie.getMovieId()+"'");
+        if(movieSerieLastMomentModels.size()>0){
+            movieSerieLastMomentModel=movieSerieLastMomentModels.get(0);
+        }else{
+            movieSerieLastMomentModel=new MovieSerieLastMomentModel(movie.getMovieId());
+            movieSerieLastMomentModel.time=0;
+            movieSerieLastMomentModel.save();
+        }
 
         playButton=(ImageButton)findViewById(R.id.play_button);
         playButton.setOnClickListener(new View.OnClickListener() {
@@ -99,7 +114,6 @@ public class MoviePageActivity extends AppCompatActivity {
                 Toast.makeText(MoviePageActivity.this, "მიმდინარეობს ფილმის ჩატვირთვა", Toast.LENGTH_LONG).show();
             }
         });
-
         startVideoPlaying();
     }
 
@@ -126,15 +140,7 @@ public class MoviePageActivity extends AppCompatActivity {
 
                 public void onPrepared(MediaPlayer mp) {
 
-                    List<MovieSerieLastMomentModel> movieSerieLastMomentModels=MovieSerieLastMomentModel.find(MovieSerieLastMomentModel.class, "movie_id = '"+movie.getMovieId()+"'");
-                    if(movieSerieLastMomentModels.size()>0){
-                        movieSerieLastMomentModel=movieSerieLastMomentModels.get(0);
-                    }else{
-                        movieSerieLastMomentModel=new MovieSerieLastMomentModel(movie.getMovieId());
-                        movieSerieLastMomentModel.time=0;
-                        movieSerieLastMomentModel.save();
-                    }
-
+                    playButton.setVisibility(View.GONE);
                     videoView.seekTo(movieSerieLastMomentModel.time);
                     videoView.start();
                     myTimer = new Timer();
@@ -211,6 +217,8 @@ public class MoviePageActivity extends AppCompatActivity {
             quality=new MovieServices().getMovieQuality(strings[0]);
             langs=new MovieServices().getMovieLangs(strings[0]);
             videoPath=new MovieServices().getMoviePath(strings[0]);
+            directorText=new MovieServices().getDirector(strings[0]);
+            generText=new MovieServices().getJanrebi(strings[0]);
 
             movie.setLang(langs);
 
@@ -242,6 +250,8 @@ public class MoviePageActivity extends AppCompatActivity {
             lang=langs.split(",")[0];
             videourl = videoPath + movieId + "_" + lang + "_"+quality.split(",")[0]+".mp4";
             //PlayVideo();
+            director.setText(directorText);
+            gener.setText(generText);
             playButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -447,12 +457,13 @@ public class MoviePageActivity extends AppCompatActivity {
         tabSpec.setContent(R.id.tab1);
         tabSpec.setIndicator(extras.getString("title"));
         tabHost.addTab(tabSpec);
-
+        director=(TextView)findViewById(R.id.directorText);
+        gener=(TextView)findViewById(R.id.geners);
         tabSpec=tabHost.newTabSpec("movie");
         tabSpec.setContent(R.id.tab3);
         tabSpec.setIndicator("IMDB");
         tabHost.addTab(tabSpec);
-        movie= (Movie) getIntent().getSerializableExtra("Movie");
+
         langs=extras.getString("lang");
 
         castLayout=(LinearLayout)findViewById(R.id.actorsLayout);
@@ -522,9 +533,12 @@ public class MoviePageActivity extends AppCompatActivity {
                         .setItems(langs.split(","), new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 movieTime = videoView.getCurrentPosition();
-                                myTimer.cancel();
-                                myTimer.purge();
-                                movieSerieLastMomentModel.setTime(videoView.getCurrentPosition());
+                                if(myTimer!=null){
+                                    myTimer.cancel();
+                                    myTimer.purge();
+                                }
+
+                                movieSerieLastMomentModel.setTime(movieSerieLastMomentModel.getTime());
                                 movieSerieLastMomentModel.save();
                                 if (currentQuality == null) {
                                     currentQuality = quality.split(",")[0];
@@ -644,8 +658,9 @@ public class MoviePageActivity extends AppCompatActivity {
     @Override
     protected void onResume(){
         super.onResume();
+        playButton.setVisibility(View.VISIBLE);
         if(videoView!=null){
-            videoView.resume();
+           // videoView.resume();
         }
         //startVideoPlaying();
     }
