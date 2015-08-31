@@ -14,7 +14,7 @@
         card_view:cardBackgroundColor="@android:color/white"
         card_view:cardCornerRadius="8dp">
 
-        <com.kgelashvili.moviesapp.Classes.ScrollViewExt
+        <com.adjara.net.Classes.ScrollViewExt
             android:id="@+id/scrollView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -179,9 +179,37 @@
 
                     </LinearLayout>
                 </HorizontalScrollView>
+                <TextView
+                    android:id="@+id/textView10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/horizontalScrollView4"
+                    android:text="ტოპ ფილმები"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <HorizontalScrollView
+                    android:id="@+id/horizontalScrollView5"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/textView10"
+                    android:layout_weight="0.04"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:id="@+id/topMoviesLayout2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:paddingLeft="@dimen/carddemo_list_padding"
+                        android:minHeight="150dp"
+
+                        android:paddingRight="@dimen/carddemo_list_padding">
+
+                    </LinearLayout>
+                </HorizontalScrollView>
 
 
             </RelativeLayout>
-        </com.kgelashvili.moviesapp.Classes.ScrollViewExt>
+        </com.adjara.net.Classes.ScrollViewExt>
     </android.support.v7.widget.CardView>
 </FrameLayout>

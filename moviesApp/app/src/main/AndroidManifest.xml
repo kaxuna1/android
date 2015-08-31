@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.kgelashvili.moviesapp" >
+    package="com.adjara.net" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -16,7 +16,7 @@
         android:theme="@style/AppTheme"
         tools:replace="android:icon" >
         <activity
-            android:name=".MainActivity"
+            android:name="com.adjara.net.MainActivity"
             android:label="adjaranet"
             android:screenOrientation="portrait" >
             <intent-filter>
@@ -26,41 +26,41 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MoviePageActivity"
+            android:name="com.adjara.net.MoviePageActivity"
             android:label="კინო"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName="com.adjara.net.MainActivity"
             android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.kgelashvili.moviesapp.MainActivity" />
+                android:value="com.adjara.net.MainActivity" />
         </activity>
         <activity
-            android:name=".FullScreenMovie"
+            android:name="com.adjara.net.FullScreenMovie"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_full_screen_movie"
-            android:parentActivityName=".MoviePageActivity"
-            android:screenOrientation="userLandscape"
+            android:parentActivityName="com.adjara.net.MoviePageActivity"
+            android:screenOrientation="sensorLandscape"
             android:theme="@style/FullscreenTheme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.kgelashvili.moviesapp.MoviePageActivity" />
+                android:value="com.adjara.net.MoviePageActivity" />
         </activity>
         <activity
-            android:name=".settingsActivity"
+            android:name="com.adjara.net.settingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName="com.adjara.net.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.kgelashvili.moviesapp.MainActivity" />
+                android:value="com.adjara.net.MainActivity" />
         </activity>
         <activity
-            android:name=".serie_page_activity"
+            android:name="com.adjara.net.serie_page_activity"
             android:label="@string/title_activity_serie_page_activity"
             android:parentActivityName=".SeriesActiviry"
             android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.kgelashvili.moviesapp.SeriesActiviry" />
+                android:value="com.adjara.net.SeriesActiviry" />
         </activity>
         <activity
             android:name="io.vov.vitamio.activity.InitActivity"
@@ -69,22 +69,22 @@
             android:theme="@android:style/Theme.NoTitleBar"
             android:windowSoftInputMode="stateAlwaysHidden" />
 
-        <receiver android:name=".broadcastreceivers.MyBroadcastReceiver" >
+        <receiver android:name="com.adjara.net.broadcastreceivers.MyBroadcastReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".broadcastreceivers.CheckEpisodesBroadcastReceiver" >
+        <receiver android:name="com.adjara.net.broadcastreceivers.CheckEpisodesBroadcastReceiver" >
         </receiver>
 
         <service
-            android:name=".services.StartUpService"
+            android:name="com.adjara.net.services.StartUpService"
             android:enabled="true"
             android:exported="true" >
         </service>
         <service
-            android:name=".services.CheckNewEpisodes"
+            android:name="com.adjara.net.services.CheckNewEpisodes"
             android:enabled="true"
             android:exported="true" >
         </service>
@@ -100,55 +100,55 @@
             android:value="true" />
         <meta-data
             android:name="DOMAIN_PACKAGE_NAME"
-            android:value="com.kgelashvili.moviesapp" />
+            android:value="com.adjara.net" />
 
         <activity
-            android:name=".GeoMoviesCollecitonActivity"
+            android:name="com.adjara.net.GeoMoviesCollecitonActivity"
             android:label="@string/title_activity_geo_movies_colleciton"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName="com.adjara.net.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.kgelashvili.moviesapp.MainActivity" />
+                android:value="com.adjara.net.MainActivity" />
         </activity>
         <activity
-            android:name=".NewsCollectionActivity"
+            android:name="com.adjara.net.NewsCollectionActivity"
             android:label="@string/title_activity_news_collection"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName="com.adjara.net.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.kgelashvili.moviesapp.MainActivity" />
+                android:value="com.adjara.net.MainActivity" />
         </activity>
         <activity
-            android:name=".HistoryPageActivity"
+            android:name="com.adjara.net.HistoryPageActivity"
             android:label="@string/title_activity_history_page"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName="com.adjara.net.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.kgelashvili.moviesapp.MainActivity" />
+                android:value="com.adjara.net.MainActivity" />
         </activity>
         <activity
-            android:name=".CollectionMoviesActivity"
+            android:name="com.adjara.net.CollectionMoviesActivity"
             android:label="@string/title_activity_collection_movies"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName="com.adjara.net.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.kgelashvili.moviesapp.MainActivity" />
+                android:value="com.adjara.net.MainActivity" />
         </activity>
         <activity
-            android:name=".WatchLaterActivity"
+            android:name="com.adjara.net.WatchLaterActivity"
             android:label="@string/title_activity_watch_later"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName="com.adjara.net.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.kgelashvili.moviesapp.MainActivity" />
+                android:value="com.adjara.net.MainActivity" />
         </activity>
         <activity
-            android:name=".ActorMoviesActivity"
+            android:name="com.adjara.net.ActorMoviesActivity"
             android:label="@string/title_activity_actor_movies"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName="com.adjara.net.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.kgelashvili.moviesapp.MainActivity" />
+                android:value="com.adjara.net.MainActivity" />
         </activity>
     </application>
 

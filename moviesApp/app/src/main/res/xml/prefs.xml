@@ -25,7 +25,7 @@
           android:key="newGeoMovies"
           android:defaultValue="true"
           />
-      <com.kgelashvili.moviesapp.Classes.NumberPickerPreference
+      <com.adjara.net.Classes.NumberPickerPreference
           android:key="interval"
           android:title="სიახლეების მიღების ინტერვალი"
           android:defaultValue="6" />

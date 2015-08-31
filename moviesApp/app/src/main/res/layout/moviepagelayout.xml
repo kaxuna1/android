@@ -5,7 +5,7 @@
     android:id="@+id/moviePageRelative"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.kgelashvili.moviesapp.serie_page_activity"
+    tools:context="com.adjara.net.serie_page_activity"
     xmlns:fancy="http://schemas.android.com/apk/res-auto">
     <TabHost
         android:layout_width="match_parent"
@@ -30,7 +30,7 @@
                 android:id="@android:id/tabcontent"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-                <com.kgelashvili.moviesapp.Classes.ScrollViewExt
+                <com.adjara.net.Classes.ScrollViewExt
                     android:id="@+id/scrollView2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -261,7 +261,6 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:textAppearance="?android:attr/textAppearanceSmall"
-                                    android:text="Small Text"
                                     android:id="@+id/durationTxt"
                                     android:paddingLeft="10dp"
                                     android:paddingRight="10dp"
@@ -286,17 +285,16 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:textAppearance="?android:attr/textAppearanceSmall"
-                                    android:text=""
                                     android:paddingBottom="5dp"
                                     android:paddingLeft="10dp"
                                     android:paddingRight="10dp"
                                     android:id="@+id/directorText"
-                                    android:layout_below="@+id/durationTxt" />
+                                    android:layout_below="@+id/durationTxt"
+                                    android:layout_marginTop="5dp" />
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:textAppearance="?android:attr/textAppearanceSmall"
-                                    android:text=""
                                     android:paddingBottom="5dp"
                                     android:paddingLeft="10dp"
                                     android:paddingRight="10dp"
@@ -321,7 +319,7 @@
                         card_view:cardBackgroundColor="@android:color/white"
                         card_view:cardCornerRadius="8dp">
 
-                        <com.kgelashvili.moviesapp.Classes.ScrollViewExt
+                        <com.adjara.net.Classes.ScrollViewExt
                             android:id="@+id/scrollView"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -396,11 +394,11 @@
 
 
                             </RelativeLayout>
-                        </com.kgelashvili.moviesapp.Classes.ScrollViewExt>
+                        </com.adjara.net.Classes.ScrollViewExt>
                     </android.support.v7.widget.CardView>
 
                 </LinearLayout>
-                </com.kgelashvili.moviesapp.Classes.ScrollViewExt>
+                </com.adjara.net.Classes.ScrollViewExt>
                 <LinearLayout
                     android:id="@+id/tab3"
                     android:layout_width="match_parent"
