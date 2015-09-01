@@ -2,6 +2,7 @@ package com.adjara.net;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -10,12 +11,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.daimajia.androidanimations.library.Techniques;
-import com.daimajia.androidanimations.library.YoYo;
 import com.adjara.net.Classes.CustomHeaderMainMovieItem;
 import com.adjara.net.Classes.CustomThumbNail;
 import com.adjara.net.model.Serie;
-import com.nineoldandroids.animation.Animator;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +22,7 @@ import java.util.List;
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardArrayAdapter;
 import it.gmariotti.cardslib.library.internal.CardHeader;
+import it.gmariotti.cardslib.library.internal.CardThumbnail;
 import it.gmariotti.cardslib.library.view.CardListView;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
@@ -140,7 +140,22 @@ public class NewsCollectionActivity extends AppCompatActivity {
 
             CustomThumbNail thumbnail=new CustomThumbNail(this);
 
-            thumbnail.setUrlResource(serie.getPoster());
+            thumbnail.setCustomSource(new CardThumbnail.CustomSource() {
+                @Override
+                public String getTag() {
+                    return serie.getPoster();
+                }
+
+                @Override
+                public Bitmap getBitmap() {
+                    try{
+
+                        return Picasso.with(NewsCollectionActivity.this).load(serie.getPoster()).resize(184,276).get();
+                    }catch (Exception e){
+                        return null;
+                    }
+                }
+            });
 
             //Set URL resource
             //thumb.setUrlResource(movie.getPoster());
@@ -163,14 +178,7 @@ public class NewsCollectionActivity extends AppCompatActivity {
                 @Override
                 public void onClick(Card card, View view) {
 
-                    YoYo.with(Techniques.ZoomOutLeft).duration(500).withListener(new Animator.AnimatorListener() {
-                        @Override
-                        public void onAnimationStart(Animator animation) {
 
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
                             Serie selectedMovie = serie;
 
                             Intent i = new Intent(NewsCollectionActivity.this, serie_page_activity.class);
@@ -183,18 +191,7 @@ public class NewsCollectionActivity extends AppCompatActivity {
                             i.putExtra("imdb", selectedMovie.getImdb_id());
                             i.putExtra("Serie",serie);
                             startActivityForResult(i, 1);
-                        }
 
-                        @Override
-                        public void onAnimationCancel(Animator animation) {
-
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animator animation) {
-
-                        }
-                    }).playOn(findViewById(R.id.newsColectionMain));
                 }
             });
             adapter3.add(card);
@@ -204,7 +201,6 @@ public class NewsCollectionActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        YoYo.with(Techniques.ZoomInLeft).playOn(findViewById(R.id.newsColectionMain));
     }
 
 }

@@ -25,9 +25,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import java.util.List;
-
 import com.adjara.net.R;
+
+import java.util.List;
 
 /**
  * @author Gabriele Mariotti (gabri.mariotti@gmail.com)

@@ -4,34 +4,34 @@ package com.adjara.net;
  * Created by KGelashvili on 7/24/2015.
  */
 
-        import android.annotation.TargetApi;
-        import android.content.Context;
-        import android.content.res.ColorStateList;
-        import android.content.res.TypedArray;
-        import android.database.DataSetObserver;
-        import android.graphics.Canvas;
-        import android.graphics.Color;
-        import android.graphics.Paint;
-        import android.graphics.Paint.Style;
-        import android.graphics.Typeface;
-        import android.os.Build;
-        import android.os.Parcel;
-        import android.os.Parcelable;
-        import android.support.v4.util.Pair;
-        import android.support.v4.view.ViewPager;
-        import android.support.v4.view.ViewPager.OnPageChangeListener;
-        import android.util.AttributeSet;
-        import android.util.DisplayMetrics;
-        import android.util.TypedValue;
-        import android.view.LayoutInflater;
-        import android.view.View;
-        import android.view.ViewGroup;
-        import android.view.ViewTreeObserver.OnGlobalLayoutListener;
-        import android.widget.HorizontalScrollView;
-        import android.widget.LinearLayout;
-        import android.widget.TextView;
+import android.annotation.TargetApi;
+import android.content.Context;
+import android.content.res.ColorStateList;
+import android.content.res.TypedArray;
+import android.database.DataSetObserver;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Paint.Style;
+import android.graphics.Typeface;
+import android.os.Build;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.support.v4.util.Pair;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.util.AttributeSet;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.widget.HorizontalScrollView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
-        import com.astuetz.pagerslidingtabstrip.R;
+import com.astuetz.pagerslidingtabstrip.R;
 
 public class PagerSlidingTabStrip extends HorizontalScrollView {
 

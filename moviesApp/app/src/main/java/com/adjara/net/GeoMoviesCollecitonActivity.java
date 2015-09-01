@@ -2,6 +2,7 @@ package com.adjara.net;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -14,8 +15,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 
-import com.daimajia.androidanimations.library.Techniques;
-import com.daimajia.androidanimations.library.YoYo;
 import com.adjara.net.Classes.CustomHeaderMainMovieItem;
 import com.adjara.net.Classes.CustomThumbNail;
 import com.adjara.net.Classes.JanrebiData;
@@ -23,12 +22,13 @@ import com.adjara.net.Classes.MovieServices;
 import com.adjara.net.model.Janri;
 import com.adjara.net.model.Movie;
 import com.adjara.net.model.MovieAndSerie;
-import com.nineoldandroids.animation.Animator;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardArrayAdapter;
+import it.gmariotti.cardslib.library.internal.CardThumbnail;
 import it.gmariotti.cardslib.library.view.CardListView;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
@@ -37,7 +37,7 @@ public class GeoMoviesCollecitonActivity extends AppCompatActivity {
 
     boolean loadingMore = true;
     private int currentLoaded = 0;
-    ArrayList<Card> cards=new ArrayList<Card>();
+    ArrayList<Card> cards = new ArrayList<Card>();
     CardArrayAdapter adapter2;
     final getMovies getmovies = new getMovies();
     CardListView mListView;
@@ -58,12 +58,12 @@ public class GeoMoviesCollecitonActivity extends AppCompatActivity {
                         .build()
         );
         setContentView(R.layout.activity_geo_movies_colleciton);
-        currentJanrebi=new ArrayList<Janri>();
-        final ArrayList<Janri> janrebi=new JanrebiData().getJanrebi();
-        LinearLayout janrebiLayout=(LinearLayout)findViewById(R.id.janrebi);
-        for(int i=0;i<janrebi.size();i++){
+        currentJanrebi = new ArrayList<Janri>();
+        final ArrayList<Janri> janrebi = new JanrebiData().getJanrebi();
+        LinearLayout janrebiLayout = (LinearLayout) findViewById(R.id.janrebi);
+        for (int i = 0; i < janrebi.size(); i++) {
 
-            CheckBox checkBox=new CheckBox(this);
+            CheckBox checkBox = new CheckBox(this);
             checkBox.setText(janrebi.get(i).getName());
             final int finalI = i;
             checkBox.setOnCheckedChangeListener(
@@ -71,13 +71,13 @@ public class GeoMoviesCollecitonActivity extends AppCompatActivity {
                         @Override
                         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                             //Toast.makeText(getActivity(), "ჟანრი "+janrebi.get(finalI).getName()+" "+isChecked, Toast.LENGTH_SHORT).show();
-                            if(isChecked){
+                            if (isChecked) {
                                 currentJanrebi.add(janrebi.get(finalI));
 
-                            }else{
+                            } else {
                                 currentJanrebi.remove(janrebi.get(finalI));
                             }
-                            Log.d("janrebi",getJanrebi());
+                            Log.d("janrebi", getJanrebi());
                             cards.clear();
                             adapter2.clear();
                             currentLoaded = 0;
@@ -87,8 +87,8 @@ public class GeoMoviesCollecitonActivity extends AppCompatActivity {
             janrebiLayout.addView(checkBox);
 
         }
-        mListView=(CardListView)findViewById(R.id.carddemo_list_cursor2);
-        adapter2=new CardArrayAdapter(this,cards);
+        mListView = (CardListView) findViewById(R.id.carddemo_list_cursor2);
+        adapter2 = new CardArrayAdapter(this, cards);
         mListView.setAdapter(adapter2);
         new Thread(new Runnable() {
             @Override
@@ -179,7 +179,7 @@ public class GeoMoviesCollecitonActivity extends AppCompatActivity {
         protected ArrayList<MovieAndSerie> doInBackground(String... strings) {
             Log.d("kinoLoad", "gamodzaxda");
             MovieServices movieServices = new MovieServices();
-            ArrayList<MovieAndSerie> movies = movieServices.getMainGeo(strings[0],getJanrebi());
+            ArrayList<MovieAndSerie> movies = movieServices.getMainGeo(strings[0], getJanrebi());
             publishProgress(movies);
 
             return movies;
@@ -192,7 +192,7 @@ public class GeoMoviesCollecitonActivity extends AppCompatActivity {
                 addMovieToLoadidData(values[0].get(i));
             }
             //adapter.notifyDataSetChanged();
-            Log.d("moviesLogKaxa","gamodzaxda");
+            Log.d("moviesLogKaxa", "gamodzaxda");
             Log.d("moviesLog", "" + currentLoaded);
             currentLoaded += 30;
             //populateMoviesListViev();
@@ -206,15 +206,13 @@ public class GeoMoviesCollecitonActivity extends AppCompatActivity {
         //adapter.add(movie);
 
 
-
-
         Card card = new Card(GeoMoviesCollecitonActivity.this);
 
 
         //Create a CardHeader
         CustomHeaderMainMovieItem header = new CustomHeaderMainMovieItem(this,
-                movie.getTitle_en(),movie.getRelease_date()
-                ,movie.getDescription().length()>50?movie.getDescription().substring(0,49):movie.getDescription());
+                movie.getTitle_en(), movie.getRelease_date()
+                , movie.getDescription().length() > 50 ? movie.getDescription().substring(0, 49) : movie.getDescription());
 
         //Set the header title
         header.setTitle(movie.getTitle_en());
@@ -230,14 +228,27 @@ public class GeoMoviesCollecitonActivity extends AppCompatActivity {
         //header.setOtherButtonDrawable(R.drawable.card_menu_button_other_add);
 
 
-
-
         //Create thumbnail
         //CustomThumbCard thumb = new CustomThumbCard(MainActivity.this);
 
-        CustomThumbNail thumbnail=new CustomThumbNail(this);
+        CustomThumbNail thumbnail = new CustomThumbNail(this);
 
-        thumbnail.setUrlResource(movie.getPoster());
+        thumbnail.setCustomSource(new CardThumbnail.CustomSource() {
+            @Override
+            public String getTag() {
+                return movie.getPoster();
+            }
+
+            @Override
+            public Bitmap getBitmap() {
+                try {
+
+                    return Picasso.with(GeoMoviesCollecitonActivity.this).load(movie.getPoster()).resize(184, 276).get();
+                } catch (Exception e) {
+                    return null;
+                }
+            }
+        });
 
         //Set URL resource
         //thumb.setUrlResource(movie.getPoster());
@@ -249,7 +260,6 @@ public class GeoMoviesCollecitonActivity extends AppCompatActivity {
         card.addCardThumbnail(thumbnail);
 
 
-
         //Set card in the cardView
 
 
@@ -259,56 +269,37 @@ public class GeoMoviesCollecitonActivity extends AppCompatActivity {
             @Override
             public void onClick(Card card, View view) {
 
-                YoYo.with(Techniques.ZoomOutLeft).duration(500).withListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animation) {
+                Movie selectedMovie = movie;
 
-                    }
+                Intent i = new Intent(GeoMoviesCollecitonActivity.this, MoviePageActivity.class);
+                i.putExtra("movieId", selectedMovie.getMovieId());
+                i.putExtra("description", selectedMovie.getDescription());
+                i.putExtra("title", selectedMovie.getTitle_en());
+                i.putExtra("date", selectedMovie.getRelease_date());
+                i.putExtra("duration", selectedMovie.getDuration());
+                i.putExtra("rating", selectedMovie.getImdb());
+                i.putExtra("imdb", selectedMovie.getImdb_id());
+                i.putExtra("lang", selectedMovie.getLang());
+                i.putExtra("time", 0);
+                i.putExtra("Movie", selectedMovie);
+                startActivityForResult(i, 1);
 
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        Movie selectedMovie = movie;
-
-                        Intent i = new Intent(GeoMoviesCollecitonActivity.this, MoviePageActivity.class);
-                        i.putExtra("movieId", selectedMovie.getMovieId());
-                        i.putExtra("description", selectedMovie.getDescription());
-                        i.putExtra("title", selectedMovie.getTitle_en());
-                        i.putExtra("date", selectedMovie.getRelease_date());
-                        i.putExtra("duration", selectedMovie.getDuration());
-                        i.putExtra("rating", selectedMovie.getImdb());
-                        i.putExtra("imdb", selectedMovie.getImdb_id());
-                        i.putExtra("lang", selectedMovie.getLang());
-                        i.putExtra("time", 0);
-                        i.putExtra("Movie", selectedMovie);
-                        startActivityForResult(i, 1);
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animation) {
-
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animation) {
-
-                    }
-                }).playOn(findViewById(R.id.geoColectionMain));
             }
         });
 
         adapter2.add(card);
 
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        YoYo.with(Techniques.ZoomInLeft).playOn(findViewById(R.id.geoColectionMain));
     }
 
-    String getJanrebi(){
-        String value="";
-        for(int i=0;i<currentJanrebi.size();i++){
-            value+="searchTags%5B%5D="+currentJanrebi.get(i).getValue()+"&";
+    String getJanrebi() {
+        String value = "";
+        for (int i = 0; i < currentJanrebi.size(); i++) {
+            value += "searchTags%5B%5D=" + currentJanrebi.get(i).getValue() + "&";
         }
 
 

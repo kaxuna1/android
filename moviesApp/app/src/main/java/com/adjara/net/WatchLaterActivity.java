@@ -2,6 +2,7 @@ package com.adjara.net;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -10,12 +11,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.daimajia.androidanimations.library.Techniques;
-import com.daimajia.androidanimations.library.YoYo;
 import com.adjara.net.Classes.CustomHeaderMainMovieItem;
 import com.adjara.net.Classes.CustomThumbNail;
 import com.adjara.net.model.Movie;
-import com.nineoldandroids.animation.Animator;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +23,7 @@ import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardArrayAdapter;
 import it.gmariotti.cardslib.library.internal.CardExpand;
 import it.gmariotti.cardslib.library.internal.CardHeader;
+import it.gmariotti.cardslib.library.internal.CardThumbnail;
 import it.gmariotti.cardslib.library.view.CardListView;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
@@ -137,7 +137,22 @@ public class WatchLaterActivity extends AppCompatActivity {
 
             CustomThumbNail thumbnail=new CustomThumbNail(WatchLaterActivity.this);
 
-            thumbnail.setUrlResource(movie.getPoster());
+            thumbnail.setCustomSource(new CardThumbnail.CustomSource() {
+                @Override
+                public String getTag() {
+                    return movie.getPoster();
+                }
+
+                @Override
+                public Bitmap getBitmap() {
+                    try {
+
+                        return Picasso.with(WatchLaterActivity.this).load(movie.getPoster()).resize(184, 276).get();
+                    } catch (Exception e) {
+                        return null;
+                    }
+                }
+            });
 
             //Set URL resource
             //thumb.setUrlResource(movie.getPoster());
@@ -159,14 +174,7 @@ public class WatchLaterActivity extends AppCompatActivity {
             card.setOnClickListener(new Card.OnCardClickListener() {
                 @Override
                 public void onClick(Card card, View view) {
-                    YoYo.with(Techniques.ZoomOutLeft).duration(500).withListener(new Animator.AnimatorListener() {
-                        @Override
-                        public void onAnimationStart(Animator animation) {
 
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
                             Movie selectedMovie = movie;
 
                             Intent i = new Intent(WatchLaterActivity.this, MoviePageActivity.class);
@@ -181,18 +189,7 @@ public class WatchLaterActivity extends AppCompatActivity {
                             i.putExtra("time", 0);
                             i.putExtra("Movie",selectedMovie);
                             startActivityForResult(i, 1);
-                        }
 
-                        @Override
-                        public void onAnimationCancel(Animator animation) {
-
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animator animation) {
-
-                        }
-                    }).playOn(findViewById(R.id.watchLaterMain));
 
                 }
             });
@@ -205,6 +202,5 @@ public class WatchLaterActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        YoYo.with(Techniques.ZoomInLeft).playOn(findViewById(R.id.watchLaterMain));
     }
 }

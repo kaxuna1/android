@@ -1,6 +1,7 @@
 package com.adjara.net.fragments;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,8 +18,6 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-import com.daimajia.androidanimations.library.Techniques;
-import com.daimajia.androidanimations.library.YoYo;
 import com.adjara.net.Classes.CustomHeaderMainMovieItem;
 import com.adjara.net.Classes.CustomThumbNail;
 import com.adjara.net.Classes.JanrebiData;
@@ -28,7 +27,7 @@ import com.adjara.net.R;
 import com.adjara.net.model.Janri;
 import com.adjara.net.model.Serie;
 import com.adjara.net.serie_page_activity;
-import com.nineoldandroids.animation.Animator;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -36,6 +35,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardArrayAdapter;
+import it.gmariotti.cardslib.library.internal.CardThumbnail;
 import it.gmariotti.cardslib.library.view.CardListView;
 
 /**
@@ -250,7 +250,22 @@ public class SeriesPageFragment extends Fragment {
 
         CustomThumbNail thumbnail=new CustomThumbNail(getActivity());
 
-        thumbnail.setUrlResource(serie.getPoster());
+        thumbnail.setCustomSource(new CardThumbnail.CustomSource() {
+            @Override
+            public String getTag() {
+                return serie.getPoster();
+            }
+
+            @Override
+            public Bitmap getBitmap() {
+                try{
+
+                    return Picasso.with(getActivity()).load(serie.getPoster()).resize(184,276).get();
+                }catch (Exception e){
+                    return null;
+                }
+            }
+        });
 
         //Set URL resource
         //thumb.setUrlResource(movie.getPoster());

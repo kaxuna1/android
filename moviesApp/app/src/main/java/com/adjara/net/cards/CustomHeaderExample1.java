@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.adjara.net.R;
+
 import it.gmariotti.cardslib.library.internal.CardHeader;
 
 /**

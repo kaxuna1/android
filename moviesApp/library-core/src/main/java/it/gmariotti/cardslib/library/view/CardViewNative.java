@@ -1127,7 +1127,7 @@ public class CardViewNative extends android.support.v7.widget.CardView implement
             layout(0, 0, getMeasuredWidth(), getMeasuredHeight());
         }
 
-        Bitmap b = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+        Bitmap b = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.RGB_565);
         Canvas c = new Canvas(b);
         draw(c);
         return b;

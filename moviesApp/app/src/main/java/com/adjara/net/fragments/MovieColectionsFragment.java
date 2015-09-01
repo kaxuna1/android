@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import com.adjara.net.Classes.CustomThumbNail2;
 import com.adjara.net.Classes.MovieServices;
 import com.adjara.net.Classes.dbHelper;
 import com.adjara.net.CollectionMoviesActivity;
@@ -33,12 +32,16 @@ public class MovieColectionsFragment extends Fragment {
     private static final String ARG_POSITION = "position";
     private int position;
     private static View view;
-    ArrayList<Card> cards=new ArrayList<Card>();
+    ArrayList<Card> cards;
     CardGridArrayAdapter mCardArrayAdapter;
 
 
     @InjectView(R.id.carddemo_grid_base1)
     CardGridView mListView;
+
+    public MovieColectionsFragment() {
+
+    }
 
     public static MovieColectionsFragment newInstance(int position,View view,dbHelper dbHelper2) {
         MovieColectionsFragment f = new MovieColectionsFragment();
@@ -58,7 +61,7 @@ public class MovieColectionsFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_movie_colections, container, false);
         ButterKnife.inject(this, rootView);
         ViewCompat.setElevation(rootView, 50);
-
+        cards = new ArrayList<Card>();
         mCardArrayAdapter = new CardGridArrayAdapter(getActivity(), cards);
 
         mListView.setAdapter(mCardArrayAdapter);
@@ -101,18 +104,13 @@ public class MovieColectionsFragment extends Fragment {
         GplayGridCard card = new GplayGridCard(getActivity());
         card.headerTitle = colectionModel.getName();
         card.secondaryTitle = colectionModel.getCnt()+" ფილმი";
-        CustomThumbNail2 thumbNail2=new CustomThumbNail2(getActivity());
-        //thumbNail2.setUrlResource("http://static.adjaranet.com/collections/thumb/" + colectionModel.getId() + "_big.jpg");
-        //card.addCardThumbnail(thumbNail2);
         card.thumbUrl="http://static.adjaranet.com/collections/thumb/" + colectionModel.getId() + "_big.jpg";
         card.setOnClickListener(new Card.OnCardClickListener() {
             @Override
             public void onClick(Card card, View view) {
                 Intent i = new Intent(getActivity(), CollectionMoviesActivity.class);
                 i.putExtra("id",colectionModel.getId());
-
                 startActivityForResult(i, 1);
-
             }
         });
         card.init();

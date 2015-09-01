@@ -16,11 +16,11 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
 
-import com.adjara.net.broadcastreceivers.CheckEpisodesBroadcastReceiver;
 import com.adjara.net.Classes.MovieServices;
 import com.adjara.net.MainActivity;
 import com.adjara.net.MoviePageActivity;
 import com.adjara.net.R;
+import com.adjara.net.broadcastreceivers.CheckEpisodesBroadcastReceiver;
 import com.adjara.net.model.Episode;
 import com.adjara.net.model.Movie;
 import com.adjara.net.model.Season;

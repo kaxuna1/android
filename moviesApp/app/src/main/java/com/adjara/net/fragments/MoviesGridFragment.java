@@ -13,11 +13,6 @@ import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
-import com.daimajia.androidanimations.library.Techniques;
-import com.daimajia.androidanimations.library.YoYo;
-import com.felipecsl.asymmetricgridview.library.Utils;
-import com.felipecsl.asymmetricgridview.library.model.AsymmetricItem;
-import com.felipecsl.asymmetricgridview.library.widget.AsymmetricGridViewAdapter;
 import com.adjara.net.Classes.DemoAdapter;
 import com.adjara.net.Classes.MovieServices;
 import com.adjara.net.Classes.dbHelper;
@@ -25,8 +20,10 @@ import com.adjara.net.MoviePageActivity;
 import com.adjara.net.R;
 import com.adjara.net.model.DemoItem;
 import com.adjara.net.model.Movie;
+import com.felipecsl.asymmetricgridview.library.Utils;
+import com.felipecsl.asymmetricgridview.library.model.AsymmetricItem;
+import com.felipecsl.asymmetricgridview.library.widget.AsymmetricGridViewAdapter;
 import com.koushikdutta.ion.Ion;
-import com.nineoldandroids.animation.Animator;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -228,14 +225,6 @@ public class MoviesGridFragment extends Fragment{
             imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    YoYo.with(Techniques.ZoomOutLeft).duration(500).withListener(new Animator.AnimatorListener() {
-                        @Override
-                        public void onAnimationStart(Animator animation) {
-
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
                             Movie selectedMovie = currentMovie;
 
                             Intent i = new Intent(getActivity(), MoviePageActivity.class);
@@ -250,18 +239,7 @@ public class MoviesGridFragment extends Fragment{
                             i.putExtra("time", 0);
                             i.putExtra("Movie", selectedMovie);
                             startActivityForResult(i, 1);
-                        }
 
-                        @Override
-                        public void onAnimationCancel(Animator animation) {
-
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animator animation) {
-
-                        }
-                    }).playOn(MoviesGridFragment.view);
                 }
             });
 

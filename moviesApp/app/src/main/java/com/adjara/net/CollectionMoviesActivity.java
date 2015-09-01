@@ -1,6 +1,7 @@
 package com.adjara.net;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -13,11 +14,13 @@ import com.adjara.net.Classes.CustomThumbNail;
 import com.adjara.net.Classes.MovieServices;
 import com.adjara.net.model.Movie;
 import com.adjara.net.model.Serie;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardArrayAdapter;
+import it.gmariotti.cardslib.library.internal.CardThumbnail;
 import it.gmariotti.cardslib.library.view.CardListView;
 
 
@@ -127,7 +130,22 @@ public class CollectionMoviesActivity extends AppCompatActivity {
 
         CustomThumbNail thumbnail=new CustomThumbNail(this);
 
-        thumbnail.setUrlResource(movie.getPoster());
+        thumbnail.setCustomSource(new CardThumbnail.CustomSource() {
+            @Override
+            public String getTag() {
+                return movie.getPoster();
+            }
+
+            @Override
+            public Bitmap getBitmap() {
+                try {
+
+                    return Picasso.with(CollectionMoviesActivity.this).load(movie.getPoster()).resize(184, 276).get();
+                } catch (Exception e) {
+                    return null;
+                }
+            }
+        });
 
         //Set URL resource
         //thumb.setUrlResource(movie.getPoster());

@@ -178,6 +178,9 @@ public class CardView extends BaseCardView implements CardViewWrapper {
     public CardView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
+    public String getK(){
+        return "kaxa";
+    }
 
     //--------------------------------------------------------------------------
     // Init
@@ -982,7 +985,7 @@ public class CardView extends BaseCardView implements CardViewWrapper {
             layout(0, 0, getMeasuredWidth(), getMeasuredHeight());
         }
 
-        Bitmap b = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+        Bitmap b = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.RGB_565);
         Canvas c = new Canvas(b);
         draw(c);
         return b;

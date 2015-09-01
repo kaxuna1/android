@@ -26,8 +26,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.adjara.net.Classes.FloatingActionButton;
-import com.daimajia.androidanimations.library.Techniques;
-import com.daimajia.androidanimations.library.YoYo;
 import com.adjara.net.Classes.dbHelper;
 import com.adjara.net.broadcastreceivers.CheckEpisodesBroadcastReceiver;
 import com.adjara.net.fragments.MainPageFragment;
@@ -82,6 +80,7 @@ public class MainActivity extends AppCompatActivity{
                         .setFontAttrId(R.attr.fontPath)
                         .build()
         );
+
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
         FloatingActionButton mFab = new FloatingActionButton.Builder(this)
@@ -303,7 +302,6 @@ public class MainActivity extends AppCompatActivity{
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        YoYo.with(Techniques.ZoomInLeft).playOn(findViewById(R.id.fragmentMainLinar));
     }
 
 

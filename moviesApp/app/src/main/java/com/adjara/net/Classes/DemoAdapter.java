@@ -3,8 +3,8 @@ package com.adjara.net.Classes;
 /**
  * Created by vakhtanggelashvili on 8/9/15.
  */
-import android.widget.ListAdapter;
 
+import android.widget.ListAdapter;
 
 import com.adjara.net.model.DemoItem;
 

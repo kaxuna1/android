@@ -1,6 +1,7 @@
 package com.adjara.net.fragments;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,8 +17,6 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-import com.daimajia.androidanimations.library.Techniques;
-import com.daimajia.androidanimations.library.YoYo;
 import com.adjara.net.Classes.CustomHeaderMainMovieItem;
 import com.adjara.net.Classes.CustomThumbNail;
 import com.adjara.net.Classes.JanrebiData;
@@ -27,7 +26,7 @@ import com.adjara.net.MoviePageActivity;
 import com.adjara.net.R;
 import com.adjara.net.model.Janri;
 import com.adjara.net.model.Movie;
-import com.nineoldandroids.animation.Animator;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -35,6 +34,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardArrayAdapter;
+import it.gmariotti.cardslib.library.internal.CardThumbnail;
 import it.gmariotti.cardslib.library.view.CardListView;
 
 /**
@@ -49,12 +49,11 @@ public class MoviesPageFragment extends Fragment {
     private static View view;
     private static dbHelper dbHelper2;
     private int currentLoaded = 0;
-    ArrayList<Card> cards=new ArrayList<Card>();
+    ArrayList<Card> cards = new ArrayList<Card>();
     CardArrayAdapter adapter2;
     final getMovies getmovies = new getMovies();
-    ArrayList<Janri> currentJanrebi=new ArrayList<Janri>();;
-
-
+    ArrayList<Janri> currentJanrebi = new ArrayList<Janri>();
+    ;
 
 
     @InjectView(R.id.searchBox)
@@ -67,13 +66,13 @@ public class MoviesPageFragment extends Fragment {
     LinearLayout janrebiLayout;
 
 
-    public static MoviesPageFragment newInstance(int position,View view,dbHelper dbHelper2) {
+    public static MoviesPageFragment newInstance(int position, View view, dbHelper dbHelper2) {
         MoviesPageFragment f = new MoviesPageFragment();
         Bundle b = new Bundle();
         b.putInt(ARG_POSITION, position);
         f.setArguments(b);
-        MoviesPageFragment.view=view;
-        MoviesPageFragment.dbHelper2=dbHelper2;
+        MoviesPageFragment.view = view;
+        MoviesPageFragment.dbHelper2 = dbHelper2;
         return f;
     }
 
@@ -88,7 +87,7 @@ public class MoviesPageFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.moviepagefragment, container, false);
         ButterKnife.inject(this, rootView);
         ViewCompat.setElevation(rootView, 50);
-        adapter2=new CardArrayAdapter(getActivity(),cards);
+        adapter2 = new CardArrayAdapter(getActivity(), cards);
         mListView.setAdapter(adapter2);
         new Thread(new Runnable() {
             @Override
@@ -170,29 +169,29 @@ public class MoviesPageFragment extends Fragment {
 
             }
         });
-        final ArrayList<Janri> janrebi=new JanrebiData().getJanrebi();
+        final ArrayList<Janri> janrebi = new JanrebiData().getJanrebi();
 
-        for(int i=0;i<janrebi.size();i++){
+        for (int i = 0; i < janrebi.size(); i++) {
 
-            CheckBox checkBox=new CheckBox(getActivity());
+            CheckBox checkBox = new CheckBox(getActivity());
             checkBox.setText(janrebi.get(i).getName());
             final int finalI = i;
             checkBox.setOnCheckedChangeListener(
                     new CompoundButton.OnCheckedChangeListener() {
-                                                    @Override
-                                                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                                                        //Toast.makeText(getActivity(), "ჟანრი "+janrebi.get(finalI).getName()+" "+isChecked, Toast.LENGTH_SHORT).show();
-                                                        if(isChecked){
-                                                            currentJanrebi.add(janrebi.get(finalI));
+                        @Override
+                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                            //Toast.makeText(getActivity(), "ჟანრი "+janrebi.get(finalI).getName()+" "+isChecked, Toast.LENGTH_SHORT).show();
+                            if (isChecked) {
+                                currentJanrebi.add(janrebi.get(finalI));
 
-                                                        }else{
-                                                            currentJanrebi.remove(janrebi.get(finalI));
-                                                        }
-                                                        cards.clear();
-                                                        adapter2.clear();
-                                                        currentLoaded = 0;
-                                                    }
-                                                }
+                            } else {
+                                currentJanrebi.remove(janrebi.get(finalI));
+                            }
+                            cards.clear();
+                            adapter2.clear();
+                            currentLoaded = 0;
+                        }
+                    }
             );
             janrebiLayout.addView(checkBox);
 
@@ -227,12 +226,10 @@ public class MoviesPageFragment extends Fragment {
         }
 
     }
-    
+
     public void addMovieToLoadidData(final Movie movie) {
 
         //adapter.add(movie);
-
-
 
 
         Card card = new Card(getActivity());
@@ -240,12 +237,13 @@ public class MoviesPageFragment extends Fragment {
 
         //Create a CardHeader
         CustomHeaderMainMovieItem header = new CustomHeaderMainMovieItem(getActivity(),
-                movie.getTitle_en(),movie.getRelease_date(),movie.getDescription().length()>50?movie.getDescription().substring(0,49):movie.getDescription());
+                movie.getTitle_en(), movie.getRelease_date(), movie.getDescription().length() > 50 ? movie.getDescription().substring(0, 49) : movie.getDescription());
 
         //Set the header title
         header.setTitle(movie.getTitle_en());
 
         card.addCardHeader(header);
+
 
         //header.setOtherButtonVisible(true);
 
@@ -256,24 +254,38 @@ public class MoviesPageFragment extends Fragment {
         //header.setOtherButtonDrawable(R.drawable.card_menu_button_other_add);
 
 
-
-
         //Create thumbnail
         //CustomThumbCard thumb = new CustomThumbCard(MainActivity.this);
 
-        CustomThumbNail thumbnail=new CustomThumbNail(getActivity());
+        CustomThumbNail thumbnail = new CustomThumbNail(getActivity());
 
-        thumbnail.setUrlResource(movie.getPoster());
+        //thumbnail.setUrlResource(movie.getPoster());
+
+        thumbnail.setCustomSource(new CardThumbnail.CustomSource() {
+            @Override
+            public String getTag() {
+                return movie.getPoster();
+            }
+
+            @Override
+            public Bitmap getBitmap() {
+                try{
+
+                    return Picasso.with(getActivity()).load(movie.getPoster()).resize(184, 276).get();
+                }catch (Exception e){
+                    return null;
+                }
+            }
+        });
 
         //Set URL resource
         //thumb.setUrlResource(movie.getPoster());
-        
+
         //Error Resource ID
         thumbnail.setErrorResource(R.drawable.ic_error_loadingorangesmall);
 
         //Add thumbnail to a card
         card.addCardThumbnail(thumbnail);
-
 
 
         //Set card in the cardView
@@ -285,54 +297,33 @@ public class MoviesPageFragment extends Fragment {
             @Override
             public void onClick(Card card, View view) {
 
-                YoYo.with(Techniques.ZoomOutLeft).duration(500).withListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animation) {
+                Movie selectedMovie = movie;
 
-                    }
+                Intent i = new Intent(getActivity(), MoviePageActivity.class);
+                i.putExtra("movieId", selectedMovie.getMovieId());
+                i.putExtra("description", selectedMovie.getDescription());
+                i.putExtra("title", selectedMovie.getTitle_en());
+                i.putExtra("date", selectedMovie.getRelease_date());
+                i.putExtra("duration", selectedMovie.getDuration());
+                i.putExtra("rating", selectedMovie.getImdb());
+                i.putExtra("imdb", selectedMovie.getImdb_id());
+                i.putExtra("lang", selectedMovie.getLang());
+                i.putExtra("time", 0);
+                i.putExtra("Movie", selectedMovie);
+                startActivityForResult(i, 1);
 
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        Movie selectedMovie = movie;
-
-                        Intent i = new Intent(getActivity(), MoviePageActivity.class);
-                        i.putExtra("movieId", selectedMovie.getMovieId());
-                        i.putExtra("description", selectedMovie.getDescription());
-                        i.putExtra("title", selectedMovie.getTitle_en());
-                        i.putExtra("date", selectedMovie.getRelease_date());
-                        i.putExtra("duration", selectedMovie.getDuration());
-                        i.putExtra("rating", selectedMovie.getImdb());
-                        i.putExtra("imdb", selectedMovie.getImdb_id());
-                        i.putExtra("lang", selectedMovie.getLang());
-                        i.putExtra("time", 0);
-                        i.putExtra("Movie", selectedMovie);
-                        startActivityForResult(i, 1);
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animation) {
-
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animation) {
-
-                    }
-                }).playOn(MoviesPageFragment.view);
             }
         });
 
         adapter2.add(card);
 
 
-
-
     }
 
-    String getJanrebi(){
-        String value="";
-        for(int i=0;i<currentJanrebi.size();i++){
-            value+="searchTags%5B%5D="+currentJanrebi.get(i).getValue()+"&";
+    String getJanrebi() {
+        String value = "";
+        for (int i = 0; i < currentJanrebi.size(); i++) {
+            value += "searchTags%5B%5D=" + currentJanrebi.get(i).getValue() + "&";
         }
 
 

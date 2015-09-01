@@ -10,12 +10,7 @@
         <item name="android:colorAccent">@color/accent</item>
         <item name="android:statusBarColor">@color/primary</item>
     </style>
-    <style name="FullscreenTheme" parent="android:Theme.NoTitleBar">
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowBackground">@null</item>
-        <item name="metaButtonBarStyle">@style/ButtonBar</item>
-        <item name="metaButtonBarButtonStyle">@style/ButtonBarButton</item>
-    </style>
+
     <style name="Theme" parent="FrameworkRoot.Theme" /> <!-- doesn't contain the pre-L code from the values/styles.xml -->
 
     <style name="Theme.Carddemo" parent="Theme.Carddemo.Base">

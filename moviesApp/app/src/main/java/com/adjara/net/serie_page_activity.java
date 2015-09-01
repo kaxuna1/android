@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.PixelFormat;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -32,8 +31,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
-import com.daimajia.androidanimations.library.Techniques;
-import com.daimajia.androidanimations.library.YoYo;
 import com.adjara.net.Classes.MovieServices;
 import com.adjara.net.Classes.ScrollViewExt;
 import com.adjara.net.Classes.ScrollViewListener;
@@ -45,15 +42,11 @@ import com.adjara.net.model.MovieSerieLastMomentModel;
 import com.adjara.net.model.Season;
 import com.adjara.net.model.Serie;
 import com.adjara.net.model.SeriesDataModel;
-import com.nineoldandroids.animation.Animator;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -65,41 +58,40 @@ import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class serie_page_activity extends AppCompatActivity {
-    private static ProgressDialog progressDialog=null;
+    private static ProgressDialog progressDialog = null;
     String id;
     String qual;
     String lang;
     ArrayList<Season> seasons;
-    int currentSeason=1;
-    int currentEpisode=0;
-    String currentLangs="";
-    String currentLang="";
-    ArrayList<Episode> currentEpisodes=new ArrayList<Episode>();
-    String videourl="";
+    int currentSeason = 1;
+    int currentEpisode = 0;
+    String currentLangs = "";
+    String currentLang = "";
+    ArrayList<Episode> currentEpisodes = new ArrayList<Episode>();
+    String videourl = "";
     VideoView videoView;
-    int movieTime=0;
+    int movieTime = 0;
     EpisodesListAdapter adapter;
     Serie serie;
     LinearLayout castLayout;
-    TabHost tabHost=null;
+    TabHost tabHost = null;
     private WebView webView;
     ListView episodesListView;
     LinearLayout relatedLayout;
     MovieSerieLastMomentModel movieSerieLastMomentModel;
-    ImageButton playButton=null;
-    TextView director=null;
-    String directorText="";
-    TextView gener=null;
-    String generText="";
+    ImageButton playButton = null;
+    TextView director = null;
+    String directorText = "";
+    TextView gener = null;
+    String generText = "";
     Bundle extras;
-
-
 
 
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,8 +100,10 @@ public class serie_page_activity extends AppCompatActivity {
                         .setFontAttrId(R.attr.fontPath)
                         .build()
         );
+        progressDialog = ProgressDialog.show(serie_page_activity.this, "", "მიმდინარეობს ჩატვირთვა", true);
+        progressDialog.setCancelable(true);
         setContentView(R.layout.activity_serie_page_activity);
-        playButton=(ImageButton)findViewById(R.id.play_button);
+        playButton = (ImageButton) findViewById(R.id.play_button);
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -121,35 +115,31 @@ public class serie_page_activity extends AppCompatActivity {
         startPlayer();
 
 
-
-
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        movieTime=resultCode;
+        movieTime = resultCode;
         super.onActivityResult(requestCode, resultCode, data);
 
     }
 
     private void PlayVideo() {
-        try
-        {
-            getWindow().setFormat(PixelFormat.TRANSLUCENT);
-
+        try {
 
 
             final Uri video = Uri.parse(videourl);
             videoView.setVideoURI(video);
             videoView.requestFocus();
-            videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener()
-            {
+            videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
 
-                public void onPrepared(MediaPlayer mp)
-                {
+                public void onPrepared(MediaPlayer mp) {
                     playButton.setVisibility(View.GONE);
                     videoView.seekTo(movieSerieLastMomentModel.time);
                     videoView.start();
-                    progressDialog.dismiss();
+                    if (progressDialog != null)
+                        if (progressDialog.isShowing())
+                            progressDialog.dismiss();
                     videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
                         @Override
                         public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
@@ -160,9 +150,9 @@ public class serie_page_activity extends AppCompatActivity {
                         }
                     });
 
-                    ScrollViewExt scrollViewExt=(ScrollViewExt)findViewById(R.id.scrollView2);
+                    ScrollViewExt scrollViewExt = (ScrollViewExt) findViewById(R.id.scrollView2);
 
-                    final MediaController mediaController = new MediaController(serie_page_activity.this,true);
+                    final MediaController mediaController = new MediaController(serie_page_activity.this, true);
 
                     scrollViewExt.setScrollViewListener(new ScrollViewListener() {
                         @Override
@@ -177,9 +167,7 @@ public class serie_page_activity extends AppCompatActivity {
                 }
             });
 
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             System.out.println("Video Play Error :" + e.toString());
             //finish();
         }
@@ -193,13 +181,12 @@ public class serie_page_activity extends AppCompatActivity {
         return true;
     }
 
-    private class GetSeriesDataJSON extends AsyncTask<String,SeriesDataModel, SeriesDataModel> {
+    private class GetSeriesDataJSON extends AsyncTask<String, SeriesDataModel, SeriesDataModel> {
 
 
         @Override
         protected SeriesDataModel doInBackground(String... params) {
-            Document doc = null;
-            SeriesDataModel seriesDataModel=new SeriesDataModel();
+            SeriesDataModel seriesDataModel = new SeriesDataModel();
             seriesDataModel.jsonObject = new MovieServices().getSerieDataJson(id);
 
             publishProgress(seriesDataModel);
@@ -207,6 +194,7 @@ public class serie_page_activity extends AppCompatActivity {
 
             return null;
         }
+
         @Override
         protected void onProgressUpdate(SeriesDataModel... values) {
             super.onProgressUpdate(values);
@@ -214,45 +202,46 @@ public class serie_page_activity extends AppCompatActivity {
 
         }
     }
+
     public static boolean isInteger(String s) {
-        return isInteger(s,10);
+        return isInteger(s, 10);
     }
 
     public static boolean isInteger(String s, int radix) {
-        if(s.isEmpty()) return false;
-        for(int i = 0; i < s.length(); i++) {
-            if(i == 0 && s.charAt(i) == '-') {
-                if(s.length() == 1) return false;
+        if (s.isEmpty()) return false;
+        for (int i = 0; i < s.length(); i++) {
+            if (i == 0 && s.charAt(i) == '-') {
+                if (s.length() == 1) return false;
                 else continue;
             }
-            if(Character.digit(s.charAt(i),radix) < 0) return false;
+            if (Character.digit(s.charAt(i), radix) < 0) return false;
         }
         return true;
     }
 
     private void setSeriesDataJSON(SeriesDataModel value) {
-        try{
-            JSONObject jsonValue=value.jsonObject;
-            int i=1;
+        try {
+            JSONObject jsonValue = value.jsonObject;
+            int i = 1;
 
             Iterator<?> keys = jsonValue.keys();
-            while( keys.hasNext() ) {
-                String key = (String)keys.next();
-                if(isInteger(key)){
-                    int seasonNumber=Integer.parseInt(key);
-                    String seasonForLink=seasonNumber>9?"":"0"+seasonNumber;
-                    Season season =new Season("Season "+key);
+            while (keys.hasNext()) {
+                String key = (String) keys.next();
+                if (isInteger(key)) {
+                    int seasonNumber = Integer.parseInt(key);
+                    String seasonForLink = seasonNumber > 9 ? "" : "0" + seasonNumber;
+                    Season season = new Season("Season " + key);
                     try {
-                        JSONObject seasonEpisodesJSON=jsonValue.getJSONObject(key);
+                        JSONObject seasonEpisodesJSON = jsonValue.getJSONObject(key);
                         Iterator<?> keysEpisodes = seasonEpisodesJSON.keys();
-                        while (keysEpisodes.hasNext()){
-                            String keyEpisode =(String)keysEpisodes.next();
-                            int episodeNumber=Integer.parseInt(keyEpisode);
-                            String epForLink=episodeNumber>9?"":"0"+episodeNumber;
-                            JSONObject episodeJSONObject=seasonEpisodesJSON.getJSONObject(keyEpisode);
-                            String firstQual=episodeJSONObject.getString("quality").split(",")[0];
-                            String episodeLink="http://"+jsonValue.getString("file_url")+id+"_"+seasonForLink+"_"+epForLink+"_{L}_"+firstQual+".mp4";
-                            Episode episode=new Episode(episodeLink,episodeJSONObject.getString("lang"),episodeNumber+" "+episodeJSONObject.getString("name"));
+                        while (keysEpisodes.hasNext()) {
+                            String keyEpisode = (String) keysEpisodes.next();
+                            int episodeNumber = Integer.parseInt(keyEpisode);
+                            String epForLink = episodeNumber > 9 ? "" : "0" + episodeNumber;
+                            JSONObject episodeJSONObject = seasonEpisodesJSON.getJSONObject(keyEpisode);
+                            String firstQual = episodeJSONObject.getString("quality").split(",")[0];
+                            String episodeLink = "http://" + jsonValue.getString("file_url") + id + "_" + seasonForLink + "_" + epForLink + "_{L}_" + firstQual + ".mp4";
+                            Episode episode = new Episode(episodeLink, episodeJSONObject.getString("lang"), episodeNumber + " " + episodeJSONObject.getString("name"));
                             episode.setQual(episodeJSONObject.getString("quality"));
                             season.addEpisode(episode);
                         }
@@ -263,29 +252,29 @@ public class serie_page_activity extends AppCompatActivity {
 
                 }
             }
-            serie.lastSes=seasons.size();
-            serie.lastEp=seasons.get(seasons.size()-1).getEpisodes().size();
+            serie.lastSes = seasons.size();
+            serie.lastEp = seasons.get(seasons.size() - 1).getEpisodes().size();
 
-            final String[] seasonNames=new String[seasons.size()];
-            for(int k=0;k<seasons.size();k++){
-                seasonNames[k]=seasons.get(k).getName();
+            final String[] seasonNames = new String[seasons.size()];
+            for (int k = 0; k < seasons.size(); k++) {
+                seasonNames[k] = seasons.get(k).getName();
             }
             adapter.clear();
-            for(int e=0;e<seasons.get(movieSerieLastMomentModel.getSeason()).getEpisodes().size();e++){
+            for (int e = 0; e < seasons.get(movieSerieLastMomentModel.getSeason()).getEpisodes().size(); e++) {
                 adapter.add(seasons.get(0).getEpisode(e));
             }
 
 
             //playLastEpisode
 
-            currentLang=currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getLang().split(",")[0];
-            videourl=currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getLink().replace("{L}",currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getLang().split(",")[0]);
+            currentLang = currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getLang().split(",")[0];
+            videourl = currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getLink().replace("{L}", currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getLang().split(",")[0]);
             qual = currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getQual().split(",")[0];
             videourl.replaceAll("_\\d+\\.", "_" + qual + ".");
             movieSerieLastMomentModel.setSerie(movieSerieLastMomentModel.getSerie());
 
             //getActionBar().setTitle(extras.getString("title") + " " + currentEpisodes.get(position).getName());
-            ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.langBtnSerie)).setOnClickListener(new View.OnClickListener() {
+            ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.langBtnSerie)).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(serie_page_activity.this);
@@ -296,24 +285,24 @@ public class serie_page_activity extends AppCompatActivity {
 
                                     playButton.setVisibility(View.GONE);
                                     lang = currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getLang().split(",")[which];
-                                    videourl=currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getLink().replace("{L}",lang);
-                                    if(qual==null){
+                                    videourl = currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getLink().replace("{L}", lang);
+                                    if (qual == null) {
                                         qual = currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getQual().split(",")[0];
                                     }
-                                    videourl.replaceAll("_\\d+\\.","_"+qual+".");
+                                    videourl.replaceAll("_\\d+\\.", "_" + qual + ".");
                                     Uri video = Uri.parse(videourl);
                                     videoView.setVideoURI(video);
                                     videoView.requestFocus();
                                     videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
 
                                         public void onPrepared(MediaPlayer mp) {
-                                            if(progressDialog!=null)
-                                                progressDialog.dismiss();
+                                            if (progressDialog != null)
+                                                if (progressDialog.isShowing())
+                                                    progressDialog.dismiss();
                                             videoView.start();
                                             videoView.seekTo(movieTime);
                                         }
                                     });
-
 
 
                                 }
@@ -322,7 +311,7 @@ public class serie_page_activity extends AppCompatActivity {
                     builder.show();
                 }
             });
-            ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.qualBtn)).setOnClickListener(new View.OnClickListener() {
+            ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.qualBtn)).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(serie_page_activity.this);
@@ -333,7 +322,7 @@ public class serie_page_activity extends AppCompatActivity {
                                     //videourl=currentEpisodes.get(position).getLink().replace("{L}", lang);
                                     playButton.setVisibility(View.GONE);
                                     qual = currentEpisodes.get(movieSerieLastMomentModel.getSerie()).getQual().split(",")[which];
-                                    videourl.replaceAll("_\\d+\\.","_"+qual+".");
+                                    videourl.replaceAll("_\\d+\\.", "_" + qual + ".");
 
                                     Uri video = Uri.parse(videourl);
                                     videoView.setVideoURI(video);
@@ -341,12 +330,13 @@ public class serie_page_activity extends AppCompatActivity {
                                     videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
 
                                         public void onPrepared(MediaPlayer mp) {
-                                            progressDialog.dismiss();
+                                            if (progressDialog != null)
+                                                if (progressDialog.isShowing())
+                                                    progressDialog.dismiss();
                                             videoView.start();
                                             videoView.seekTo(movieTime);
                                         }
                                     });
-
 
 
                                 }
@@ -367,16 +357,6 @@ public class serie_page_activity extends AppCompatActivity {
             });
 
 
-
-
-
-
-
-
-
-
-
-
             //setListViewHeightBasedOnChildren(episodesListView);
 
             ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.seasonChangeBtn)).setOnClickListener(new View.OnClickListener() {
@@ -388,11 +368,11 @@ public class serie_page_activity extends AppCompatActivity {
                                 public void onClick(DialogInterface dialog, int which) {
 
                                     adapter.clear();
-                                    for(int e=0;e<seasons.get(which).getEpisodes().size();e++){
+                                    for (int e = 0; e < seasons.get(which).getEpisodes().size(); e++) {
                                         adapter.add(seasons.get(which).getEpisode(e));
                                     }
                                     //setListViewHeightBasedOnChildren(episodesListView);
-                                    currentSeason=(which);
+                                    currentSeason = (which);
                                     movieSerieLastMomentModel.setSeason(currentSeason);
                                     movieSerieLastMomentModel.setSerie(0);
                                     movieSerieLastMomentModel.save();
@@ -403,15 +383,17 @@ public class serie_page_activity extends AppCompatActivity {
                     builder.show();
                 }
             });
+            if (progressDialog != null)
+                if (progressDialog.isShowing())
+                    progressDialog.dismiss();
 
 
-        }catch (Exception e){
+        } catch (Exception e) {
             Toast.makeText(serie_page_activity.this, "გაწყდა კავშირი ინტერნეტთან", Toast.LENGTH_LONG).show();
             finish();
 
 
         }
-
 
 
     }
@@ -442,78 +424,43 @@ public class serie_page_activity extends AppCompatActivity {
             if (view == null)
                 view = getLayoutInflater().inflate(R.layout.episodeslistitem, viewGroup, false);
             final Episode currentEpisode = currentEpisodes.get(position);
-            ((TextView)view.findViewById(R.id.episodeTitle)).setText(currentEpisode.getName());
+            ((TextView) view.findViewById(R.id.episodeTitle)).setText(currentEpisode.getName());
             return view;
         }
     }
 
     public void onBackPressed() {
-        if(tabHost.getCurrentTab()==1){
-            if(webView.canGoBack()){
+        if (tabHost.getCurrentTab() == 1) {
+            if (webView.canGoBack()) {
                 webView.goBack();
-            }else{
-                YoYo.with(Techniques.SlideOutRight).withListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animation) {
-                        finish();
-                    }
+            } else {
 
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
+                finish();
 
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animation) {
-
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animation) {
-
-                    }
-                }).duration(500).playOn(findViewById(R.id.mainfragmentframe));
             }
-        }else{
-            YoYo.with(Techniques.SlideOutRight).withListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator animation) {
-                    finish();
-                }
+        } else {
 
-                @Override
-                public void onAnimationEnd(Animator animation) {
+            finish();
 
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animation) {
-
-                }
-
-                @Override
-                public void onAnimationRepeat(Animator animation) {
-
-                }
-            }).duration(500).playOn(findViewById(R.id.mainfragmentframe));
         }
 
 
     }
 
-    class getSerieActorsAsync extends AsyncTask<String,ArrayList<Actor>,ArrayList<Actor>>{
+    class getSerieActorsAsync extends AsyncTask<String, ArrayList<Actor>, ArrayList<Actor>> {
 
         @Override
         protected ArrayList<Actor> doInBackground(String... strings) {
             ArrayList<Actor> actors;
-            actors=new MovieServices().getSerieActors(strings[0]);
+            actors = new MovieServices().getSerieActors(strings[0]);
 
-            directorText=new MovieServices().getDirector(strings[0]);
-            generText=new MovieServices().getJanrebi(strings[0]);
+            directorText = new MovieServices().getDirector(strings[0]);
+            generText = new MovieServices().getJanrebi(strings[0]);
 
             publishProgress(actors);
             return actors;
         }
+
         @Override
         protected void onProgressUpdate(ArrayList<Actor>... values) {
             super.onProgressUpdate(values);
@@ -533,12 +480,19 @@ public class serie_page_activity extends AppCompatActivity {
         RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.actorontop, null, false);
 
 
-
-
         MaterialLargeImageCard card =
                 MaterialLargeImageCard.with(this)
                         //.setTextOverImage(actor.actorName)
-                        .useDrawableUrl("http://static.adjaranet.com/cast/"+actor.actorId+".jpg")
+                        .useDrawableExternal(new MaterialLargeImageCard.DrawableExternal() {
+                            @Override
+                            public void setupInnerViewElements(ViewGroup parent, View viewImage) {
+                                Picasso.with(serie_page_activity.this)
+                                        .load("http://static.adjaranet.com/cast/" + actor.actorId + ".jpg")
+                                        .resize(184, 276)
+                                        .error(getResources().getDrawable(R.drawable.both))
+                                        .into((ImageView) viewImage);
+                            }
+                        })
                                 //.setupSupplementalActions(R.layout.carddemo_native_material_supplemental_actions_large_icon, actions)
                         .build();
 
@@ -547,14 +501,14 @@ public class serie_page_activity extends AppCompatActivity {
             @Override
             public void onClick(Card card, View view) {
                 Intent i = new Intent(serie_page_activity.this, ActorMoviesActivity.class);
-                i.putExtra("id",actor.actorId);
+                i.putExtra("id", actor.actorId);
 
                 startActivityForResult(i, 1);
 
             }
         });
         CardViewNative cardView = (CardViewNative) layout.findViewById(R.id.actorCard);
-        ((TextView)layout.findViewById(R.id.actorCardName)).setText(actor.actorName);
+        ((TextView) layout.findViewById(R.id.actorCardName)).setText(actor.actorName);
         cardView.setCard(card);
 
         linearLayout.addView(layout);
@@ -587,15 +541,20 @@ public class serie_page_activity extends AppCompatActivity {
         LinearLayout linearLayout = relatedLayout;
         LayoutInflater inflater = LayoutInflater.from(this);
         RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.actorontop, null, false);
-        final Serie serie=new Serie(movie.getMovieId(),movie.getTitle_en(),movie.getLink(),movie.getPoster(),movie.getImdb(),movie.getImdb_id(),
-                movie.getRelease_date(),movie.getDescription(),movie.getDuration(),movie.getLang());
-
+        final Serie serie = new Serie(movie.getMovieId(), movie.getTitle_en(), movie.getLink(), movie.getPoster(), movie.getImdb(), movie.getImdb_id(),
+                movie.getRelease_date(), movie.getDescription(), movie.getDuration(), movie.getLang());
 
 
         MaterialLargeImageCard card =
                 MaterialLargeImageCard.with(this)
                         //.setTextOverImage(actor.actorName)
-                        .useDrawableUrl(movie.getPoster())
+                        .useDrawableExternal(new MaterialLargeImageCard.DrawableExternal() {
+                            @Override
+                            public void setupInnerViewElements(ViewGroup parent, View viewImage) {
+                                Picasso.with(serie_page_activity.this).load(movie.getPoster())
+                                        .resize(184, 276).into((ImageView) viewImage);
+                            }
+                        })
                                 //.setupSupplementalActions(R.layout.carddemo_native_material_supplemental_actions_large_icon, actions)
                         .build();
 
@@ -614,47 +573,47 @@ public class serie_page_activity extends AppCompatActivity {
                 i.putExtra("rating", serie.getImdb());
                 i.putExtra("imdb", serie.getImdb_id());
                 i.putExtra("lang", serie.getLang());
-                i.putExtra("Serie",serie);
+                i.putExtra("Serie", serie);
                 i.putExtra("time", 0);
-                i.putExtra("Serie",serie);
+                i.putExtra("Serie", serie);
                 startActivity(i);
             }
         });
         CardViewNative cardView = (CardViewNative) layout.findViewById(R.id.actorCard);
-        ((TextView)layout.findViewById(R.id.actorCardName)).setText(movie.getTitle_en());
+        ((TextView) layout.findViewById(R.id.actorCardName)).setText(movie.getTitle_en());
         cardView.setCard(card);
 
         linearLayout.addView(layout);
 
     }
 
-    private void startPlayer(){
+    private void startPlayer() {
 
         extras = getIntent().getExtras();
-        tabHost = (TabHost)findViewById(R.id.tabHost);
+        tabHost = (TabHost) findViewById(R.id.tabHost);
         tabHost.setup();
-        TabHost.TabSpec tabSpec=tabHost.newTabSpec("movie");
+        TabHost.TabSpec tabSpec = tabHost.newTabSpec("movie");
         tabSpec.setContent(R.id.tab1);
         tabSpec.setIndicator(extras.getString("title"));
         tabHost.addTab(tabSpec);
 
 
-        tabSpec=tabHost.newTabSpec("movie");
+        tabSpec = tabHost.newTabSpec("movie");
         tabSpec.setContent(R.id.tab3);
         tabSpec.setIndicator("IMDb");
         tabHost.addTab(tabSpec);
 
-        relatedLayout=(LinearLayout)findViewById(R.id.relatedMoviesLayout);
-        castLayout=(LinearLayout)findViewById(R.id.actorsLayout);
-        director=(TextView)findViewById(R.id.directorText);
-        gener=(TextView)findViewById(R.id.geners);
-        seasons=new ArrayList<Season>();
+        relatedLayout = (LinearLayout) findViewById(R.id.relatedMoviesLayout);
+        castLayout = (LinearLayout) findViewById(R.id.actorsLayout);
+        director = (TextView) findViewById(R.id.directorText);
+        gener = (TextView) findViewById(R.id.geners);
+        seasons = new ArrayList<Season>();
 
-        id=extras.getString("movieId");
+        id = extras.getString("movieId");
         // getActionBar().setTitle(extras.getString("title"));
 
 
-        ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.downloadBtn)).setOnClickListener(new View.OnClickListener() {
+        ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.downloadBtn)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (!videourl.isEmpty()) {
@@ -669,8 +628,8 @@ public class serie_page_activity extends AppCompatActivity {
 
             }
         });
-        serie= (Serie) getIntent().getSerializableExtra("Serie");
-        ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.getNewsBtn)).setOnClickListener(new View.OnClickListener() {
+        serie = (Serie) getIntent().getSerializableExtra("Serie");
+        ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.getNewsBtn)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //Serie serie = (Serie) getIntent().getSerializableExtra("Serie");
@@ -685,7 +644,7 @@ public class serie_page_activity extends AppCompatActivity {
 
             }
         });
-        ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.fullScreenButton)).setOnClickListener(new View.OnClickListener() {
+        ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.fullScreenButton)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(serie_page_activity.this, FullScreenMovie.class);
@@ -698,17 +657,17 @@ public class serie_page_activity extends AppCompatActivity {
                 i.putExtra("imdb", extras.getString("imdb"));
                 i.putExtra("time", videoView.getCurrentPosition());
                 i.putExtra("link", videourl);
-                movieSerieLastMomentModel.time=videoView.getCurrentPosition();
+                movieSerieLastMomentModel.time = videoView.getCurrentPosition();
                 movieSerieLastMomentModel.save();
 
                 startActivityForResult(i, 0);
 
             }
         });
-        TextView date=(TextView)findViewById(R.id.movieDate);
+        TextView date = (TextView) findViewById(R.id.movieDate);
         date.setText(extras.getString("date"));
         ((TextView) findViewById(R.id.imdbRating)).setText(extras.getString("rating"));
-        ((ImageView)findViewById(R.id.imdbImg)).setOnClickListener(new View.OnClickListener() {
+        ((ImageView) findViewById(R.id.imdbImg)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 tabHost.setCurrentTab(1);
@@ -717,20 +676,19 @@ public class serie_page_activity extends AppCompatActivity {
         ((TextView) findViewById(R.id.descriptionTxt)).setText(extras.getString("description"));
 
 
-
-        final GetSeriesDataJSON getSeries=new GetSeriesDataJSON();
+        final GetSeriesDataJSON getSeries = new GetSeriesDataJSON();
 
         webView = (WebView) findViewById(R.id.webView1);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebViewClient(new WebViewClient());
         webView.loadUrl("http://www.imdb.com/title/" + extras.getString("imdb"));
 
-        final List<MovieSerieLastMomentModel> movieSerieLastMomentModels=MovieSerieLastMomentModel.find(MovieSerieLastMomentModel.class, "movie_id = '"+serie.getMovieId()+"'");
-        if(movieSerieLastMomentModels.size()>0){
-            movieSerieLastMomentModel=movieSerieLastMomentModels.get(0);
-        }else{
-            movieSerieLastMomentModel=new MovieSerieLastMomentModel(serie.getMovieId());
-            movieSerieLastMomentModel.time=0;
+        final List<MovieSerieLastMomentModel> movieSerieLastMomentModels = MovieSerieLastMomentModel.find(MovieSerieLastMomentModel.class, "movie_id = '" + serie.getMovieId() + "'");
+        if (movieSerieLastMomentModels.size() > 0) {
+            movieSerieLastMomentModel = movieSerieLastMomentModels.get(0);
+        } else {
+            movieSerieLastMomentModel = new MovieSerieLastMomentModel(serie.getMovieId());
+            movieSerieLastMomentModel.time = 0;
             movieSerieLastMomentModel.setSeason(0);
             movieSerieLastMomentModel.setSerie(0);
             movieSerieLastMomentModel.save();
@@ -746,8 +704,8 @@ public class serie_page_activity extends AppCompatActivity {
         }).start();
 
 
-        episodesListView = (ListView)findViewById(R.id.listViewSerie);
-        adapter=new EpisodesListAdapter();
+        episodesListView = (ListView) findViewById(R.id.listViewSerie);
+        adapter = new EpisodesListAdapter();
         videoView = (VideoView) findViewById(R.id.myserieview);
         episodesListView.setAdapter(adapter);
         episodesListView.setOnTouchListener(new View.OnTouchListener() {
@@ -762,17 +720,17 @@ public class serie_page_activity extends AppCompatActivity {
         episodesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                currentLang=currentEpisodes.get(position).getLang().split(",")[0];
-                videourl=currentEpisodes.get(position).getLink().replace("{L}",currentEpisodes.get(position).getLang().split(",")[0]);
+                currentLang = currentEpisodes.get(position).getLang().split(",")[0];
+                videourl = currentEpisodes.get(position).getLink().replace("{L}", currentEpisodes.get(position).getLang().split(",")[0]);
                 qual = currentEpisodes.get(position).getQual().split(",")[0];
-                videourl.replaceAll("_\\d+\\.","_"+qual+".");
+                videourl.replaceAll("_\\d+\\.", "_" + qual + ".");
                 movieSerieLastMomentModel.setSerie(position);
-                movieSerieLastMomentModel.time=0;
+                movieSerieLastMomentModel.time = 0;
                 movieSerieLastMomentModel.save();
                 progressDialog = ProgressDialog.show(serie_page_activity.this, "", "მიმდინარეობს ჩატვირთვა", true);
                 progressDialog.setCancelable(true);
                 //getActionBar().setTitle(extras.getString("title") + " " + currentEpisodes.get(position).getName());
-                ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.langBtnSerie)).setOnClickListener(new View.OnClickListener() {
+                ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.langBtnSerie)).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(serie_page_activity.this);
@@ -782,23 +740,26 @@ public class serie_page_activity extends AppCompatActivity {
                                         movieTime = videoView.getCurrentPosition();
 
                                         lang = currentEpisodes.get(position).getLang().split(",")[which];
-                                        videourl=currentEpisodes.get(position).getLink().replace("{L}",lang);
-                                        if(qual==null){
+                                        videourl = currentEpisodes.get(position).getLink().replace("{L}", lang);
+                                        if (qual == null) {
                                             qual = currentEpisodes.get(position).getQual().split(",")[0];
                                         }
-                                        videourl.replaceAll("_\\d+\\.","_"+qual+".");
+                                        videourl.replaceAll("_\\d+\\.", "_" + qual + ".");
+                                        progressDialog = ProgressDialog.show(serie_page_activity.this, "", "მიმდინარეობს ჩატვირთვა", true);
+                                        progressDialog.setCancelable(true);
                                         Uri video = Uri.parse(videourl);
                                         videoView.setVideoURI(video);
                                         videoView.requestFocus();
                                         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
 
                                             public void onPrepared(MediaPlayer mp) {
-                                                progressDialog.dismiss();
+                                                if (progressDialog != null)
+                                                    if (progressDialog.isShowing())
+                                                        progressDialog.dismiss();
                                                 videoView.start();
                                                 videoView.seekTo(movieTime);
                                             }
                                         });
-
 
 
                                     }
@@ -807,7 +768,7 @@ public class serie_page_activity extends AppCompatActivity {
                         builder.show();
                     }
                 });
-                ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.qualBtn)).setOnClickListener(new View.OnClickListener() {
+                ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.qualBtn)).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(serie_page_activity.this);
@@ -818,20 +779,22 @@ public class serie_page_activity extends AppCompatActivity {
                                         //videourl=currentEpisodes.get(position).getLink().replace("{L}", lang);
 
                                         qual = currentEpisodes.get(position).getQual().split(",")[which];
-                                        videourl.replaceAll("_\\d+\\.","_"+qual+".");
-
+                                        videourl.replaceAll("_\\d+\\.", "_" + qual + ".");
+                                        progressDialog = ProgressDialog.show(serie_page_activity.this, "", "მიმდინარეობს ჩატვირთვა", true);
+                                        progressDialog.setCancelable(true);
                                         Uri video = Uri.parse(videourl);
                                         videoView.setVideoURI(video);
                                         videoView.requestFocus();
                                         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
 
                                             public void onPrepared(MediaPlayer mp) {
-                                                progressDialog.dismiss();
+                                                if (progressDialog != null)
+                                                    if (progressDialog.isShowing())
+                                                        progressDialog.dismiss();
                                                 videoView.start();
                                                 videoView.seekTo(movieTime);
                                             }
                                         });
-
 
 
                                     }
@@ -844,18 +807,18 @@ public class serie_page_activity extends AppCompatActivity {
             }
         });
 
-        HistoryModel historyModel=new HistoryModel(serie.getMovieId(),serie.getTitle_en(),serie.getLink(),
-                serie.getPoster(),serie.getImdb(),serie.getImdb_id(),serie.getRelease_date(),serie.getDescription(),
-                serie.getDuration(),serie.getLang()
+        HistoryModel historyModel = new HistoryModel(serie.getMovieId(), serie.getTitle_en(), serie.getLink(),
+                serie.getPoster(), serie.getImdb(), serie.getImdb_id(), serie.getRelease_date(), serie.getDescription(),
+                serie.getDuration(), serie.getLang()
         );
 
         historyModel.setType(2);
 
-        List<HistoryModel> movieList=HistoryModel.find(HistoryModel.class, "movie_id = '"+historyModel.getMovieId()+"'");
+        List<HistoryModel> movieList = HistoryModel.find(HistoryModel.class, "movie_id = '" + historyModel.getMovieId() + "'");
 
-        if(movieList.size()==0) {
+        if (movieList.size() == 0) {
             historyModel.save();
-        }else{
+        } else {
             movieList.get(0).delete();
             historyModel.save();
         }
@@ -863,30 +826,32 @@ public class serie_page_activity extends AppCompatActivity {
 
     }
 
-    public void stopVideoPlaying(){
+    public void stopVideoPlaying() {
         videoView.pause();
     }
 
     @Override
-    protected void onPause(){
+    protected void onPause() {
         super.onPause();
         stopVideoPlaying();
     }
+
     @Override
-    protected void onStop(){
+    protected void onStop() {
         super.onStop();
         stopVideoPlaying();
     }
 
     @Override
-    protected void onDestroy(){
+    protected void onDestroy() {
         super.onDestroy();
         stopVideoPlaying();
     }
+
     @Override
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
-        if(videoView!=null){
+        if (videoView != null) {
             videoView.resume();
         }
         //startVideoPlaying();

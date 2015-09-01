@@ -1,33 +1,28 @@
 package com.adjara.net.fragments;
 
 
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.content.Intent;
-import android.os.AsyncTask;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-import com.daimajia.androidanimations.library.Techniques;
-import com.daimajia.androidanimations.library.YoYo;
 import com.adjara.net.Classes.MovieServices;
+import com.adjara.net.GeoMoviesCollecitonActivity;
 import com.adjara.net.MoviePageActivity;
 import com.adjara.net.R;
 import com.adjara.net.model.Movie;
 import com.adjara.net.model.Serie;
 import com.adjara.net.serie_page_activity;
-import com.adjara.net.GeoMoviesCollecitonActivity;
-import com.nineoldandroids.animation.Animator;
+import com.squareup.picasso.Picasso;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-
-import java.io.IOException;
 import java.util.ArrayList;
 
 import butterknife.ButterKnife;
@@ -104,11 +99,7 @@ public class MainPageFragment extends Fragment {
             @Override
             public void run() {
                 geoMovies.doInBackground("");
-                new getGeoEpisodes().doInBackground("");
-                premierMovies.doInBackground("");
-                latestEpisodes.doInBackground("");
-                newAddedMovies.doInBackground("");
-                new getTopMovies().doInBackground("");
+
 
 
             }
@@ -136,6 +127,14 @@ public class MainPageFragment extends Fragment {
                 addGeoMovieToColection(values[0].get(i));
             }
 
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    new getGeoEpisodes().doInBackground("");
+
+                }
+            }).start();
+
         }
 
     }
@@ -149,11 +148,17 @@ public class MainPageFragment extends Fragment {
 
         MaterialLargeImageCard card =
                 MaterialLargeImageCard.with(getActivity())
+                        .useDrawableExternal(new MaterialLargeImageCard.DrawableExternal() {
+                            @Override
+                            public void setupInnerViewElements(ViewGroup parent, View viewImage) {
+                                Picasso.with(getActivity()).load(movie.getPoster()).resize(184,276).into((ImageView) viewImage);
+                            }
+                        })
                         //.setTextOverImage(movie.getTitle_en())
-                        .useDrawableUrl(movie.getPoster())
+                        //.useDrawableUrl(movie.getPoster())
                                 //.setupSupplementalActions(R.layout.carddemo_native_material_supplemental_actions_large_icon, actions)
                         .build();
-
+        card.setDrawableIdCardThumbnail(R.drawable.logo);
 
         card.setOnClickListener(new Card.OnCardClickListener() {
             @Override
@@ -189,13 +194,6 @@ public class MainPageFragment extends Fragment {
 
             MovieServices movieServices = new MovieServices();
             ArrayList<Movie> movies = movieServices.getPremierMovies();
-            try {
-                Document doc = Jsoup.connect("http://counter.top.ge/cgi-bin/cod?100+88152").get();
-                doc = Jsoup.connect("http://s1.counter.top.ge/cgi-bin/count?ID:88152+JS:11+REFERER:+RESOLUTION:1366X768+DEPT:24+RAND:4687.131163664162").get();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
             publishProgress(movies);
 
             return movies;
@@ -207,6 +205,15 @@ public class MainPageFragment extends Fragment {
             for (int i = 0; i < values[0].size(); i++) {
                 addPremiereMovieToColection(values[0].get(i));
             }
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+
+                    new getLatestEpisodes().doInBackground("");
+
+
+                }
+            }).start();
 
         }
 
@@ -221,7 +228,12 @@ public class MainPageFragment extends Fragment {
         MaterialLargeImageCard card =
                 MaterialLargeImageCard.with(getActivity())
                         //.setTextOverImage(movie.getTitle_en())
-                        .useDrawableUrl(movie.getPoster())
+                        .useDrawableExternal(new MaterialLargeImageCard.DrawableExternal() {
+                            @Override
+                            public void setupInnerViewElements(ViewGroup parent, View viewImage) {
+                                Picasso.with(getActivity()).load(movie.getPoster()).resize(184, 276).into((ImageView) viewImage);
+                            }
+                        })
                                 //.setupSupplementalActions(R.layout.carddemo_native_material_supplemental_actions_large_icon, actions)
                         .build();
 
@@ -263,13 +275,6 @@ public class MainPageFragment extends Fragment {
 
             MovieServices movieServices = new MovieServices();
             ArrayList<Movie> movies = movieServices.getTopMovies();
-            try {
-                Document doc = Jsoup.connect("http://counter.top.ge/cgi-bin/cod?100+88152").get();
-                doc = Jsoup.connect("http://s1.counter.top.ge/cgi-bin/count?ID:88152+JS:11+REFERER:+RESOLUTION:1366X768+DEPT:24+RAND:4687.131163664162").get();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
             publishProgress(movies);
 
             return movies;
@@ -295,7 +300,12 @@ public class MainPageFragment extends Fragment {
         MaterialLargeImageCard card =
                 MaterialLargeImageCard.with(getActivity())
                         //.setTextOverImage(movie.getTitle_en())
-                        .useDrawableUrl(movie.getPoster())
+                        .useDrawableExternal(new MaterialLargeImageCard.DrawableExternal() {
+                            @Override
+                            public void setupInnerViewElements(ViewGroup parent, View viewImage) {
+                                Picasso.with(getActivity()).load(movie.getPoster()).resize(184, 276).into((ImageView) viewImage);
+                            }
+                        })
                                 //.setupSupplementalActions(R.layout.carddemo_native_material_supplemental_actions_large_icon, actions)
                         .build();
 
@@ -348,6 +358,13 @@ public class MainPageFragment extends Fragment {
             for (int i = 0; i < values[0].size(); i++) {
                 addNewAddedMoviesToColection(values[0].get(i));
             }
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    new getTopMovies().doInBackground("");
+
+                }
+            }).start();
 
         }
 
@@ -362,7 +379,12 @@ public class MainPageFragment extends Fragment {
         MaterialLargeImageCard card =
                 MaterialLargeImageCard.with(getActivity())
                         //.setTextOverImage(movie.getTitle_en())
-                        .useDrawableUrl(movie.getPoster())
+                        .useDrawableExternal(new MaterialLargeImageCard.DrawableExternal() {
+                            @Override
+                            public void setupInnerViewElements(ViewGroup parent, View viewImage) {
+                                Picasso.with(getActivity()).load(movie.getPoster()).resize(184, 276).into((ImageView) viewImage);
+                            }
+                        })
                                 //.setupSupplementalActions(R.layout.carddemo_native_material_supplemental_actions_large_icon, actions)
                         .build();
 
@@ -415,6 +437,14 @@ public class MainPageFragment extends Fragment {
             for (int i = 0; i < values[0].size(); i++) {
                 addLatestEpisodeToColection(values[0].get(i));
             }
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+
+                    new getNewAddedMovies().doInBackground("");
+
+                }
+            }).start();
 
         }
 
@@ -431,7 +461,12 @@ public class MainPageFragment extends Fragment {
         MaterialLargeImageCard card =
                 MaterialLargeImageCard.with(getActivity())
                         //.setTextOverImage("Se "+serie.getLastSes()+" Ep "+serie.getLastEp())
-                        .useDrawableUrl(serie.getPoster())
+                        .useDrawableExternal(new MaterialLargeImageCard.DrawableExternal() {
+                            @Override
+                            public void setupInnerViewElements(ViewGroup parent, View viewImage) {
+                                Picasso.with(getActivity()).load(serie.getPoster()).resize(184, 276).into((ImageView) viewImage);
+                            }
+                        })
                         .build();
 
 
@@ -478,7 +513,16 @@ public class MainPageFragment extends Fragment {
             super.onProgressUpdate(values);
             for (int i = 0; i < values[0].size(); i++) {
                 addGeoEpisodeToColection(values[0].get(i));
+
             }
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    new getPremierMovies().doInBackground("");
+
+
+                }
+            }).start();
 
         }
 
@@ -494,7 +538,12 @@ public class MainPageFragment extends Fragment {
         MaterialLargeImageCard card =
                 MaterialLargeImageCard.with(getActivity())
                         //.setTextOverImage("Se "+serie.getLastSes()+" Ep "+serie.getLastEp())
-                        .useDrawableUrl(serie.getPoster())
+                        .useDrawableExternal(new MaterialLargeImageCard.DrawableExternal() {
+                            @Override
+                            public void setupInnerViewElements(ViewGroup parent, View viewImage) {
+                                Picasso.with(getActivity()).load(serie.getPoster()).resize(184,276).into((ImageView) viewImage);
+                            }
+                        })
                         .build();
 
 
@@ -502,7 +551,6 @@ public class MainPageFragment extends Fragment {
             @Override
             public void onClick(Card card, View view) {
                 Serie selectedMovie = serie;
-
                 Intent i = new Intent(getActivity(), serie_page_activity.class);
                 i.putExtra("movieId", selectedMovie.getMovieId());
                 i.putExtra("description", selectedMovie.getDescription());

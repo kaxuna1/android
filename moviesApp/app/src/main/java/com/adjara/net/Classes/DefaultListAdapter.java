@@ -3,13 +3,13 @@ package com.adjara.net.Classes;
 /**
  * Created by vakhtanggelashvili on 8/9/15.
  */
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-
 
 import com.adjara.net.R;
 import com.adjara.net.model.DemoItem;
