@@ -31,7 +31,7 @@ package it.gmariotti.cardslib.demo.iabutils;
  * </p>
  *
  * @author Robert Harder
- * @author rharder@usa.net
+ * @author rharder@usa.adjaranet
  * @version 1.3
  */
 
