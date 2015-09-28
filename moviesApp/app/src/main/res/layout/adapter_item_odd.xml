@@ -5,7 +5,7 @@
     android:layout_height="fill_parent"
     android:background="@color/md_grey_100"
     android:id="@+id/mainfragmentframe">
-    <com.adjara.adjaranet.model.SquareImageView
+    <com.adjara.app.model.SquareImageView
         android:id="@+id/imageGrid"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"

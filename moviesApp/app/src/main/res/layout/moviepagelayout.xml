@@ -5,7 +5,7 @@
     android:id="@+id/moviePageRelative"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.adjara.adjaranet.serie_page_activity"
+    tools:context="com.adjara.app.serie_page_activity"
     xmlns:fancy="http://schemas.android.com/apk/res-auto">
     <TabHost
         android:layout_width="match_parent"
@@ -30,7 +30,7 @@
                 android:id="@android:id/tabcontent"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-                <com.adjara.adjaranet.Classes.ScrollViewExt
+                <com.adjara.app.Classes.ScrollViewExt
                     android:id="@+id/scrollView2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -321,7 +321,7 @@
                         card_view:cardBackgroundColor="@android:color/white"
                         card_view:cardCornerRadius="8dp">
 
-                        <com.adjara.adjaranet.Classes.ScrollViewExt
+                        <com.adjara.app.Classes.ScrollViewExt
                             android:id="@+id/scrollView"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -396,11 +396,11 @@
 
 
                             </RelativeLayout>
-                        </com.adjara.adjaranet.Classes.ScrollViewExt>
+                        </com.adjara.app.Classes.ScrollViewExt>
                     </android.support.v7.widget.CardView>
 
                 </LinearLayout>
-                </com.adjara.adjaranet.Classes.ScrollViewExt>
+                </com.adjara.app.Classes.ScrollViewExt>
                 <LinearLayout
                     android:id="@+id/tab3"
                     android:layout_width="match_parent"

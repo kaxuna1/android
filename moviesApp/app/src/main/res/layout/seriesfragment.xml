@@ -29,7 +29,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:descendantFocusability="beforeDescendants"
-                    tools:context="com.adjara.adjaranet.SeriesActiviry">
+                    tools:context="com.adjara.app.SeriesActiviry">
 
                     <EditText
                         android:id="@+id/searchBoxSeries"
