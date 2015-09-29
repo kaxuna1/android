@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -133,7 +134,18 @@ public class MainActivity extends AppCompatActivity{
 
 
     }
-
+    public boolean isOnline()
+    {
+        try
+        {
+            ConnectivityManager cm = (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
+            return cm.getActiveNetworkInfo().isConnectedOrConnecting();
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+    }
 
     public void initializePage(){
         ButterKnife.inject(this);

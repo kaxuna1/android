@@ -1,6 +1,7 @@
 package com.adjara.app;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,12 +10,15 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
@@ -36,6 +40,11 @@ import com.adjara.app.model.Movie;
 import com.adjara.app.model.MovieSerieLastMomentModel;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -74,6 +83,21 @@ public class MoviePageActivity extends AppCompatActivity {
     private static Timer myTimer;
     MovieSerieLastMomentModel movieSerieLastMomentModel;
     boolean fromFullScreen=false;
+    File file1;
+    public static final String LOG_TAG = "Android Downloader";
+
+    //initialize our progress dialog/bar
+    private ProgressDialog mProgressDialog;
+    public static final int DIALOG_DOWNLOAD_PROGRESS = 0;
+
+    //initialize root directory
+    File rootDir = Environment.getExternalStorageDirectory();
+
+    //defining file name and url
+    public String fileName = "codeofaninja.jpg";
+    public String fileURL = "https://lh4.googleusercontent.com/-HiJOyupc-tQ/TgnDx1_HDzI/AAAAAAAAAWo/DEeOtnRimak/s800/DSC04158.JPG";
+
+    boolean contineuDownload=true;
 
     public MoviePageActivity() {
     }
@@ -523,10 +547,38 @@ public class MoviePageActivity extends AppCompatActivity {
         ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.downloadButtonSerie)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String url = videourl;
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(url));
-                startActivity(i);
+
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(MoviePageActivity.this);
+                builder.setTitle("აირჩიეთ ენა")
+                        .setItems(langs.split(","), new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                movieTime = videoView.getCurrentPosition();
+                                if (myTimer != null) {
+                                    myTimer.cancel();
+                                    myTimer.purge();
+                                }
+
+                                movieSerieLastMomentModel.setTime(movieSerieLastMomentModel.getTime());
+                                movieSerieLastMomentModel.save();
+                                if (currentQuality == null) {
+                                    currentQuality = quality.split(",")[0];
+                                }
+                                lang = langs.split(",")[which];
+                                videourl = videoPath + value + "_" +
+                                        lang + "_" + quality.split(",")[0] + ".mp4";
+                                String url = videourl;
+                                fileName=movie.getTitle_en()+".mp4";
+                                checkAndCreateDirectory("/Movies");
+                                Log.d("downloadLink", url);
+                                new DownloadFileAsync().execute(url);
+
+                            }
+                        });
+                builder.create();
+                builder.show();
+
+
             }
         });
         new Thread(new Runnable() {
@@ -661,6 +713,139 @@ public class MoviePageActivity extends AppCompatActivity {
             fromFullScreen=false;
         }
         //startVideoPlaying();
+    }
+    class DownloadFileAsync extends AsyncTask<String, String, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            showDialog(DIALOG_DOWNLOAD_PROGRESS);
+        }
+
+
+        @Override
+        protected String doInBackground(String... aurl) {
+
+            try {
+                //connecting to url
+                Log.d("downloaderLink", aurl[0]);
+                URL u = new URL(aurl[0]);
+                URLConnection c = u.openConnection();
+                //c.setUseCaches(true);
+                int lenghtOfFile = c.getContentLength();
+                //c.setDoOutput(true);
+                //c.setReadTimeout(1000);
+
+                c.connect();
+
+
+                //lenghtOfFile is used for calculating download progress
+
+                Log.d("filesize",""+lenghtOfFile);
+
+                //this is where the file will be seen after the download
+                String fileName2=rootDir + "/Movies/"+ fileName;
+
+                file1 = new File(rootDir + "/Movies/", fileName);
+                FileOutputStream f = new FileOutputStream(file1);
+                //file input is from the url
+                InputStream in = c.getInputStream();
+
+                //here’s the download code
+                byte[] buffer = new byte[1024];
+                int len1 = 0;
+                long total = 0;
+                contineuDownload=true;
+                while ((len1 = in.read(buffer)) > 0) {
+                    if(contineuDownload){
+                        total += len1; //total = total + len1
+                        publishProgress("" + (int)((total*100)/lenghtOfFile));
+                        f.write(buffer, 0, len1);
+                    }else{
+                        file1.delete();
+                        break;
+                    }
+
+                }
+                f.close();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        protected void onProgressUpdate(String... progress) {
+            Log.d(LOG_TAG,progress[0]);
+            mProgressDialog.setProgress(Integer.parseInt(progress[0]));
+
+        }
+
+        @Override
+        protected void onPostExecute(String unused) {
+            //dismiss the dialog after the file was downloaded
+            dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
+        }
+    }
+
+    //function to verify if directory exists
+    public void checkAndCreateDirectory(String dirName){
+        File new_dir = new File( rootDir + dirName );
+        if( !new_dir.exists() ){
+            new_dir.mkdirs();
+        }
+    }
+
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        switch (id) {
+            case DIALOG_DOWNLOAD_PROGRESS: //we set this to 0
+                mProgressDialog = new ProgressDialog(this);
+                mProgressDialog.setMessage("მიმდინარეობს გადმოწერა…");
+                mProgressDialog.setIndeterminate(false);
+                mProgressDialog.setCanceledOnTouchOutside(false);
+                mProgressDialog.setMax(100);
+                mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                mProgressDialog.setCancelable(true);
+                mProgressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "გაუქმება", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        contineuDownload = false;
+                        dialog.cancel();
+                    }
+                });
+                mProgressDialog.setButton(DialogInterface.BUTTON_POSITIVE, "გახსნა", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(file1.getPath()));
+                        intent.setDataAndType(Uri.parse(file1.getPath()), "video/mp4");
+                        MoviePageActivity.this.startActivity(intent);
+
+                    }
+                });
+                mProgressDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        if(contineuDownload){
+                            mProgressDialog.show();
+                        }
+
+                    }
+                });
+                mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+
+                        contineuDownload=false;
+                    }
+                });
+                mProgressDialog.show();
+                return mProgressDialog;
+            default:
+                return null;
+        }
+
     }
 
 }
