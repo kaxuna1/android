@@ -1,23 +1,27 @@
 package com.adjara.app;
 
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.webkit.MimeTypeMap;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -85,6 +89,7 @@ public class MoviePageActivity extends AppCompatActivity {
     boolean fromFullScreen=false;
     File file1;
     public static final String LOG_TAG = "Android Downloader";
+    int oldHeight;
 
     //initialize our progress dialog/bar
     private ProgressDialog mProgressDialog;
@@ -101,7 +106,25 @@ public class MoviePageActivity extends AppCompatActivity {
 
     public MoviePageActivity() {
     }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,    WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            ViewGroup.LayoutParams params=((RelativeLayout) findViewById(R.id.relativeLayout4)).getLayoutParams();
+            oldHeight=params.height;
+            params.height=ViewGroup.LayoutParams.MATCH_PARENT;
+            params.width=ViewGroup.LayoutParams.MATCH_PARENT;
+            ((RelativeLayout) findViewById(R.id.relativeLayout4)).setLayoutParams(params);
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            ViewGroup.LayoutParams params=((RelativeLayout) findViewById(R.id.relativeLayout4)).getLayoutParams();
+            params.height=oldHeight;
+            params.width=ViewGroup.LayoutParams.MATCH_PARENT;
+            ((RelativeLayout) findViewById(R.id.relativeLayout4)).setLayoutParams(params);
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN,    WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+        }
+    }
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -163,30 +186,6 @@ public class MoviePageActivity extends AppCompatActivity {
                         if (progressDialog.isShowing())
                             progressDialog.dismiss();
                     final Bundle extras = getIntent().getExtras();
-                    ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.fullScreenButton)).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            Intent i = new Intent(MoviePageActivity.this, FullScreenMovie.class);
-                            i.putExtra("movieId", extras.getString("movieId"));
-                            i.putExtra("description", extras.getString("description"));
-                            i.putExtra("title", extras.getString("title"));
-                            i.putExtra("date", extras.getString("date"));
-                            i.putExtra("duration", extras.getString("duration"));
-                            i.putExtra("rating", extras.getString("rating"));
-                            i.putExtra("imdb", extras.getString("imdb"));
-                            i.putExtra("time", videoView.getCurrentPosition());
-                            i.putExtra("link", videourl);
-
-                            if (myTimer != null) {
-                                myTimer.cancel();
-                                myTimer.purge();
-
-                            }
-
-
-                            startActivity(i);
-                        }
-                    });
                     myTimer = new Timer();
                     myTimer.schedule(new TimerTask() {
                         @Override
@@ -505,32 +504,6 @@ public class MoviePageActivity extends AppCompatActivity {
 
         final String value = extras.getString("movieId");
         movieId = extras.getString("movieId");
-
-
-       /* ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.fullScreenButton)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(MoviePageActivity.this, FullScreenMovie.class);
-                i.putExtra("movieId", extras.getString("movieId"));
-                i.putExtra("description", extras.getString("description"));
-                i.putExtra("title", extras.getString("title"));
-                i.putExtra("date", extras.getString("date"));
-                i.putExtra("duration", extras.getString("duration"));
-                i.putExtra("rating", extras.getString("rating"));
-                i.putExtra("imdb", extras.getString("imdb"));
-                i.putExtra("time", videoView.getCurrentPosition());
-                i.putExtra("link", videourl);
-
-                if(myTimer!=null){
-                    myTimer.cancel();
-                    myTimer.purge();
-
-                }
-
-
-                startActivityForResult(i, 0);
-            }
-        });*/
         ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.watchLaterBtn)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -708,6 +681,7 @@ public class MoviePageActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         //playButton.setVisibility(View.VISIBLE);
+
         if (fromFullScreen) {
             PlayVideo();
             fromFullScreen=false;

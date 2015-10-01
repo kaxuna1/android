@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -19,6 +20,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AdapterView;
@@ -94,8 +96,8 @@ public class serie_page_activity extends AppCompatActivity {
     TextView gener = null;
     String generText = "";
     Bundle extras;
-
-
+    boolean fromFullScreen=false;
+    int oldHeight;
 
     boolean contineuDownload=true;
     File file1;
@@ -115,7 +117,25 @@ public class serie_page_activity extends AppCompatActivity {
     //defining file name and url
     public String fileName = "codeofaninja.jpg";
     public String fileURL = "https://lh4.googleusercontent.com/-HiJOyupc-tQ/TgnDx1_HDzI/AAAAAAAAAWo/DEeOtnRimak/s800/DSC04158.JPG";
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,    WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            ViewGroup.LayoutParams params=((RelativeLayout) findViewById(R.id.relativeLayout6)).getLayoutParams();
+            oldHeight=params.height;
+            params.height=ViewGroup.LayoutParams.MATCH_PARENT;
+            params.width=ViewGroup.LayoutParams.MATCH_PARENT;
+            ((RelativeLayout) findViewById(R.id.relativeLayout6)).setLayoutParams(params);
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            ViewGroup.LayoutParams params=((RelativeLayout) findViewById(R.id.relativeLayout6)).getLayoutParams();
+            params.height=oldHeight;
+            params.width=ViewGroup.LayoutParams.MATCH_PARENT;
+            ((RelativeLayout) findViewById(R.id.relativeLayout6)).setLayoutParams(params);
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN,    WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+        }
+    }
 
 
 
@@ -159,6 +179,7 @@ public class serie_page_activity extends AppCompatActivity {
         if(resultCode==5){
            nextEp();
         }
+        fromFullScreen=true;
         super.onActivityResult(requestCode, resultCode, data);
     }
     public void nextEp(){
@@ -860,26 +881,7 @@ public class serie_page_activity extends AppCompatActivity {
 
             }
         });
-        ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.fullScreenButton)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(serie_page_activity.this, FullScreenSerie.class);
-                i.putExtra("movieId", extras.getString("movieId"));
-                i.putExtra("description", extras.getString("description"));
-                i.putExtra("title", extras.getString("title"));
-                i.putExtra("date", extras.getString("date"));
-                i.putExtra("duration", extras.getString("duration"));
-                i.putExtra("rating", extras.getString("rating"));
-                i.putExtra("imdb", extras.getString("imdb"));
-                i.putExtra("time", videoView.getCurrentPosition());
-                i.putExtra("link", videourl);
-                movieSerieLastMomentModel.time = videoView.getCurrentPosition();
-                movieSerieLastMomentModel.save();
 
-                startActivityForResult(i, 0);
-
-            }
-        });
         TextView date = (TextView) findViewById(R.id.movieDate);
         date.setText(extras.getString("date"));
         ((TextView) findViewById(R.id.imdbRating)).setText(extras.getString("rating"));
@@ -1068,7 +1070,7 @@ public class serie_page_activity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (videoView != null) {
+        if (fromFullScreen) {
             PlayVideo();
         }
         //startVideoPlaying();
