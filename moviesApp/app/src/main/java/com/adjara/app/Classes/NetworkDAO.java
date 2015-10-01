@@ -35,6 +35,7 @@ public class NetworkDAO {
         HttpClient httpClient =new DefaultHttpClient(httpParameters);
 
         String response=httpClient.execute(httpGet, responseHandler);
+
         return response;
     }
     public String requestWithTempFile(String uri) throws IOException {

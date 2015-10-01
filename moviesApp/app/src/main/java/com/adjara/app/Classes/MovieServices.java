@@ -28,8 +28,7 @@ public class MovieServices {
                 "&country=false&game=0&videos=0&xvideos=0&xphotos=0&trailers=0&episode=0&tvshow=0&flashgames=0";
         NetworkDAO networkDAO=new NetworkDAO();
         try {
-            String rawMoviesData=networkDAO.request(url);
-            JSONObject jsonObject=new JSONObject(rawMoviesData);
+            JSONObject jsonObject=new JSONObject(networkDAO.request(url));
             JSONArray movies=jsonObject.getJSONArray("data");
             for (int i=0;i<movies.length();i++){
                 JSONObject movieJ=movies.getJSONObject(i);
@@ -65,8 +64,7 @@ public class MovieServices {
                 "&country=false&game=0&videos=0&xvideos=0&xphotos=0&trailers=0&episode=1&tvshow=0&flashgames=0";
         NetworkDAO networkDAO=new NetworkDAO();
         try {
-            String rawMoviesData=networkDAO.request(url);
-            JSONObject jsonObject=new JSONObject(rawMoviesData);
+            JSONObject jsonObject=new JSONObject(networkDAO.request(url));
             JSONArray movies=jsonObject.getJSONArray("data");
             for (int i=0;i<movies.length();i++){
                 JSONObject movieJ=movies.getJSONObject(i);
@@ -97,8 +95,7 @@ public class MovieServices {
         String url = "http://adjaranet.com/cache/cached_home_geomovies.php?type=geomovies&order=new&period=day&limit=25";
         NetworkDAO networkDAO=new NetworkDAO();
         try {
-            String rawMoviesData=networkDAO.request(url);
-            JSONArray movies=new JSONArray(rawMoviesData);
+            JSONArray movies=new JSONArray(networkDAO.request(url));
             //JSONArray movies=jsonObject.getJSONArray("data");
             for (int i=0;i<movies.length();i++){
                 JSONObject movieJ=movies.getJSONObject(i);
@@ -130,8 +127,7 @@ public class MovieServices {
         String url = "http://adjaranet.com/cache/cached_home_premiere.php?type=premiere&order=new&period=week&limit=25";
         NetworkDAO networkDAO=new NetworkDAO();
         try {
-            String rawMoviesData=networkDAO.request(url);
-            JSONArray movies=new JSONArray(rawMoviesData);
+            JSONArray movies=new JSONArray(networkDAO.request(url));
             //JSONArray movies=jsonObject.getJSONArray("data");
             for (int i=0;i<movies.length();i++){
                 JSONObject movieJ=movies.getJSONObject(i);
@@ -164,8 +160,7 @@ public class MovieServices {
         String url = "http://adjaranet.com/Home/ajax_home?ajax=1&type=premiere&order=top&period=week&limit=25";
         NetworkDAO networkDAO=new NetworkDAO();
         try {
-            String rawMoviesData=networkDAO.request(url);
-            JSONArray movies=new JSONArray(rawMoviesData);
+            JSONArray movies=new JSONArray(networkDAO.request(url));
             //JSONArray movies=jsonObject.getJSONArray("data");
             for (int i=0;i<movies.length();i++){
                 JSONObject movieJ=movies.getJSONObject(i);
@@ -198,8 +193,7 @@ public class MovieServices {
         String url = "http://adjaranet.com/cache/cached_home_episodes.php?type=episodes&order=new&period=week&limit=25";
         NetworkDAO networkDAO=new NetworkDAO();
         try {
-            String rawMoviesData=networkDAO.request(url);
-            JSONArray movies=new JSONArray(rawMoviesData);
+            JSONArray movies=new JSONArray(networkDAO.request(url));
             //JSONArray movies=jsonObject.getJSONArray("data");
             for (int i=0;i<movies.length();i++){
                 JSONObject movieJ=movies.getJSONObject(i);
@@ -231,8 +225,7 @@ public class MovieServices {
         String url = "http://adjaranet.com/Home/ajax_home?ajax=1&type=geomovies&order=top&period=null&limit=25";
         NetworkDAO networkDAO=new NetworkDAO();
         try {
-            String rawMoviesData=networkDAO.request(url);
-            JSONArray movies=new JSONArray(rawMoviesData);
+            JSONArray movies=new JSONArray(networkDAO.request(url));
             //JSONArray movies=jsonObject.getJSONArray("data");
             for (int i=0;i<movies.length();i++){
                 JSONObject movieJ=movies.getJSONObject(i);
@@ -264,9 +257,8 @@ public class MovieServices {
         String url = "http://adjaranet.com/cache/cached_home_movies.php?type=movies&order=new&period=week&limit=25";
         NetworkDAO networkDAO=new NetworkDAO();
         try {
-            String rawMoviesData=networkDAO.request(url);
 
-            JSONArray movies=new JSONArray(rawMoviesData);
+            JSONArray movies=new JSONArray(networkDAO.request(url));
             //JSONArray movies=jsonObject.getJSONArray("data");
             for (int i=0;i<movies.length();i++){
                 JSONObject movieJ=movies.getJSONObject(i);
@@ -299,9 +291,7 @@ public class MovieServices {
         String url = "http://adjaranet.com/req/jsondata/req.php?id="+movieId+"&reqId=getLangAndHd";
         NetworkDAO networkDAO=new NetworkDAO();
         try {
-            String rawData=networkDAO.request(url);
-
-            JSONObject movieData=new JSONObject(rawData);
+            JSONObject movieData=new JSONObject(networkDAO.request(url));
             JSONObject actorsObject=movieData.getJSONObject("cast");
             Iterator<?> keys = actorsObject.keys();
             while( keys.hasNext() ) {
@@ -323,8 +313,7 @@ public class MovieServices {
         String url = "http://adjaranet.com/req/jsondata/req.php?id="+serieId+"&reqId=getInfo";
         NetworkDAO networkDAO=new NetworkDAO();
         try {
-            String rawData=networkDAO.request(url);
-            JSONObject movieData=new JSONObject(rawData);
+            JSONObject movieData=new JSONObject(networkDAO.request(url));
             JSONObject actorsObject=movieData.getJSONObject("cast");
             Iterator<?> keys = actorsObject.keys();
             while( keys.hasNext() ) {
@@ -345,8 +334,7 @@ public class MovieServices {
         String url = "http://adjaranet.com/req/jsondata/req.php?id="+serieId+"&reqId=getInfo";
         NetworkDAO networkDAO=new NetworkDAO();
         try {
-            String rawData=networkDAO.request(url);
-            JSONObject movieData=new JSONObject(rawData);
+            JSONObject movieData=new JSONObject(networkDAO.request(url));
             return movieData;
 
         } catch (IOException e) {
@@ -365,9 +353,7 @@ public class MovieServices {
         String url = "http://adjaranet.com/req/jsondata/req.php?id="+movieId+"&reqId=getLangAndHd";
         NetworkDAO networkDAO=new NetworkDAO();
         try {
-            String rawData=networkDAO.request(url);
-
-            JSONObject movieData=new JSONObject(rawData);
+            JSONObject movieData=new JSONObject(networkDAO.request(url));
             JSONObject object0=movieData.getJSONObject("0");
             quality=object0.getString("quality");
 
@@ -388,8 +374,7 @@ public class MovieServices {
         String url = "http://adjaranet.com/req/jsondata/req.php?id="+movieId+"&reqId=getLangAndHd";
         NetworkDAO networkDAO=new NetworkDAO();
         try {
-            String rawData=networkDAO.request(url);
-            JSONObject movieData=new JSONObject(rawData);
+            JSONObject movieData=new JSONObject(networkDAO.request(url));
             JSONObject object0=movieData.getJSONObject("0");
             langs=object0.getString("lang");
             return langs;
@@ -542,9 +527,7 @@ public class MovieServices {
         String url = "http://adjaranet.com/req/jsondata/req.php?id="+movieId+"&reqId=getLangAndHd";
         NetworkDAO networkDAO=new NetworkDAO();
         try {
-            String rawData=networkDAO.request(url);
-
-            JSONObject movieData=new JSONObject(rawData);
+            JSONObject movieData=new JSONObject(networkDAO.request(url));
             JSONObject object0=movieData.getJSONObject("0");
             path=object0.getString("url");
 
@@ -599,8 +582,7 @@ public class MovieServices {
         String url = "http://adjaranet.com/req/jsondata/req.php?id="+id+"&reqId=getInfo";
         NetworkDAO networkDAO=new NetworkDAO();
         try {
-            String rawData=networkDAO.request(url);
-            JSONObject movieData=new JSONObject(rawData);
+            JSONObject movieData=new JSONObject(networkDAO.request(url));
             JSONObject directorObject=movieData.getJSONObject("director");
             Iterator<?> keys = directorObject.keys();
             while( keys.hasNext() ) {
@@ -623,8 +605,7 @@ public class MovieServices {
         String url = "http://adjaranet.com/req/jsondata/req.php?id="+id+"&reqId=getInfo";
         NetworkDAO networkDAO=new NetworkDAO();
         try {
-            String rawData=networkDAO.request(url);
-            JSONObject movieData=new JSONObject(rawData);
+            JSONObject movieData=new JSONObject(networkDAO.request(url));
             JSONObject directorObject=movieData.getJSONObject("genres");
             Iterator<?> keys = directorObject.keys();
             while( keys.hasNext() ) {
@@ -653,10 +634,8 @@ public class MovieServices {
         String url = "http://www.telize.com/geoip";
         NetworkDAO networkDAO=new NetworkDAO();
         try {
-            String rawData=networkDAO.request(url);
-            JSONObject myData=new JSONObject(rawData);
-            Log.d("kaxaLog",rawData);
-            System.out.println(rawData);
+            JSONObject myData=new JSONObject(networkDAO.request(url));
+
             region=myData.getString("country");
         } catch (IOException e) {
             e.printStackTrace();

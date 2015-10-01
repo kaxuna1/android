@@ -91,6 +91,8 @@ public class MoviePageActivity extends AppCompatActivity {
     public static final String LOG_TAG = "Android Downloader";
     int oldHeight;
 
+
+
     //initialize our progress dialog/bar
     private ProgressDialog mProgressDialog;
     public static final int DIALOG_DOWNLOAD_PROGRESS = 0;

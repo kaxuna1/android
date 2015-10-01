@@ -118,9 +118,7 @@
                         fancy:fb_textSize="18px"
                         android:layout_alignTop="@+id/getNewsBtn"
                         android:layout_toRightOf="@+id/getNewsBtn"
-                        android:layout_marginLeft="5dp"
-                        android:layout_alignRight="@+id/fullScreenButton"
-                        android:layout_alignEnd="@+id/fullScreenButton" />
+                        android:layout_marginLeft="5dp" />
                     <mehdi.sakout.fancybuttons.FancyButton
                         android:id="@+id/qualBtn"
                         android:layout_width="140dp"
