@@ -5,7 +5,7 @@
     android:id="@+id/moviePageRelative"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.adjara.app.serie_page_activity"
+    tools:context="com.adjaran.app.serie_page_activity"
     xmlns:fancy="http://schemas.android.com/apk/res-auto">
 
     <RelativeLayout
@@ -60,7 +60,7 @@
                 android:id="@android:id/tabcontent"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-                <com.adjara.app.Classes.ScrollViewExt
+                <com.adjaran.app.Classes.ScrollViewExt
                     android:id="@+id/scrollView2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -128,6 +128,25 @@
                                 android:layout_toRightOf="@+id/langBtnSerie"
                                 android:layout_toEndOf="@+id/langBtnSerie"
                                 android:layout_marginLeft="5dp" />
+                            <mehdi.sakout.fancybuttons.FancyButton
+                                android:id="@+id/fullScreenButton"
+                                android:layout_width="40dp"
+                                android:layout_height="30dp"
+                                fancy:fb_borderColor="#FFFFFF"
+                                fancy:fb_borderWidth="1dp"
+                                fancy:fb_defaultColor="#ffb82e0c"
+                                fancy:fb_focusColor="#ff911d1a"
+                                fancy:fb_fontIconResource="&#xf065;"
+                                fancy:fb_iconPosition="left"
+                                fancy:fb_radius="30dp"
+                                fancy:fb_text=""
+                                fancy:fb_textColor="#FFFFFF"
+                                fancy:fb_textSize="18px"
+                                android:layout_alignParentTop="true"
+                                android:layout_toRightOf="@+id/qualBtn"
+                                android:layout_alignRight="@+id/downloadButtonSerie"
+                                android:layout_alignEnd="@+id/downloadButtonSerie"
+                                android:layout_marginLeft="5dp" />
 
                             <mehdi.sakout.fancybuttons.FancyButton
                                 android:id="@+id/downloadButtonSerie"
@@ -137,7 +156,8 @@
                                 fancy:fb_borderWidth="1dp"
                                 fancy:fb_defaultColor="#7ab800"
                                 fancy:fb_focusColor="#9bd823"
-                                fancy:fb_fontIconResource="&#xf0ed;"                                fancy:fb_iconPosition="left"
+                                fancy:fb_fontIconResource="&#xf0ed;"
+                                fancy:fb_iconPosition="left"
                                 fancy:fb_radius="30dp"
                                 fancy:fb_text=""
                                 fancy:fb_textColor="#FFFFFF"
@@ -305,7 +325,7 @@
                         card_view:cardBackgroundColor="@android:color/white"
                         card_view:cardCornerRadius="8dp">
 
-                        <com.adjara.app.Classes.ScrollViewExt
+                        <com.adjaran.app.Classes.ScrollViewExt
                             android:id="@+id/scrollView"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -380,11 +400,11 @@
 
 
                             </RelativeLayout>
-                        </com.adjara.app.Classes.ScrollViewExt>
+                        </com.adjaran.app.Classes.ScrollViewExt>
                     </android.support.v7.widget.CardView>
 
                 </LinearLayout>
-                </com.adjara.app.Classes.ScrollViewExt>
+                </com.adjaran.app.Classes.ScrollViewExt>
                 <LinearLayout
                     android:id="@+id/tab3"
                     android:layout_width="match_parent"

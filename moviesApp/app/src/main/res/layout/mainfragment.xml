@@ -14,7 +14,7 @@
         card_view:cardBackgroundColor="@android:color/white"
         card_view:cardCornerRadius="8dp">
 
-        <com.adjara.app.Classes.ScrollViewExt
+        <com.adjaran.app.Classes.ScrollViewExt
             android:id="@+id/scrollView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -210,6 +210,6 @@
 
 
             </RelativeLayout>
-        </com.adjara.app.Classes.ScrollViewExt>
+        </com.adjaran.app.Classes.ScrollViewExt>
     </android.support.v7.widget.CardView>
 </FrameLayout>

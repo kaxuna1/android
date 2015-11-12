@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.adjara.app.serie_page_activity">
+    tools:context="com.adjaran.app.serie_page_activity">
     <item android:id="@+id/action_download" android:title="გადმოწერა"
         android:orderInCategory="100" app:showAsAction="never" />
 </menu>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.adjara.app" >
+    package="com.adjaran.app" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -22,7 +22,7 @@
             android:exported="true" />
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/app_id"/>
         <activity
-            android:name="com.adjara.app.MainActivity"
+            android:name="com.adjaran.app.MainActivity"
             android:label="adjaranet"
             android:configChanges="orientation|screenSize">
             <intent-filter>
@@ -32,44 +32,47 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.adjara.app.MoviePageActivity"
+            android:name="com.adjaran.app.MoviePageActivity"
             android:label="კინო"
-            android:parentActivityName="com.adjara.app.MainActivity"
+            android:parentActivityName="com.adjaran.app.MainActivity"
+            android:screenOrientation="portrait"
             android:configChanges="orientation|screenSize" >
+
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.adjara.app.MainActivity" />
+                android:value="com.adjaran.app.MainActivity" />
         </activity>
         <activity
-            android:name="com.adjara.app.FullScreenMovie"
+            android:name="com.adjaran.app.FullScreenMovie"
             android:label="@string/title_activity_full_screen_movie"
             android:screenOrientation="sensorLandscape"
             android:configChanges="orientation"
             android:theme="@style/FullscreenTheme" >
         </activity>
         <activity
-            android:name="com.adjara.app.FullScreenSerie"
+            android:name="com.adjaran.app.FullScreenSerie"
             android:label="@string/title_activity_full_screen_movie"
             android:screenOrientation="sensorLandscape"
             android:theme="@style/FullscreenTheme" >
         </activity>
         <activity
-            android:name="com.adjara.app.settingsActivity"
+            android:name="com.adjaran.app.settingsActivity"
             android:label="@string/title_activity_settings"
             android:configChanges="orientation|screenSize"
-            android:parentActivityName="com.adjara.app.MainActivity" >
+            android:parentActivityName="com.adjaran.app.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.adjara.app.MainActivity" />
+                android:value="com.adjaran.app.MainActivity" />
         </activity>
         <activity
-            android:name="com.adjara.app.serie_page_activity"
+            android:name="com.adjaran.app.serie_page_activity"
             android:label="@string/title_activity_serie_page_activity"
             android:parentActivityName=".SeriesActiviry"
+            android:screenOrientation="portrait"
             android:configChanges="orientation|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.adjara.app.SeriesActiviry" />
+                android:value="com.adjaran.app.SeriesActiviry" />
         </activity>
         <activity
             android:name="io.vov.vitamio.activity.InitActivity"
@@ -78,22 +81,22 @@
             android:theme="@android:style/Theme.NoTitleBar"
             android:windowSoftInputMode="stateAlwaysHidden" />
 
-        <receiver android:name="com.adjara.app.broadcastreceivers.MyBroadcastReceiver" >
+        <receiver android:name="com.adjaran.app.broadcastreceivers.MyBroadcastReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.adjara.app.broadcastreceivers.CheckEpisodesBroadcastReceiver" >
+        <receiver android:name="com.adjaran.app.broadcastreceivers.CheckEpisodesBroadcastReceiver" >
         </receiver>
 
         <service
-            android:name="com.adjara.app.services.StartUpService"
+            android:name="com.adjaran.app.services.StartUpService"
             android:enabled="true"
             android:exported="true" >
         </service>
         <service
-            android:name="com.adjara.app.services.CheckNewEpisodes"
+            android:name="com.adjaran.app.services.CheckNewEpisodes"
             android:enabled="true"
             android:exported="true" >
         </service>
@@ -109,61 +112,61 @@
             android:value="true" />
         <meta-data
             android:name="DOMAIN_PACKAGE_NAME"
-            android:value="com.adjara.app" />
+            android:value="com.adjaran.app" />
 
         <activity
-            android:name="com.adjara.app.GeoMoviesCollecitonActivity"
+            android:name="com.adjaran.app.GeoMoviesCollecitonActivity"
             android:label="@string/title_activity_geo_movies_colleciton"
             android:configChanges="orientation|screenSize"
-            android:parentActivityName="com.adjara.app.MainActivity" >
+            android:parentActivityName="com.adjaran.app.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.adjara.app.MainActivity" />
+                android:value="com.adjaran.app.MainActivity" />
         </activity>
         <activity
-            android:name="com.adjara.app.NewsCollectionActivity"
+            android:name="com.adjaran.app.NewsCollectionActivity"
             android:label="@string/title_activity_news_collection"
             android:configChanges="orientation|screenSize"
-            android:parentActivityName="com.adjara.app.MainActivity" >
+            android:parentActivityName="com.adjaran.app.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.adjara.app.MainActivity" />
+                android:value="com.adjaran.app.MainActivity" />
         </activity>
         <activity
-            android:name="com.adjara.app.HistoryPageActivity"
+            android:name="com.adjaran.app.HistoryPageActivity"
             android:label="@string/title_activity_history_page"
             android:configChanges="orientation|screenSize"
-            android:parentActivityName="com.adjara.app.MainActivity" >
+            android:parentActivityName="com.adjaran.app.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.adjara.app.MainActivity" />
+                android:value="com.adjaran.app.MainActivity" />
         </activity>
         <activity
-            android:name="com.adjara.app.CollectionMoviesActivity"
+            android:name="com.adjaran.app.CollectionMoviesActivity"
             android:label="@string/title_activity_collection_movies"
             android:configChanges="orientation|screenSize"
-            android:parentActivityName="com.adjara.app.MainActivity" >
+            android:parentActivityName="com.adjaran.app.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.adjara.app.MainActivity" />
+                android:value="com.adjaran.app.MainActivity" />
         </activity>
         <activity
-            android:name="com.adjara.app.WatchLaterActivity"
+            android:name="com.adjaran.app.WatchLaterActivity"
             android:label="@string/title_activity_watch_later"
             android:configChanges="orientation|screenSize"
-            android:parentActivityName="com.adjara.app.MainActivity" >
+            android:parentActivityName="com.adjaran.app.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.adjara.app.MainActivity" />
+                android:value="com.adjaran.app.MainActivity" />
         </activity>
         <activity
-            android:name="com.adjara.app.ActorMoviesActivity"
+            android:name="com.adjaran.app.ActorMoviesActivity"
             android:label="@string/title_activity_actor_movies"
             android:configChanges="orientation|screenSize"
-            android:parentActivityName="com.adjara.app.MainActivity" >
+            android:parentActivityName="com.adjaran.app.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.adjara.app.MainActivity" />
+                android:value="com.adjaran.app.MainActivity" />
         </activity>
         <activity android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
