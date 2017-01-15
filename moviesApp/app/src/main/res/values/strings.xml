@@ -11,6 +11,8 @@
     <string name="back_button_label">Back</string>
     <string name="next_button_label">Next</string>
     <string name="app_id">478200162351948</string>
+    <string name="app_id_cast">4F8B3483</string>
+    <string name="media_route_menu_title">Play on&#8230;</string>
 
     <!-- Optional button to Skip a PreferenceActivity [CHAR LIMIT=20] -->
     <string name="skip_button_label">Skip</string>

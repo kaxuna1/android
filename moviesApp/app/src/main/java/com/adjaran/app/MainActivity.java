@@ -10,6 +10,7 @@ import android.graphics.drawable.LayerDrawable;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -36,6 +37,12 @@ import com.adjaran.app.fragments.MoviesPageFragment;
 import com.adjaran.app.fragments.SeriesPageFragment;
 import com.adjaran.app.utils.SimpleSectionedListAdapter;
 import com.facebook.appevents.AppEventsLogger;
+import com.google.android.gms.cast.framework.CastButtonFactory;
+import com.google.android.gms.cast.framework.CastContext;
+import com.google.android.gms.cast.framework.CastSession;
+import com.google.android.gms.cast.framework.CastStateListener;
+import com.google.android.gms.cast.framework.IntroductoryOverlay;
+import com.google.android.gms.cast.framework.SessionManagerListener;
 import com.mikepenz.iconics.typeface.FontAwesome;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
@@ -60,9 +67,13 @@ public class MainActivity extends AppCompatActivity{
     com.astuetz.PagerSlidingTabStrip tabs;
     @InjectView(R.id.pager)
     ViewPager pager;
+    private final SessionManagerListener<CastSession> mSessionManagerListener =
+            new MySessionManagerListener();
 
+    private IntroductoryOverlay mIntroductoryOverlay;
     private MyPagerAdapter adapter;
     private Drawable oldBackground = null;
+    private MenuItem mediaRouteMenuItem;
     private int currentColor;
     private SystemBarTintManager mTintManager;
     dbHelper dbHelper2=new dbHelper(MainActivity.this);
@@ -70,9 +81,58 @@ public class MainActivity extends AppCompatActivity{
     private DrawerLayout mDrawer;
     int mCurrentTitle=R.string.app_name;
     SimpleFacebook mSimpleFacebook;
-
+    private CastSession mCastSession;
     SimpleSectionedListAdapter mSectionedAdapter;
+    private CastContext mCastContext;
+    private CastStateListener mCastStateListener;
 
+
+    private class MySessionManagerListener implements SessionManagerListener<CastSession> {
+
+        @Override
+        public void onSessionEnded(CastSession session, int error) {
+            if (session == mCastSession) {
+                mCastSession = null;
+            }
+            invalidateOptionsMenu();
+        }
+
+        @Override
+        public void onSessionResumed(CastSession session, boolean wasSuspended) {
+            mCastSession = session;
+            invalidateOptionsMenu();
+        }
+
+        @Override
+        public void onSessionStarted(CastSession session, String sessionId) {
+            mCastSession = session;
+            invalidateOptionsMenu();
+        }
+
+        @Override
+        public void onSessionStarting(CastSession session) {
+        }
+
+        @Override
+        public void onSessionStartFailed(CastSession session, int error) {
+        }
+
+        @Override
+        public void onSessionEnding(CastSession session) {
+        }
+
+        @Override
+        public void onSessionResuming(CastSession session, String sessionId) {
+        }
+
+        @Override
+        public void onSessionResumeFailed(CastSession session, int error) {
+        }
+
+        @Override
+        public void onSessionSuspended(CastSession session, int reason) {
+        }
+    }
     @Override
     protected void onResume() {
         super.onResume();
@@ -87,6 +147,13 @@ public class MainActivity extends AppCompatActivity{
     }
 
     @Override
+    protected void onPause() {
+        mCastContext.removeCastStateListener(mCastStateListener);
+        mCastContext.getSessionManager().removeSessionManagerListener(
+                mSessionManagerListener, CastSession.class);
+        super.onPause();
+    }
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
@@ -98,15 +165,17 @@ public class MainActivity extends AppCompatActivity{
 
         setContentView(R.layout.activity_main);
 
-           // initializePage();
-        new Thread(new Runnable() {
+        initializePage();
+       /* new Thread(new Runnable() {
             @Override
             public void run() {
                 String region=new getRegion().doInBackground("");
 
 
             }
-        }).start();
+        }).start();*/
+        mCastContext = CastContext.getSharedInstance(this);
+        mCastContext.registerLifecycleCallbacksBeforeIceCreamSandwich(this, savedInstanceState);
 
 
 
@@ -147,6 +216,8 @@ public class MainActivity extends AppCompatActivity{
     }
 
     public void initializePage(){
+
+
         ButterKnife.inject(this);
 
 
@@ -281,6 +352,8 @@ public class MainActivity extends AppCompatActivity{
                 })
                 .build();
         toolbar.setTitle("adjaranet");
+
+
     }
 
 
@@ -306,12 +379,47 @@ public class MainActivity extends AppCompatActivity{
         oldBackground = ld;
         currentColor = newColor;
     }
-    @Override
+  /*  @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu items for use in the action bar
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
         return super.onCreateOptionsMenu(menu);
+    }*/
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+      super.onCreateOptionsMenu(menu);
+      getMenuInflater().inflate(R.menu.main, menu);
+      mediaRouteMenuItem = CastButtonFactory.setUpMediaRouteButton(getApplicationContext(), menu,
+              R.id.media_route_menu_item);
+      showIntroductoryOverlay();
+      return true;
+  }
+    private void showIntroductoryOverlay() {
+        if (mIntroductoryOverlay != null) {
+            mIntroductoryOverlay.remove();
+        }
+        if ((mediaRouteMenuItem != null) && mediaRouteMenuItem.isVisible()) {
+            new Handler().post(new Runnable() {
+                @Override
+                public void run() {
+                    mIntroductoryOverlay = new IntroductoryOverlay.Builder(
+                            MainActivity.this, mediaRouteMenuItem)
+                            .setTitleText("მოგესალმებით")
+                            .setOverlayColor(R.color.primary)
+                            .setSingleTime()
+                            .setOnOverlayDismissedListener(
+                                    new IntroductoryOverlay.OnOverlayDismissedListener() {
+                                        @Override
+                                        public void onOverlayDismissed() {
+                                            mIntroductoryOverlay = null;
+                                        }
+                                    })
+                            .build();
+                    mIntroductoryOverlay.show();
+                }
+            });
+        }
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

@@ -1,11 +1,10 @@
 package com.adjaran.app.Classes;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.BasicHttpParams;
+
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
@@ -19,28 +18,16 @@ import java.net.URL;
  * Created by KGelashvili on 7/10/2015.
  */
 public class NetworkDAO {
+    private final OkHttpClient client = new OkHttpClient();
+
     public String request(String uri) throws IOException {
+        Request request = new Request.Builder()
+                .url(uri)
+                .build();
+        Response response = client.newCall(request).execute();
+        if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
 
-        int timeoutConnection = 5000;
-
-// Set the default socket timeout (SO_TIMEOUT)
-// in milliseconds which is the timeout for waiting for data.
-        int timeoutSocket = 4000;
-
-// set timeout parameters for HttpClient
-        HttpParams httpParameters = new BasicHttpParams();
-        HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
-        HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
-        HttpConnectionParams.setSocketBufferSize(httpParameters, 8192);
-
-
-        HttpGet httpGet=new HttpGet(uri);
-        ResponseHandler<String> responseHandler=new BasicResponseHandler();
-        HttpClient httpClient =new DefaultHttpClient(httpParameters);
-
-        String response=httpClient.execute(httpGet, responseHandler);
-
-        return response;
+        return response.body().string();
     }
     public InputStream requestWithTempFile(String uri) throws IOException {
 

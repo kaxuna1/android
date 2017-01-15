@@ -309,6 +309,7 @@ public class MoviesPageFragment extends Fragment {
                 i.putExtra("imdb", selectedMovie.getImdb_id());
                 i.putExtra("lang", selectedMovie.getLang());
                 i.putExtra("time", 0);
+                i.putExtra("poster",selectedMovie.getPoster());
                 i.putExtra("Movie", selectedMovie);
                 startActivityForResult(i, 1);
 

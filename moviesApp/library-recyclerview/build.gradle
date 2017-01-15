@@ -5,12 +5,12 @@ repositories {
 }
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "20.0.0"
+    compileSdkVersion 25
+    buildToolsVersion '25.0.2'
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 22
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
     }
@@ -28,7 +28,7 @@ dependencies {
     //Annotation
     compile 'com.android.support:support-annotations:22.1.1'
     //Recycler View
-    compile 'com.android.support:recyclerview-v7:22.1.1'
+    compile 'com.android.support:recyclerview-v7:25.1.0'
 }
 
 // Used to update in Maven

@@ -5,7 +5,7 @@ import com.orm.SugarRecord;
 /**
  * Created by vakhtanggelashvili on 8/10/15.
  */
-public class HistoryModel extends SugarRecord<HistoryModel> {
+public class HistoryModel extends SugarRecord {
     int type;
     public String movieId;
     public String title_en;

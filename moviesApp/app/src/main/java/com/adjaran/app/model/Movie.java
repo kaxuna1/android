@@ -8,7 +8,7 @@ import java.util.ArrayList;
 /**
  * Created by KGelashvili on 7/10/2015.
  */
-public class Movie extends SugarRecord<Movie> implements Serializable {
+public class Movie extends SugarRecord implements Serializable {
     public String movieId;
     public String title_en;
     public String link;

@@ -34,7 +34,13 @@
             android:layout_weight="1"
             tools:context=".MainActivity" />
 
-
+        <fragment
+            android:id="@+id/castMiniController"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:visibility="gone"
+            class="com.google.android.gms.cast.framework.media.widget.MiniControllerFragment"/>
     </LinearLayout>
 
 </android.support.v4.widget.DrawerLayout>

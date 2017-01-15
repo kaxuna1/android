@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -43,6 +44,14 @@ import com.adjaran.app.model.HistoryModel;
 import com.adjaran.app.model.Movie;
 import com.adjaran.app.model.MovieSerieLastMomentModel;
 import com.adjaran.app.util.SystemUiHider;
+import com.adjaran.app.utils.MediaItem;
+import com.google.android.gms.cast.MediaInfo;
+import com.google.android.gms.cast.MediaMetadata;
+import com.google.android.gms.cast.framework.CastContext;
+import com.google.android.gms.cast.framework.CastSession;
+import com.google.android.gms.cast.framework.SessionManagerListener;
+import com.google.android.gms.cast.framework.media.RemoteMediaClient;
+import com.google.android.gms.common.images.WebImage;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -71,6 +80,7 @@ public class MoviePageActivity extends AppCompatActivity {
     String lang = null;
     VideoView videoView;
     String videourl = "";
+    String poster = "";
 
     String videoPath = "";
     int movieTime;
@@ -87,12 +97,13 @@ public class MoviePageActivity extends AppCompatActivity {
     Movie movie = null;
     private static Timer myTimer;
     MovieSerieLastMomentModel movieSerieLastMomentModel;
-    boolean fromFullScreen=false;
+    boolean fromFullScreen = false;
     File file1;
     public static final String LOG_TAG = "Android Downloader";
     int oldHeight;
     private SystemUiHider mSystemUiHider;
-
+    private MediaItem mSelectedMedia;
+    private static List<MediaItem> mediaList;
 
     //initialize our progress dialog/bar
     private ProgressDialog mProgressDialog;
@@ -105,21 +116,23 @@ public class MoviePageActivity extends AppCompatActivity {
     public String fileName = "codeofaninja.jpg";
     public String fileURL = "https://lh4.googleusercontent.com/-HiJOyupc-tQ/TgnDx1_HDzI/AAAAAAAAAWo/DEeOtnRimak/s800/DSC04158.JPG";
 
-    boolean contineuDownload=true;
+    boolean contineuDownload = true;
+    private CastContext mCastContext;
 
     public MoviePageActivity() {
     }
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,    WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
 
-            ViewGroup.LayoutParams params=((RelativeLayout) findViewById(R.id.relativeLayout4)).getLayoutParams();
-            oldHeight=params.height;
-            params.height=ViewGroup.LayoutParams.MATCH_PARENT;
-            params.width=ViewGroup.LayoutParams.MATCH_PARENT;
+            ViewGroup.LayoutParams params = ((RelativeLayout) findViewById(R.id.relativeLayout4)).getLayoutParams();
+            oldHeight = params.height;
+            params.height = ViewGroup.LayoutParams.MATCH_PARENT;
+            params.width = ViewGroup.LayoutParams.MATCH_PARENT;
             ((RelativeLayout) findViewById(R.id.relativeLayout4)).setLayoutParams(params);
 
             final View contentView = findViewById(R.id.myvideoview);
@@ -128,7 +141,7 @@ public class MoviePageActivity extends AppCompatActivity {
             mSystemUiHider.setOnVisibilityChangeListener(new SystemUiHider.OnVisibilityChangeListener() {
                 @Override
                 public void onVisibilityChange(boolean visible) {
-                    if(visible==true){
+                    if (visible == true) {
                         Handler mHideHandler = new Handler();
                         mHideHandler.removeCallbacks(mHideRunnable);
                         mHideHandler.postDelayed(mHideRunnable, 1000);
@@ -143,21 +156,23 @@ public class MoviePageActivity extends AppCompatActivity {
 
                 }
             });
-            ViewGroup.LayoutParams params=((RelativeLayout) findViewById(R.id.relativeLayout4)).getLayoutParams();
-            params.height=oldHeight;
-            params.width=ViewGroup.LayoutParams.MATCH_PARENT;
+            ViewGroup.LayoutParams params = ((RelativeLayout) findViewById(R.id.relativeLayout4)).getLayoutParams();
+            params.height = oldHeight;
+            params.width = ViewGroup.LayoutParams.MATCH_PARENT;
             ((RelativeLayout) findViewById(R.id.relativeLayout4)).setLayoutParams(params);
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
 
         }
     }
+
     Runnable mHideRunnable = new Runnable() {
         @Override
         public void run() {
             mSystemUiHider.hide();
         }
     };
+
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
@@ -169,10 +184,11 @@ public class MoviePageActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                        .setDefaultFontPath("fonts/bpg_square_mtavruli_2009.ttf")
-                        .setFontAttrId(R.attr.fontPath)
-                        .build()
+                .setDefaultFontPath("fonts/bpg_square_mtavruli_2009.ttf")
+                .setFontAttrId(R.attr.fontPath)
+                .build()
         );
+        mediaList = new ArrayList<>();
         progressDialog = ProgressDialog.show(MoviePageActivity.this, "", "მიმდინარეობს ჩატვირთვა", true);
         progressDialog.setCancelable(true);
         setContentView(R.layout.moviepagelayout);
@@ -185,7 +201,16 @@ public class MoviePageActivity extends AppCompatActivity {
             movieSerieLastMomentModel.time = 0;
             movieSerieLastMomentModel.save();
         }
-        movieTime=movieSerieLastMomentModel.getTime();
+        movieTime = movieSerieLastMomentModel.getTime();
+        setupCastListener();
+        mCastContext = CastContext.getSharedInstance(this);
+        mCastContext.registerLifecycleCallbacksBeforeIceCreamSandwich(this, savedInstanceState);
+
+        mCastSession = mCastContext.getSessionManager().getCurrentCastSession();
+        if (mCastSession != null)
+            if (mCastSession.isConnected()) {
+                Toast.makeText(MoviePageActivity.this, "თქვენ დაკავშირებული ხართ google cast მოწყობილობასთან!", Toast.LENGTH_LONG).show();
+            }
 
         playButton = (ImageButton) findViewById(R.id.play_button);
         playButton.setOnClickListener(new View.OnClickListener() {
@@ -194,7 +219,9 @@ public class MoviePageActivity extends AppCompatActivity {
                 Toast.makeText(MoviePageActivity.this, "მიმდინარეობს ფილმის ჩატვირთვა", Toast.LENGTH_LONG).show();
             }
         });
-        ((mehdi.sakout.fancybuttons.FancyButton)findViewById(R.id.fullScreenButton)).setOnClickListener(new View.OnClickListener() {
+
+
+        ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.fullScreenButton)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
@@ -203,10 +230,86 @@ public class MoviePageActivity extends AppCompatActivity {
         startVideoPlaying();
     }
 
+    private CastSession mCastSession;
+    private SessionManagerListener<CastSession> mSessionManagerListener;
+
+    private void setupCastListener() {
+        mSessionManagerListener = new SessionManagerListener<CastSession>() {
+
+            @Override
+            public void onSessionEnded(CastSession session, int error) {
+                onApplicationDisconnected();
+            }
+
+            @Override
+            public void onSessionResumed(CastSession session, boolean wasSuspended) {
+                onApplicationConnected(session);
+            }
+
+            @Override
+            public void onSessionResumeFailed(CastSession session, int error) {
+                onApplicationDisconnected();
+            }
+
+            @Override
+            public void onSessionStarted(CastSession session, String sessionId) {
+                onApplicationConnected(session);
+            }
+
+            @Override
+            public void onSessionStartFailed(CastSession session, int error) {
+                onApplicationDisconnected();
+            }
+
+            @Override
+            public void onSessionStarting(CastSession session) {
+            }
+
+            @Override
+            public void onSessionEnding(CastSession session) {
+            }
+
+            @Override
+            public void onSessionResuming(CastSession session, String sessionId) {
+            }
+
+            @Override
+            public void onSessionSuspended(CastSession session, int reason) {
+            }
+
+            private void onApplicationConnected(CastSession castSession) {
+                mCastSession = castSession;
+               /* if (null != mSelectedMedia) {
+
+                    if (mPlaybackState == PlaybackState.PLAYING) {
+                        mVideoView.pause();
+                        loadRemoteMedia(mSeekbar.getProgress(), true);
+                        finish();
+                        return;
+                    } else {
+                        mPlaybackState = PlaybackState.IDLE;
+                        updatePlaybackLocation(PlaybackLocation.REMOTE);
+                    }
+                }
+                updatePlayButton(mPlaybackState);*/
+                invalidateOptionsMenu();
+            }
+
+            private void onApplicationDisconnected() {
+               /* updatePlaybackLocation(PlaybackLocation.LOCAL);
+                mPlaybackState = PlaybackState.IDLE;
+                mLocation = PlaybackLocation.LOCAL;
+                updatePlayButton(mPlaybackState);*/
+                invalidateOptionsMenu();
+            }
+        };
+    }
+
 
     private void PlayVideo() {
         try {
             //videoView.setMediaController(mediaController);
+
 
             videoView.setVideoURI(Uri.parse(videourl));
             videoView.requestFocus();
@@ -214,48 +317,89 @@ public class MoviePageActivity extends AppCompatActivity {
 
                 public void onPrepared(MediaPlayer mp) {
 
-                    playButton.setVisibility(View.GONE);
-                    videoView.seekTo(movieSerieLastMomentModel.getTime());
-                    videoView.start();
-                    if (progressDialog != null)
-                        if (progressDialog.isShowing())
-                            progressDialog.dismiss();
-                    final Bundle extras = getIntent().getExtras();
-                    myTimer = new Timer();
-                    myTimer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            movieSerieLastMomentModel.time = videoView.getCurrentPosition();
-                            movieSerieLastMomentModel.save();
+                    if (mCastSession != null) {
+                        if (mCastSession.isConnected()) {
+
+                            final RemoteMediaClient remoteMediaClient = mCastSession.getRemoteMediaClient();
+                            remoteMediaClient.addListener(new RemoteMediaClient.Listener() {
+                                @Override
+                                public void onStatusUpdated() {
+                                    Intent intent = new Intent(MoviePageActivity.this, ExpandedControlsActivity.class);
+                                    startActivity(intent);
+                                    remoteMediaClient.removeListener(this);
+                                }
+
+                                @Override
+                                public void onMetadataUpdated() {
+                                }
+
+                                @Override
+                                public void onQueueStatusUpdated() {
+                                }
+
+                                @Override
+                                public void onPreloadStatusUpdated() {
+                                }
+
+                                @Override
+                                public void onSendingRemoteMediaRequest() {
+                                }
+
+                                @Override
+                                public void onAdBreakStatusUpdated() {
+
+                                }
+                            });
+                            remoteMediaClient.load(buildMediaInfo(mp.getDuration()), true, 0);
+
                         }
+                    } else {
+                        playButton.setVisibility(View.GONE);
+                        videoView.seekTo(movieSerieLastMomentModel.getTime());
+                        videoView.start();
+                        if (progressDialog != null)
+                            if (progressDialog.isShowing())
+                                progressDialog.dismiss();
+                        final Bundle extras = getIntent().getExtras();
+                        myTimer = new Timer();
+                        myTimer.schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                movieSerieLastMomentModel.time = videoView.getCurrentPosition();
+                                movieSerieLastMomentModel.save();
+                            }
 
-                    }, 0, 1000);
-                    videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-                        @Override
-                        public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
-                            movieTime = mediaPlayer.getCurrentPosition();
+                        }, 0, 1000);
+                        videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                            @Override
+                            public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
+                                movieTime = mediaPlayer.getCurrentPosition();
 
-                            PlayVideo();
+                                PlayVideo();
 
-                            return true;
-                        }
-                    });
-                    ScrollViewExt scrollViewExt = (ScrollViewExt) findViewById(R.id.scrollView2);
+                                return true;
+                            }
+                        });
+                        ScrollViewExt scrollViewExt = (ScrollViewExt) findViewById(R.id.scrollView2);
 
-                    final MediaController mediaController = new MediaController(MoviePageActivity.this, true);
+                        final MediaController mediaController = new MediaController(MoviePageActivity.this, true);
 
-                    scrollViewExt.setScrollViewListener(new ScrollViewListener() {
-                        @Override
-                        public void onScrollChanged(ScrollViewExt scrollView, int x, int y, int oldx, int oldy) {
-                            mediaController.hide();
-                        }
-                    });
-                    mediaController.setAnchorView(videoView);
-                    videoView.setMediaController(mediaController);
+                        scrollViewExt.setScrollViewListener(new ScrollViewListener() {
+                            @Override
+                            public void onScrollChanged(ScrollViewExt scrollView, int x, int y, int oldx, int oldy) {
+                                mediaController.hide();
+                            }
+                        });
+                        mediaController.setAnchorView(videoView);
+                        videoView.setMediaController(mediaController);
+
+                    }
+
 
 
                 }
             });
+
 
         } catch (Exception e) {
             finish();
@@ -335,8 +479,8 @@ public class MoviePageActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
                         playButton.setVisibility(View.GONE);
-                        progressDialog = ProgressDialog.show(MoviePageActivity.this, "", "მიმდინარეობს ჩატვირთვა", true);
-                        progressDialog.setCancelable(true);
+                        //     progressDialog = ProgressDialog.show(MoviePageActivity.this, "", "მიმდინარეობს ჩატვირთვა", true);
+                        //      progressDialog.setCancelable(true);
                         PlayVideo();
                     }
                 });
@@ -395,7 +539,7 @@ public class MoviePageActivity extends AppCompatActivity {
                                         .resize(184, 276).into((ImageView) viewImage);
                             }
                         })
-                                //.setupSupplementalActions(R.layout.carddemo_native_material_supplemental_actions_large_icon, actions)
+                        //.setupSupplementalActions(R.layout.carddemo_native_material_supplemental_actions_large_icon, actions)
                         .build();
 
 
@@ -445,7 +589,7 @@ public class MoviePageActivity extends AppCompatActivity {
                                         .into((ImageView) viewImage);
                             }
                         })
-                                //.setupSupplementalActions(R.layout.carddemo_native_material_supplemental_actions_large_icon, actions)
+                        //.setupSupplementalActions(R.layout.carddemo_native_material_supplemental_actions_large_icon, actions)
                         .build();
 
 
@@ -469,14 +613,14 @@ public class MoviePageActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         movieTime = resultCode;
-        fromFullScreen=true;
+        fromFullScreen = true;
         super.onActivityResult(requestCode, resultCode, data);
 
 
     }
 
     public void onBackPressed() {
-        if(this.getResources().getConfiguration().orientation==Configuration.ORIENTATION_LANDSCAPE){
+        if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             return;
         }
@@ -535,6 +679,7 @@ public class MoviePageActivity extends AppCompatActivity {
         tabHost.addTab(tabSpec);
 
         langs = extras.getString("lang");
+        poster = extras.getString("poster");
 
         castLayout = (LinearLayout) findViewById(R.id.actorsLayout);
         relatedLayout = (LinearLayout) findViewById(R.id.relatedMoviesLayout);
@@ -580,7 +725,7 @@ public class MoviePageActivity extends AppCompatActivity {
                                 videourl = videoPath + value + "_" +
                                         lang + "_" + quality.split(",")[0] + ".mp4";
                                 String url = videourl;
-                                fileName=movie.getTitle_en()+".mp4";
+                                fileName = movie.getTitle_en() + ".mp4";
                                 checkAndCreateDirectory("/Movies");
                                 Log.d("downloadLink", url);
                                 new DownloadFileAsync().execute(url);
@@ -722,10 +867,11 @@ public class MoviePageActivity extends AppCompatActivity {
         //playButton.setVisibility(View.VISIBLE);
         if (fromFullScreen) {
             PlayVideo();
-            fromFullScreen=false;
+            fromFullScreen = false;
         }
         //startVideoPlaying();
     }
+
     class DownloadFileAsync extends AsyncTask<String, String, String> {
 
         @Override
@@ -753,10 +899,10 @@ public class MoviePageActivity extends AppCompatActivity {
 
                 //lenghtOfFile is used for calculating download progress
 
-                Log.d("filesize",""+lenghtOfFile);
+                Log.d("filesize", "" + lenghtOfFile);
 
                 //this is where the file will be seen after the download
-                String fileName2=rootDir + "/Movies/"+ fileName;
+                String fileName2 = rootDir + "/Movies/" + fileName;
 
                 file1 = new File(rootDir + "/Movies/", fileName);
                 FileOutputStream f = new FileOutputStream(file1);
@@ -767,13 +913,13 @@ public class MoviePageActivity extends AppCompatActivity {
                 byte[] buffer = new byte[1024];
                 int len1 = 0;
                 long total = 0;
-                contineuDownload=true;
+                contineuDownload = true;
                 while ((len1 = in.read(buffer)) > 0) {
-                    if(contineuDownload){
+                    if (contineuDownload) {
                         total += len1; //total = total + len1
-                        publishProgress("" + (int)((total*100)/lenghtOfFile));
+                        publishProgress("" + (int) ((total * 100) / lenghtOfFile));
                         f.write(buffer, 0, len1);
-                    }else{
+                    } else {
                         file1.delete();
                         break;
                     }
@@ -789,7 +935,7 @@ public class MoviePageActivity extends AppCompatActivity {
         }
 
         protected void onProgressUpdate(String... progress) {
-            Log.d(LOG_TAG,progress[0]);
+            Log.d(LOG_TAG, progress[0]);
             mProgressDialog.setProgress(Integer.parseInt(progress[0]));
 
         }
@@ -802,9 +948,9 @@ public class MoviePageActivity extends AppCompatActivity {
     }
 
     //function to verify if directory exists
-    public void checkAndCreateDirectory(String dirName){
-        File new_dir = new File( rootDir + dirName );
-        if( !new_dir.exists() ){
+    public void checkAndCreateDirectory(String dirName) {
+        File new_dir = new File(rootDir + dirName);
+        if (!new_dir.exists()) {
             new_dir.mkdirs();
         }
     }
@@ -839,7 +985,7 @@ public class MoviePageActivity extends AppCompatActivity {
                 mProgressDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
-                        if(contineuDownload){
+                        if (contineuDownload) {
                             mProgressDialog.show();
                         }
 
@@ -849,7 +995,7 @@ public class MoviePageActivity extends AppCompatActivity {
                     @Override
                     public void onCancel(DialogInterface dialog) {
 
-                        contineuDownload=false;
+                        contineuDownload = false;
                     }
                 });
                 mProgressDialog.show();
@@ -858,6 +1004,27 @@ public class MoviePageActivity extends AppCompatActivity {
                 return null;
         }
 
+    }
+
+
+    private MediaInfo buildMediaInfo(long dur) {
+
+    /*    MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        Uri uri = Uri.parse(videourl);
+        retriever.setDataSource(this.getApplicationContext(), uri);
+        String dur = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+*/
+
+        MediaMetadata movieMetadata = new MediaMetadata(MediaMetadata.MEDIA_TYPE_MOVIE);
+        //movieMetadata.addImage(new WebImage(Uri.parse(poster)));
+        movieMetadata.putString(MediaMetadata.KEY_TITLE, movie.getTitle_en());
+        movieMetadata.addImage(new WebImage(Uri.parse(movie.getPoster())));
+        return new MediaInfo.Builder(videourl)
+                .setStreamType(MediaInfo.STREAM_TYPE_BUFFERED)
+                .setContentType("videos/mp4")
+                .setMetadata(movieMetadata)
+                .setStreamDuration(dur)
+                .build();
     }
 
 }
