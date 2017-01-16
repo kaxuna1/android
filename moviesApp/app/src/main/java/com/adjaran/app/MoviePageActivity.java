@@ -1,6 +1,5 @@
 package com.adjaran.app;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -9,7 +8,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.media.MediaMetadataRetriever;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -53,6 +55,7 @@ import com.google.android.gms.cast.framework.SessionManagerListener;
 import com.google.android.gms.cast.framework.media.RemoteMediaClient;
 import com.google.android.gms.common.images.WebImage;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -64,9 +67,12 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import fm.jiecao.jcvideoplayer_lib.JCVideoPlayer;
+import fm.jiecao.jcvideoplayer_lib.JCVideoPlayerStandard;
 import it.gmariotti.cardslib.library.cards.material.MaterialLargeImageCard;
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.view.CardViewNative;
+import mehdi.sakout.fancybuttons.FancyButton;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -88,7 +94,6 @@ public class MoviePageActivity extends AppCompatActivity {
     LinearLayout castLayout;
     LinearLayout relatedLayout;
     TabHost tabHost = null;
-    ImageButton playButton = null;
     TextView director = null;
     String directorText = "";
     TextView gener = null;
@@ -116,8 +121,14 @@ public class MoviePageActivity extends AppCompatActivity {
     public String fileName = "codeofaninja.jpg";
     public String fileURL = "https://lh4.googleusercontent.com/-HiJOyupc-tQ/TgnDx1_HDzI/AAAAAAAAAWo/DEeOtnRimak/s800/DSC04158.JPG";
 
+
+    JCVideoPlayerStandard jCVideoPlayer;
     boolean contineuDownload = true;
     private CastContext mCastContext;
+
+    JCVideoPlayer.JCAutoFullscreenListener sensorEventListener;
+    SensorManager sensorManager;
+
 
     public MoviePageActivity() {
     }
@@ -188,10 +199,16 @@ public class MoviePageActivity extends AppCompatActivity {
                 .setFontAttrId(R.attr.fontPath)
                 .build()
         );
+
+
         mediaList = new ArrayList<>();
         progressDialog = ProgressDialog.show(MoviePageActivity.this, "", "მიმდინარეობს ჩატვირთვა", true);
         progressDialog.setCancelable(true);
         setContentView(R.layout.moviepagelayout);
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        sensorEventListener = new JCVideoPlayer.JCAutoFullscreenListener();
+        jCVideoPlayer = (JCVideoPlayerStandard) findViewById(R.id.myvideoview);
+
         movie = (Movie) getIntent().getSerializableExtra("Movie");
         List<MovieSerieLastMomentModel> movieSerieLastMomentModels = MovieSerieLastMomentModel.find(MovieSerieLastMomentModel.class, "movie_id = '" + movie.getMovieId() + "'");
         if (movieSerieLastMomentModels.size() > 0) {
@@ -212,22 +229,11 @@ public class MoviePageActivity extends AppCompatActivity {
                 Toast.makeText(MoviePageActivity.this, "თქვენ დაკავშირებული ხართ google cast მოწყობილობასთან!", Toast.LENGTH_LONG).show();
             }
 
-        playButton = (ImageButton) findViewById(R.id.play_button);
-        playButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(MoviePageActivity.this, "მიმდინარეობს ფილმის ჩატვირთვა", Toast.LENGTH_LONG).show();
-            }
-        });
 
-
-        ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.fullScreenButton)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-            }
-        });
         startVideoPlaying();
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+
     }
 
     private CastSession mCastSession;
@@ -311,7 +317,26 @@ public class MoviePageActivity extends AppCompatActivity {
             //videoView.setMediaController(mediaController);
 
 
-            videoView.setVideoURI(Uri.parse(videourl));
+            Picasso.with(this).load(movie.getPoster()).into(new Target() {
+                @Override
+                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                    jCVideoPlayer.setUp(videourl
+                            , JCVideoPlayerStandard.SCREEN_LAYOUT_NORMAL, movie.getTitle_en());
+                    jCVideoPlayer.thumbImageView.setImageBitmap(bitmap);
+                }
+
+                @Override
+                public void onBitmapFailed(Drawable errorDrawable) {
+
+                }
+
+                @Override
+                public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                }
+            });
+
+            /*videoView.setVideoURI(Uri.parse(videourl));
             videoView.requestFocus();
             videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
 
@@ -396,10 +421,9 @@ public class MoviePageActivity extends AppCompatActivity {
                     }
 
 
-
                 }
             });
-
+*/
 
         } catch (Exception e) {
             finish();
@@ -428,6 +452,13 @@ public class MoviePageActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
     }
 
     class getMovieActorsAsync extends AsyncTask<String, ArrayList<Actor>, ArrayList<Actor>> {
@@ -475,15 +506,7 @@ public class MoviePageActivity extends AppCompatActivity {
                 //PlayVideo();
                 director.setText("რეჟისორი: " + directorText);
                 gener.setText(generText);
-                playButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        playButton.setVisibility(View.GONE);
-                        //     progressDialog = ProgressDialog.show(MoviePageActivity.this, "", "მიმდინარეობს ჩატვირთვა", true);
-                        //      progressDialog.setCancelable(true);
-                        PlayVideo();
-                    }
-                });
+                PlayVideo();
                 if (progressDialog != null)
                     if (progressDialog.isShowing())
                         progressDialog.dismiss();
@@ -620,6 +643,9 @@ public class MoviePageActivity extends AppCompatActivity {
     }
 
     public void onBackPressed() {
+        if (jCVideoPlayer.backPress()) {
+            return;
+        }
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             return;
@@ -688,7 +714,7 @@ public class MoviePageActivity extends AppCompatActivity {
 
         final String value = extras.getString("movieId");
         movieId = extras.getString("movieId");
-        ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.watchLaterBtn)).setOnClickListener(new View.OnClickListener() {
+        ((FancyButton) findViewById(R.id.watchLaterBtn)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 List<Movie> movieList = Movie.find(Movie.class, "movie_id = '" + movie.getMovieId() + "'");
@@ -701,43 +727,7 @@ public class MoviePageActivity extends AppCompatActivity {
                 }
             }
         });
-        ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.downloadButtonSerie)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
 
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(MoviePageActivity.this);
-                builder.setTitle("აირჩიეთ ენა")
-                        .setItems(langs.split(","), new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                movieTime = videoView.getCurrentPosition();
-                                if (myTimer != null) {
-                                    myTimer.cancel();
-                                    myTimer.purge();
-                                }
-
-                                movieSerieLastMomentModel.setTime(movieSerieLastMomentModel.getTime());
-                                movieSerieLastMomentModel.save();
-                                if (currentQuality == null) {
-                                    currentQuality = quality.split(",")[0];
-                                }
-                                lang = langs.split(",")[which];
-                                videourl = videoPath + value + "_" +
-                                        lang + "_" + quality.split(",")[0] + ".mp4";
-                                String url = videourl;
-                                fileName = movie.getTitle_en() + ".mp4";
-                                checkAndCreateDirectory("/Movies");
-                                Log.d("downloadLink", url);
-                                new DownloadFileAsync().execute(url);
-
-                            }
-                        });
-                builder.create();
-                builder.show();
-
-
-            }
-        });
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -745,7 +735,7 @@ public class MoviePageActivity extends AppCompatActivity {
                 new getMovieRelated().doInBackground(extras.getString("movieId"));
             }
         }).start();
-        ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.langBtnSerie)).setOnClickListener(new View.OnClickListener() {
+        ((FancyButton) findViewById(R.id.langBtnSerie)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -753,7 +743,7 @@ public class MoviePageActivity extends AppCompatActivity {
                 builder.setTitle("აირჩიეთ ენა")
                         .setItems(langs.split(","), new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                movieTime = videoView.getCurrentPosition();
+                                movieTime = 0;
                                 if (myTimer != null) {
                                     myTimer.cancel();
                                     myTimer.purge();
@@ -777,7 +767,7 @@ public class MoviePageActivity extends AppCompatActivity {
                 builder.show();
             }
         });
-        ((mehdi.sakout.fancybuttons.FancyButton) findViewById(R.id.qualBtn)).setOnClickListener(new View.OnClickListener() {
+        ((FancyButton) findViewById(R.id.qualBtn)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MoviePageActivity.this);
@@ -825,7 +815,7 @@ public class MoviePageActivity extends AppCompatActivity {
         movieTime = extras.getInt("time");
 
 
-        videoView = (VideoView) findViewById(R.id.myvideoview);
+        //videoView = (VideoView) findViewById(R.id.myvideoview);
 
 
         webView = (WebView) findViewById(R.id.webView1);
@@ -836,7 +826,14 @@ public class MoviePageActivity extends AppCompatActivity {
     }
 
     public void stopVideoPlaying() {
-        videoView.pause();
+        //videoView.pause();
+
+        if (jCVideoPlayer.currentState == JCVideoPlayer.CURRENT_STATE_PLAYING) {
+            jCVideoPlayer.startButton.performClick ();
+        } else
+        if (jCVideoPlayer.currentState == JCVideoPlayer.CURRENT_STATE_PAUSE) {
+            //TODO
+        }
         if (myTimer != null) {
             myTimer.cancel();
             myTimer.purge();
@@ -847,12 +844,15 @@ public class MoviePageActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         stopVideoPlaying();
+        sensorManager.unregisterListener(sensorEventListener);
+
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         stopVideoPlaying();
+
     }
 
     @Override
@@ -865,6 +865,9 @@ public class MoviePageActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         //playButton.setVisibility(View.VISIBLE);
+        Sensor accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        sensorManager.registerListener(sensorEventListener, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
+
         if (fromFullScreen) {
             PlayVideo();
             fromFullScreen = false;

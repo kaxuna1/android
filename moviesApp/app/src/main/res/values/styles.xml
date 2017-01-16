@@ -9,6 +9,7 @@
         <!--   your app branding color for the app bar -->
 
 
+
     </style>
 
     <style name="FullscreenTheme" parent="android:Theme.NoTitleBar">
